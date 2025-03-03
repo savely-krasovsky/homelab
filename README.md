@@ -3,7 +3,9 @@
 - Uses immutable, atomic OS provisioned on Proxmox VE node as base.
 - Uses rootless Podman instead of rootful Docker.
 - Uses Quadlets systemd-like containers instead of Docker Compose.
-- VM can be fully removed and restored within 3 minutes, including containers autostart.
+- VM can be fully removed and re-provisioned again within 3 minutes, including containers autostart.
+- Provisioning of everything done using Terraform/OpenTofu.
+- Secrets provided using Bitwarden Secrets Manager.
 - Source IP is preserved using [systemd socket activation](https://github.com/eriksjolund/podman-networking-docs?tab=readme-ov-file#socket-activation-systemd-user-service) mechanism.
 - Native network performance for the reason above.
 - Stores Podman and applications data on dedicated iSCSI disk.

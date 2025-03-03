@@ -72,14 +72,16 @@ storage:
 
   files:
     # Shared network for all published services
-    - path: /var/home/core/.config/containers/systemd/reverse-proxy.network
+%{ for name, content in networks ~}
+    - path: /var/home/core/.config/containers/systemd/${name}.network
       contents:
         inline: |
-          [Network]
+          ${indent(10, content)}
       user:
         name: core
       group:
         name: core
+%{ endfor ~}
 
     # http and https sockets for traefik
     - path: /var/home/core/.config/systemd/user/http.socket
@@ -174,7 +176,7 @@ systemd:
         [Service]
         Type=oneshot
         RemainAfterExit=yes
-        ExecStart=/usr/bin/rpm-ostree install --allow-inactive --assumeyes --reboot qemu-guest-agent unzip intel-gpu-tools podman-compose
+        ExecStart=/usr/bin/rpm-ostree install --allow-inactive --assumeyes --reboot qemu-guest-agent intel-gpu-tools
         ExecStart=/bin/touch /var/lib/%N.stamp
 
         [Install]

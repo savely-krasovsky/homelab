@@ -1,13 +1,21 @@
 locals {
   butane_config = merge(var.fcos_config, {
     quadlets = local.quadlets
+    networks = local.networks
   })
 
   # Get a list of all files in the specified directory
-  quadlet_paths = fileset(path.module, "quadlets/*")
+  quadlet_paths = fileset(path.module, "quadlets/**")
   quadlets = {
     for path in local.quadlet_paths :
     replace(basename(path), ".container.tftpl", "") => templatefile(path, var.quadlets_config)
+  }
+
+  # Same with networks
+  network_paths = fileset(path.module, "networks/*")
+  networks = {
+    for path in local.network_paths :
+    replace(basename(path), ".network", "") => file(path)
   }
 
   # Bitwarden Secret Manager Secret IDs
@@ -18,6 +26,10 @@ locals {
     pocket-id-maxmind-license-key      = "08c549a4-bf48-4998-8cb0-b29200ac845d"
     actual-budget-openid-client-secret = "5754702b-d9d5-4127-b5ab-b29200abdd6a"
     open-webui-oauth-client-secret     = "b595040b-a23a-44af-8bff-b29200ad6258"
+    hoarder-oauth-client-secret        = "784d379b-bcaf-424f-bc77-b29500ff1be6"
+    hoarder-openai-api-key             = "98f5ccdf-d4b1-4883-b4e3-b295010ba589"
+    meili-master-key                   = "a67874c5-95c2-4f7a-b335-b295010010e0"
+    nextauth-secret                    = "94b4b746-f005-46e0-b60a-b29501010c06"
   }
 
   init_script_path = "${path.module}/scripts/init_fcos.sh.tftpl"
@@ -43,6 +55,8 @@ resource "proxmox_virtual_environment_vm" "fcos" {
 
   cpu {
     cores = 4
+    affinity = "26-29"
+    type = "host"
   }
 
   memory {

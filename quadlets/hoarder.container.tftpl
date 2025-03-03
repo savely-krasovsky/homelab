@@ -1,0 +1,40 @@
+[Unit]
+Description=Hoarder Web Quadlet
+
+[Container]
+Image=ghcr.io/hoarder-app/hoarder:release
+AutoUpdate=registry
+ContainerName=hoarder
+
+Environment=MEILI_ADDR=http://meilisearch:7700
+Environment=BROWSER_WEB_URL=http://chrome:9222
+Environment=NEXTAUTH_URL=https://hoarder.${base_domain}/api/auth
+Environment=DATA_DIR=/data
+Environment=DISABLE_PASSWORD_AUTH=true
+Environment=OAUTH_WELLKNOWN_URL=https://id.${base_domain}/.well-known/openid-configuration
+Environment=OAUTH_CLIENT_ID=415213ad-ceba-4601-a6ab-1e99fa7ed80b
+Environment=OAUTH_PROVIDER_NAME="Pocket ID"
+Environment=OPENAI_BASE_URL=https://openrouter.ai/api/v1
+Environment=CRAWLER_FULL_PAGE_SCREENSHOT=true
+Environment=CRAWLER_FULL_PAGE_ARCHIVE=true
+Environment=CRAWLER_VIDEO_DOWNLOAD=true
+Environment=OCR_LANGS=eng,rus
+Secret=nextauth-secret,type=env,target=NEXTAUTH_SECRET
+Secret=meili-master-key,type=env,target=MEILI_MASTER_KEY
+Secret=hoarder-oauth-client-secret,type=env,target=OAUTH_CLIENT_SECRET
+Secret=hoarder-openai-api-key,type=env,target=OPENAI_API_KEY
+
+Label="traefik.enable=true"
+Label="traefik.http.routers.hoarder.rule=Host(`hoarder.${base_domain}`)"
+
+Volume=/var/mnt/docker/app_data/hoarder:/data:Z
+
+Network=reverse-proxy.network
+Network=hoarder.network
+
+[Service]
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target

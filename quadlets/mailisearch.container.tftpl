@@ -1,0 +1,21 @@
+[Unit]
+Description=Meilisearch Quadlet
+
+[Container]
+Image=docker.io/getmeili/meilisearch:v1
+AutoUpdate=registry
+ContainerName=meilisearch
+
+Environment=MEILI_NO_ANALYTICS=true
+Secret=meili-master-key,type=env,target=MEILI_MASTER_KEY
+
+Volume=/var/mnt/docker/app_data/meilisearch:/meili_data:Z
+
+Network=hoarder.network
+
+[Service]
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target

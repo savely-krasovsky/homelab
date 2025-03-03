@@ -1,0 +1,273 @@
+variant: fcos
+version: 1.5.0
+
+passwd:
+  users:
+    - name: core
+      ssh_authorized_keys:
+        - ${ssh_key}
+
+storage:
+  directories:
+    - path: /var/home/core/.config
+      user:
+        name: core
+      group:
+        name: core
+
+    # Quadlets dir
+    - path: /var/home/core/.config/containers
+      user:
+        name: core
+      group:
+        name: core
+    - path: /var/home/core/.config/containers/systemd
+      user:
+        name: core
+      group:
+        name: core
+
+    # Systemd user dir
+    - path: /var/home/core/.config/systemd
+      user:
+        name: core
+      group:
+        name: core
+    - path: /var/home/core/.config/systemd/user
+      user:
+        name: core
+      group:
+        name: core
+
+  links:
+    # Enable Podman socket for Traefik
+    - path: /var/home/core/.config/systemd/user/timers.target.wants/podman.socket
+      target: /usr/lib/systemd/user/podman.socket
+      user:
+        name: core
+      group:
+        name: core
+
+    # Enable http and https sockets for traefik
+    - path: /var/home/core/.config/systemd/user/timers.target.wants/http.socket
+      target: /var/home/core/.config/systemd/user/http.socket
+      user:
+        name: core
+      group:
+        name: core
+    - path: /var/home/core/.config/systemd/user/timers.target.wants/https.socket
+      target: /var/home/core/.config/systemd/user/https.socket
+      user:
+        name: core
+      group:
+        name: core
+
+    # Enable Podman auto updates
+    - path: /var/home/core/.config/systemd/user/timers.target.wants/podman-auto-update.timer
+      target: /usr/lib/systemd/user/podman-auto-update.timer
+      user:
+        name: core
+      group:
+        name: core
+
+  files:
+    # Shared network for all published services
+    - path: /var/home/core/.config/containers/systemd/reverse-proxy.network
+      contents:
+        inline: |
+          [Network]
+      user:
+        name: core
+      group:
+        name: core
+
+    # http and https sockets for traefik
+    - path: /var/home/core/.config/systemd/user/http.socket
+      contents:
+        inline: |
+          [Socket]
+          ListenStream=${ip}:8080
+          FileDescriptorName=web
+          Service=traefik.service
+
+          [Install]
+          WantedBy=sockets.target
+      user:
+        name: core
+      group:
+        name: core
+    - path: /var/home/core/.config/systemd/user/https.socket
+      contents:
+        inline: |
+          [Socket]
+          ListenStream=${ip}:8443
+          FileDescriptorName=websecure
+          Service=traefik.service
+
+          [Install]
+          WantedBy=sockets.target
+      user:
+        name: core
+      group:
+        name: core
+
+    - path: /etc/containers/storage.conf
+      contents:
+        inline: |
+          [storage]
+          driver = "overlay"
+          rootless_storage_path = "/var/mnt/docker/$USER"
+
+    # Quadlets block
+%{ for name, content in quadlets ~}
+    - path: /var/home/core/.config/containers/systemd/${name}.container
+      contents:
+        inline: |
+          ${indent(10, content)}
+      user:
+        name: core
+      group:
+        name: core
+%{ endfor ~}
+
+    # Enable linger so containers can continue to run even after core user logouts
+    - path: /var/lib/systemd/linger/core
+
+    # Set machine hostname
+    - path: /etc/hostname
+      contents:
+        inline: ${hostname}
+
+    # Configure iSCSI target
+    - path: /etc/iscsi/iscsid.conf
+      overwrite: true
+      contents:
+        inline: |
+          node.startup = automatic
+          isns.address = ${truenas_ip}
+          isns.port = 3260
+
+    # Import Step CA root certificate
+    - path: /etc/pki/ca-trust/source/anchors/step-online-ca.pem
+      contents:
+        inline: |
+          ${indent(10, root_ca)}
+
+    # Enable zram swap
+    - path: /etc/systemd/zram-generator.conf
+      contents:
+        inline: |
+          [zram0]
+
+systemd:
+  units:
+    - name: install-additional-software.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Additional software installer
+        Wants=network-online.target
+        After=network-online.target
+        Before=zincati.service
+        ConditionPathExists=!/var/lib/%N.stamp
+
+        [Service]
+        Type=oneshot
+        RemainAfterExit=yes
+        ExecStart=/usr/bin/rpm-ostree install --allow-inactive --assumeyes --reboot qemu-guest-agent unzip intel-gpu-tools podman-compose
+        ExecStart=/bin/touch /var/lib/%N.stamp
+
+        [Install]
+        WantedBy=multi-user.target
+
+    - name: iscsi.service
+      enabled: true
+
+    - name: attach-iscsi-disk.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Attach iSCSI disk
+        ConditionFirstBoot=yes
+        Wants=network-online.target
+        After=network-online.target iscsi.service
+
+        [Service]
+        Type=oneshot
+        RemainAfterExit=yes
+        ExecStart=/usr/sbin/iscsiadm -m discovery -t sendtargets -p ${truenas_ip}
+        ExecStart=/usr/sbin/iscsiadm -m node -T ${truenas_iqn} -p ${truenas_ip} --login
+        ExecStart=/usr/sbin/lvmdevices --adddev /dev/sda
+        ExecStart=/usr/sbin/vgchange -ay
+
+        [Install]
+        WantedBy=multi-user.target
+
+    - name: var-mnt-docker.mount
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Mount docker directory
+        Before=remote-fs.target
+        Wants=network-online.target iscsi.service
+
+        [Mount]
+        What=/dev/vg0/lv0
+        Where=/var/mnt/docker
+        Type=xfs
+        Options=_netdev
+
+        [Install]
+        WantedBy=remote-fs.target
+
+    - name: podman-fix-selinux-context.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Fix SELinux context for Podman storage
+        Requires=var-mnt-docker.mount
+        After=var-mnt-docker.mount
+        ConditionPathExists=!/var/lib/%N.stamp
+
+        [Service]
+        Type=oneshot
+        RemainAfterExit=yes
+        ExecStart=/usr/bin/chcon -R -t container_file_t /var/mnt/docker/core
+        ExecStart=/bin/touch /var/lib/%N.stamp
+
+        [Install]
+        WantedBy=multi-user.target
+
+    - name: var-mnt-media.mount
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Mount media directory
+        Before=remote-fs.target
+
+        [Mount]
+        What=${truenas_ip}:/mnt/spool/media
+        Where=/var/mnt/media
+        Type=nfs
+
+        [Install]
+        WantedBy=remote-fs.target
+
+    - name: var-mnt-personal.mount
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Mount personal directory
+        Before=remote-fs.target
+
+        [Mount]
+        What=${truenas_ip}:/mnt/spool/personal
+        Where=/var/mnt/personal
+        Type=nfs
+
+        [Install]
+        WantedBy=remote-fs.target
+
+kernel_arguments:
+  should_exist:
+    - pcie_aspm.policy=powersupersave ip=${ip}::${gateway}:${mask}::enp6s18:none:${nameserver}

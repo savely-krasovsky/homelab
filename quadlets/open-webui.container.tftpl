@@ -1,0 +1,33 @@
+[Unit]
+Description=Open WebUI Quadlet
+
+[Container]
+Image=ghcr.io/open-webui/open-webui:main
+AutoUpdate=registry
+ContainerName=open-webui
+
+User=0:0
+
+Environment=WEBUI_URL=https://ai.${base_domain}
+Environment=ENABLE_LOGIN_FORM=False
+Environment=DEFAULT_LOCALE=ru
+Environment=CORS_ALLOW_ORIGIN=https://localhost
+Environment=ENABLE_OAUTH_SIGNUP=True
+Environment=OAUTH_CLIENT_ID=d4979561-8290-49c9-878e-0d325f7f06a6
+Environment=OPENID_PROVIDER_URL=https://id.${base_domain}/.well-known/openid-configuration
+Environment=OAUTH_PROVIDER_NAME="Pocket ID"
+Secret=open-webui-oauth-client-secret,type=env,target=OAUTH_CLIENT_SECRET
+
+Label="traefik.enable=true"
+Label="traefik.http.routers.open-webui.rule=Host(`ai.${base_domain}`)"
+
+Volume=/var/mnt/docker/app_data/open-webui:/app/backend/data:Z
+
+Network=reverse-proxy.network
+
+[Service]
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target

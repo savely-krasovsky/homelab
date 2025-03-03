@@ -1,0 +1,30 @@
+[Unit]
+Description=Smallstep step-ca Server Quadlet
+
+[Container]
+Image=docker.io/smallstep/step-ca:latest
+AutoUpdate=registry
+ContainerName=step-ca
+
+User=1000:1000
+UIDMap=+1000:@1000:1
+
+Label="traefik.enable=true"
+Label="traefik.tcp.routers.smallstep.rule=HostSNI(`ca.${base_domain}`)"
+Label="traefik.tcp.routers.smallstep.tls.passthrough=true"
+Label="traefik.tcp.services.smallstep.loadbalancer.server.port=9000"
+
+Environment=DOCKER_STEPCA_INIT_NAME=Homelab
+Environment=DOCKER_STEPCA_INIT_DNS_NAMES=ca.${base_domain}
+Environment=DOCKER_STEPCA_INIT_REMOTE_MANAGEMENT=true
+
+Volume=/var/mnt/docker/app_data/smallstep:/home/step:Z
+
+Network=reverse-proxy.network
+
+[Service]
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target

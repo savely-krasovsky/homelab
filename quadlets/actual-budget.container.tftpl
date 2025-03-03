@@ -1,0 +1,24 @@
+[Unit]
+Description=Actual Budget Quadlet
+
+[Container]
+Image=docker.io/actualbudget/actual-server:latest
+AutoUpdate=registry
+ContainerName=actual-budget
+
+User=1000:1000
+UIDMap=+1000:@1000:1
+
+Label="traefik.enable=true"
+Label="traefik.http.routers.actual-budget.rule=Host(`actual.${base_domain}`)"
+
+Volume=/var/mnt/docker/app_data/actual-budget:/data:Z
+
+Network=reverse-proxy.network
+
+[Service]
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target

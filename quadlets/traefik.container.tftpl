@@ -1,0 +1,41 @@
+[Unit]
+Description=Traefik Quadlet
+Requires=http.socket https.socket
+After=http.socket https.socket
+
+[Container]
+Image=docker.io/library/traefik
+AutoUpdate=registry
+ContainerName=traefik
+
+User=1000:1000
+UIDMap=+1000:@1000:1
+
+Environment=LEGO_DISABLE_CNAME_SUPPORT=true
+
+Label="traefik.enable=true"
+Label="traefik.http.routers.dashboard.rule=Host(`fcos.${base_domain}`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
+Label="traefik.http.routers.dashboard.service=api@internal"
+Label="traefik.http.routers.dashboard.middlewares=oauth2-proxy@file"
+Label="traefik.http.routers.dashboard-auth.rule=Host(`fcos.${base_domain}`) && PathPrefix(`/oauth2/`)"
+Label="traefik.http.routers.dashboard-auth.service=oauth2-proxy"
+
+Secret=traefik-cf-dns-api-token,type=env,target=CF_DNS_API_TOKEN
+
+Volume=/var/mnt/docker/app_data/traefik/traefik.yml:/etc/traefik/traefik.yml:Z
+Volume=/var/mnt/docker/app_data/traefik/data:/data:Z
+# requires user (!) podman.socket running
+Volume=%t/podman/podman.sock:/var/run/docker.sock
+
+Network=reverse-proxy.network
+Notify=true
+
+SecurityLabelDisable=true
+
+[Service]
+TimeoutStartSec=900
+Restart=always
+Sockets=http.socket https.socket
+
+[Install]
+WantedBy=multi-user.target default.target

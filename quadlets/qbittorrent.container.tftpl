@@ -1,0 +1,35 @@
+[Unit]
+Description=qBittorrent Quadlet
+
+[Container]
+Image=lscr.io/linuxserver/qbittorrent:latest
+AutoUpdate=registry
+ContainerName=qbittorrent
+
+UIDMap=+1000:@1000:1
+
+Label="traefik.enable=true"
+Label="traefik.http.routers.qbittorrent.rule=Host(`qb.${base_domain}`)"
+Label="traefik.http.services.qbittorrent.loadbalancer.server.port=8080"
+Label="traefik.http.routers.qbittorrent.middlewares=oauth2-proxy@file,strip-referer"
+Label="traefik.http.routers.qbittorrent-auth.rule=Host(`qb.${base_domain}`) && PathPrefix(`/oauth2/`)"
+Label="traefik.http.routers.qbittorrent-auth.service=oauth2-proxy"
+Label="traefik.http.middlewares.strip-referer.headers.customRequestHeaders.Referer="
+
+Environment=PUID=1000
+Environment=PGID=1000
+Environment=TZ=Europe/Belgrade
+Environment=WEBUI_PORT=8080
+Environment=TORRENTING_PORT=6881
+
+Volume=/var/mnt/docker/app_data/qbittorrent:/config:Z
+Volume=/var/mnt/media:/media:z
+
+Network=reverse-proxy.network
+
+[Service]
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target

@@ -1,0 +1,41 @@
+[Unit]
+Description=OAuth2 Proxy Quadlet
+# OAuth2 Proxy requests OIDC configuration after launch, Pocket-ID should be ready
+Wants=pocket-id.service
+After=pocket-id.service
+
+[Container]
+Image=quay.io/oauth2-proxy/oauth2-proxy:latest
+AutoUpdate=registry
+ContainerName=oauth2-proxy
+
+User=1000:1000
+
+Environment=OAUTH2_PROXY_HTTP_ADDRESS=0.0.0.0:4180
+Environment=OAUTH2_PROXY_PROVIDER=oidc
+Environment=OAUTH2_PROXY_OIDC_ISSUER_URL=https://id.${base_domain}
+Environment=OAUTH2_PROXY_EMAIL_DOMAINS=*
+Environment=OAUTH2_PROXY_CLIENT_ID=643ae98a-24a1-4c1d-9d0a-a102dd2fe38c
+Environment=OAUTH2_PROXY_COOKIE_SECURE=true
+Environment=OAUTH2_PROXY_REDIRECT_URL=https://oauth2-proxy.${base_domain}/oauth2/callback
+Environment=OAUTH2_PROXY_COOKIE_DOMAINS=.${base_domain}
+Environment=OAUTH2_PROXY_WHITELIST_DOMAINS=.${base_domain}
+Environment=OAUTH2_PROXY_COOKIE_REFRESH=0
+Environment=OAUTH2_PROXY_COOKIE_EXPIRE=59m
+Environment=OAUTH2_PROXY_REVERSE_PROXY=true
+Environment=OAUTH2_PROXY_UPSTREAMS=static://202
+Secret=oauth2-proxy-cookie-secret,type=env,target=OAUTH2_PROXY_COOKIE_SECRET
+Secret=oauth2-proxy-client-secret,type=env,target=OAUTH2_PROXY_CLIENT_SECRET
+
+Label="traefik.enable=true"
+Label="traefik.http.routers.oauth2-proxy.rule=Host(`oauth2-proxy.${base_domain}`)"
+Label="traefik.http.services.oauth2-proxy.loadbalancer.server.port=4180"
+
+Network=reverse-proxy.network
+
+[Service]
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target

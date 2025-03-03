@@ -1,0 +1,31 @@
+[Unit]
+Description=Plex Quadlet
+
+[Container]
+Image=docker.io/plexinc/pms-docker:plexpass
+AutoUpdate=registry
+ContainerName=plex
+
+Environment=PLEX_UID=1000
+Environment=PLEX_GID=1000
+Environment=TZ=Europe/Belgrade
+# In my setup source IP is not preserved for local network (due to SNAT hairpinning rule)
+Environment=ALLOWED_NETWORKS=192.168.100.1/32
+
+Volume=/var/mnt/docker/app_data/plex:/config:Z
+Volume=/var/mnt/media/tv_shows:/data/tv_shows:z
+Volume=/var/mnt/media/movies:/data/movies:z
+Volume=/var/mnt/media/music:/data/music:z
+Tmpfs=/transcode:size=8G,rw:Z
+
+# Host network for simplicity
+Network=host
+
+AddDevice=/dev/dri
+
+[Service]
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target

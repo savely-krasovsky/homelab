@@ -6,6 +6,9 @@ Image=docker.io/getmeili/meilisearch:v1
 AutoUpdate=registry
 ContainerName=meilisearch
 
+User=1000:1000
+UserNS=keep-id:uid=1000,gid=1000
+
 Environment=MEILI_NO_ANALYTICS=true
 Secret=meili-master-key,type=env,target=MEILI_MASTER_KEY
 

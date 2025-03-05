@@ -1,0 +1,6 @@
+[Unit]
+Description=Immich Pod
+
+[Pod]
+PodName=immich
+Network=immich.network

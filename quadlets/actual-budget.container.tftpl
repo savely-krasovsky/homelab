@@ -7,7 +7,7 @@ AutoUpdate=registry
 ContainerName=actual-budget
 
 User=1000:1000
-UIDMap=+1000:@1000:1
+UserNS=keep-id:uid=1000,gid=1000
 
 Label="traefik.enable=true"
 Label="traefik.http.routers.actual-budget.rule=Host(`actual.${base_domain}`)"

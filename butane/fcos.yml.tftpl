@@ -71,18 +71,6 @@ storage:
         name: core
 
   files:
-    # Shared network for all published services
-%{ for name, content in networks ~}
-    - path: /var/home/core/.config/containers/systemd/${name}.network
-      contents:
-        inline: |
-          ${indent(10, content)}
-      user:
-        name: core
-      group:
-        name: core
-%{ endfor ~}
-
     # http and https sockets for traefik
     - path: /var/home/core/.config/systemd/user/http.socket
       contents:
@@ -121,8 +109,8 @@ storage:
           rootless_storage_path = "/var/mnt/docker/$USER"
 
     # Quadlets block
-%{ for name, content in quadlets ~}
-    - path: /var/home/core/.config/containers/systemd/${name}.container
+%{ for name, content in quadlet_files ~}
+    - path: /var/home/core/.config/containers/systemd/${name}
       contents:
         inline: |
           ${indent(10, content)}

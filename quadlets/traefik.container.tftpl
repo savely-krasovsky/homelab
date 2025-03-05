@@ -9,7 +9,7 @@ AutoUpdate=registry
 ContainerName=traefik
 
 User=1000:1000
-UIDMap=+1000:@1000:1
+UserNS=keep-id:uid=1000,gid=1000
 
 Environment=LEGO_DISABLE_CNAME_SUPPORT=true
 

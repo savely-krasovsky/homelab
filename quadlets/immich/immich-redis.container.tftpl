@@ -1,0 +1,23 @@
+[Unit]
+Description=Immich Redis Quadlet
+
+[Container]
+Image=docker.io/redis:7-alpine
+AutoUpdate=registry
+ContainerName=immich-redis
+
+User=1000:1000
+UserNS=keep-id:uid=1000,gid=1000
+
+HealthCmd=redis-cli ping || exit 1
+
+Volume=/var/mnt/docker/app_data/immich/redis:/data:Z
+
+Pod=immich.pod
+
+[Service]
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target

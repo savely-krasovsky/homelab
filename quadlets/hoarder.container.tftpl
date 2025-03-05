@@ -6,6 +6,8 @@ Image=ghcr.io/hoarder-app/hoarder:release
 AutoUpdate=registry
 ContainerName=hoarder
 
+# Unfortunately Hoarder.app cannot fully under non-root user: https://github.com/hoarder-app/hoarder/issues/606
+
 Environment=MEILI_ADDR=http://meilisearch:7700
 Environment=BROWSER_WEB_URL=http://chrome:9222
 Environment=NEXTAUTH_URL=https://hoarder.${base_domain}/api/auth

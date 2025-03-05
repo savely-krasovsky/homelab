@@ -2,11 +2,12 @@
 Description=qBittorrent Quadlet
 
 [Container]
-Image=lscr.io/linuxserver/qbittorrent:latest
+Image=docker.io/qbittorrentofficial/qbittorrent-nox
 AutoUpdate=registry
 ContainerName=qbittorrent
 
-UIDMap=+1000:@1000:1
+User=1000:1000
+UserNS=keep-id:uid=1000,gid=1000
 
 Label="traefik.enable=true"
 Label="traefik.http.routers.qbittorrent.rule=Host(`qb.${base_domain}`)"
@@ -16,14 +17,15 @@ Label="traefik.http.routers.qbittorrent-auth.rule=Host(`qb.${base_domain}`) && P
 Label="traefik.http.routers.qbittorrent-auth.service=oauth2-proxy"
 Label="traefik.http.middlewares.strip-referer.headers.customRequestHeaders.Referer="
 
-Environment=PUID=1000
-Environment=PGID=1000
 Environment=TZ=Europe/Belgrade
-Environment=WEBUI_PORT=8080
-Environment=TORRENTING_PORT=6881
+Environment=QBT_LEGAL_NOTICE=confirm
+Environment=QBT_WEBUI_PORT=8080
 
 Volume=/var/mnt/docker/app_data/qbittorrent:/config:Z
 Volume=/var/mnt/media:/media:z
+
+PublishPort=6881:6881/tcp
+PublishPort=6881:6881/udp
 
 Network=reverse-proxy.network
 

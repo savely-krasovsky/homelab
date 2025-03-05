@@ -6,8 +6,8 @@ Image=ghcr.io/pocket-id/pocket-id:latest
 AutoUpdate=registry
 ContainerName=pocket-id
 
-User=0:0
-UIDMap="+1000:@1000:1"
+User=1000:1000
+UserNS=keep-id:uid=1000,gid=1000
 
 Environment=PUBLIC_APP_URL=https://id.${base_domain}
 Environment=PUID=1000

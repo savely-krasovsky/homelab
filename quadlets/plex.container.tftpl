@@ -6,6 +6,8 @@ Image=docker.io/plexinc/pms-docker:plexpass
 AutoUpdate=registry
 ContainerName=plex
 
+# Unfortunately plex cannot fully work under non-root user
+
 Environment=PLEX_UID=1000
 Environment=PLEX_GID=1000
 Environment=TZ=Europe/Belgrade

@@ -1,0 +1,25 @@
+[Unit]
+Description=Immich Machine Learning Quadlet
+
+[Container]
+Image=ghcr.io/immich-app/immich-machine-learning:release-openvino
+AutoUpdate=registry
+ContainerName=immich-machine-learning
+
+User=1000:1000
+UserNS=keep-id:uid=1000,gid=1000
+
+Volume=immich-model-cache:/cache
+Volume=immich-machine-learning:/usr/src/app/.config
+Volume=immich-machine-learning:/usr/src/app/.cache
+
+AddDevice=/dev/dri
+
+Pod=immich.pod
+
+[Service]
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target

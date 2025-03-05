@@ -6,7 +6,7 @@ Image=ghcr.io/open-webui/open-webui:main
 AutoUpdate=registry
 ContainerName=open-webui
 
-User=0:0
+# Unfortunately open-webui cannot work under non-root user
 
 Environment=WEBUI_URL=https://ai.${base_domain}
 Environment=ENABLE_LOGIN_FORM=False

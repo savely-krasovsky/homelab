@@ -35,6 +35,7 @@ HealthStartPeriod=5m
 Volume=/var/mnt/docker/app_data/immich/postgres:/var/lib/postgresql/data:Z
 
 Pod=immich.pod
+Notify=healthy
 
 [Service]
 TimeoutStartSec=900

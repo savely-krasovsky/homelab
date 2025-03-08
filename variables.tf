@@ -36,6 +36,9 @@ variable "quadlets_secret_config" {
     nextauth_secret                    = "94b4b746-f005-46e0-b60a-b29501010c06"
     immich_postgres_password           = "386f1adc-878f-4755-a06b-b29700b15cd0"
     immich_map_key                     = "b5735614-bc05-441d-a2e2-b29800d3b25c"
+    miniflux_postgres_password         = "1c6a587e-9dda-47de-953a-b29a01697231"
+    miniflux_database_url              = "456f8488-cdeb-4246-959d-b29a016be9ac"
+    miniflux_oauth2_client_secret      = "3bb3cedd-1ee4-4624-b865-b29a016c2318"
   }
 }
 

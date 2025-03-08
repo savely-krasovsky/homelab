@@ -14,6 +14,7 @@ HealthCmd=redis-cli ping || exit 1
 Volume=/var/mnt/docker/app_data/immich/redis:/data:Z
 
 Pod=immich.pod
+Notify=healthy
 
 [Service]
 TimeoutStartSec=900

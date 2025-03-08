@@ -1,0 +1,6 @@
+[Unit]
+Description=Miniflux Pod
+
+[Pod]
+PodName=miniflux
+Network=miniflux.network

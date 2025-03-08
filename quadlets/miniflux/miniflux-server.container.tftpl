@@ -1,0 +1,38 @@
+[Unit]
+Description=Miniflux Server Quadlet
+Wants=miniflux-postgres.service
+After=miniflux-postgres.service
+
+[Container]
+Image=docker.io/miniflux/miniflux:latest
+AutoUpdate=registry
+ContainerName=miniflux-server
+
+User=1000:1000
+UserNS=keep-id:uid=1000,gid=1000
+
+Environment=RUN_MIGRATIONS=1
+Environment=LOG_DATE_TIME=yes
+Environment=BASE_URL=https://miniflux2.${base_domain}
+Environment=OAUTH2_PROVIDER=oidc
+Environment=OAUTH2_CLIENT_ID=dd200088-7cdb-4b9a-95ba-ac6f46616aca
+Environment=OAUTH2_REDIRECT_URL=https://miniflux.${base_domain}/oauth2/oidc/callback
+Environment=OAUTH2_OIDC_DISCOVERY_ENDPOINT=https://id.${base_domain}
+Environment=OAUTH2_OIDC_PROVIDER_NAME="Pocket ID"
+Environment=OAUTH2_USER_CREATION=1
+Environment=DISABLE_LOCAL_AUTH=true
+Secret=miniflux-database-url,type=env,target=DATABASE_URL
+Secret=miniflux-oauth2-client-secret,type=env,target=OAUTH2_CLIENT_SECRET
+
+Label="traefik.enable=true"
+Label="traefik.http.routers.miniflux.rule=Host(`miniflux.${base_domain}`)"
+Label="traefik.http.services.miniflux.loadbalancer.server.port=8080"
+
+Pod=miniflux.pod
+
+[Service]
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target

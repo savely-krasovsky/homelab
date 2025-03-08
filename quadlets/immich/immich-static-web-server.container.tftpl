@@ -1,0 +1,28 @@
+[Unit]
+Description=Immich Static Web Server Quadlet
+
+[Container]
+Image=docker.io/joseluisq/static-web-server:2
+AutoUpdate=registry
+ContainerName=immich-static-web-server
+
+User=1000:1000
+UserNS=keep-id:uid=1000,gid=1000
+
+Label="traefik.enable=true"
+# Protect map from using by strangers
+Label="traefik.http.routers.immich-static-web-server.rule=Host(`immich.${base_domain}`) && PathPrefix(`/pmtiles/`) && Query(`map_key`, `${immich.map_key}`)"
+Label="traefik.http.services.immich-static-web-server.loadbalancer.server.port=8080"
+
+Environment=SERVER_PORT=8080
+
+Volume=/var/mnt/media/downloads/tiles:/public:ro
+
+Pod=immich.pod
+
+[Service]
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target

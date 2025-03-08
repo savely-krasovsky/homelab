@@ -1,0 +1,31 @@
+[Unit]
+Description=Glance Quadlet
+
+[Container]
+Image=docker.io/glanceapp/glance
+AutoUpdate=registry
+ContainerName=glance
+
+User=1000:1000
+UserNS=keep-id:uid=1000,gid=1000
+
+Label="traefik.enable=true"
+Label="traefik.http.routers.glance.rule=Host(`glance.${base_domain}`)"
+Label="traefik.http.routers.glance.middlewares=oauth2-proxy@file"
+Label="traefik.http.routers.glance.priority=1"
+Label="traefik.http.routers.glance-auth.rule=Host(`glance.${base_domain}`) && PathPrefix(`/oauth2/`)"
+Label="traefik.http.routers.glance-auth.service=oauth2-proxy"
+Label="traefik.http.routers.glance-private.rule=Host(`glance.${base_domain}`) && (ClientIP(`10.88.0.0/15`) || ClientIP(`192.168.0.0/16`))"
+Label="traefik.http.routers.glance-private.priority=2"
+
+Volume=/var/mnt/docker/app_data/glance/config:/app/config:Z
+Volume=/var/mnt/docker/app_data/glance/assets:/app/assets:Z
+
+Network=reverse-proxy.network
+
+[Service]
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target

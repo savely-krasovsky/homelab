@@ -11,11 +11,14 @@ UserNS=keep-id:uid=1000,gid=1000
 
 Label="traefik.enable=true"
 Label="traefik.http.routers.qbittorrent.rule=Host(`qb.${base_domain}`)"
-Label="traefik.http.services.qbittorrent.loadbalancer.server.port=8080"
 Label="traefik.http.routers.qbittorrent.middlewares=oauth2-proxy@file,strip-referer"
+Label="traefik.http.routers.qbittorrent.priority=1"
+Label="traefik.http.services.qbittorrent.loadbalancer.server.port=8080"
+Label="traefik.http.middlewares.strip-referer.headers.customRequestHeaders.Referer="
 Label="traefik.http.routers.qbittorrent-auth.rule=Host(`qb.${base_domain}`) && PathPrefix(`/oauth2/`)"
 Label="traefik.http.routers.qbittorrent-auth.service=oauth2-proxy"
-Label="traefik.http.middlewares.strip-referer.headers.customRequestHeaders.Referer="
+Label="traefik.http.routers.qbittorrent-private.rule=Host(`qb.${base_domain}`) && (ClientIP(`10.88.0.0/15`) || ClientIP(`192.168.0.0/16`))"
+Label="traefik.http.routers.qbittorrent-private.priority=2"
 
 Environment=TZ=Europe/Belgrade
 Environment=QBT_LEGAL_NOTICE=confirm

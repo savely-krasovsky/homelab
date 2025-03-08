@@ -1,14 +1,25 @@
+data "bitwarden_secret" "immich_map_key" {
+  id = var.quadlets_secret_config.immich_map_key
+}
+
 locals {
-  butane_config = merge(var.fcos_config, {
-    quadlet_files = local.quadlet_files
+  // Add secrets into quadlets config
+  quadlets_config = merge(var.quadlets_config, {
+    immich: {
+      map_key = data.bitwarden_secret.immich_map_key.value
+    }
   })
 
   # Get a list of all files in the specified directory
   quadlet_paths = fileset(path.module, "quadlets/**")
   quadlet_files = {
     for path in local.quadlet_paths :
-    replace(basename(path), ".tftpl", "") => templatefile(path, var.quadlets_config)
+    replace(basename(path), ".tftpl", "") => templatefile(path, local.quadlets_config)
   }
+
+  butane_config = merge(var.fcos_config, {
+    quadlet_files = local.quadlet_files
+  })
 
   init_script_path = "${path.module}/scripts/init_fcos.sh.tftpl"
 }

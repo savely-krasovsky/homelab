@@ -149,6 +149,12 @@ storage:
         inline: |
           [zram0]
 
+    - path: /etc/sysctl.d/90-bbr.conf
+      contents:
+        inline: |
+          net.core.default_qdisc = cake
+          net.ipv4.tcp_congestion_control = bbr
+
 systemd:
   units:
     - name: install-additional-software.service

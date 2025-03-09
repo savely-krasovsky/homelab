@@ -6,7 +6,7 @@ echo "Importing secrets..."
 # Fedora CoreOS has strict SELinux policies, so we need to make proper adjustments.
 %{ for name, id in secrets ~}
 podman run --rm -it -v /var/home/core:/home/app --user 1000:1000 --uidmap +1000:@1000:1 --security-opt=label=disable \
-  bitwarden/bws secret get --color=no --access-token=${bws_access_token} ${id} | jq -r .value | tr -d '\n' | \
+  docker.io/bitwarden/bws secret get --color=no --access-token=${bws_access_token} ${id} | jq -r .value | tr -d '\n' | \
   podman secret create --replace ${replace(name, "_", "-")} - # I prefer '-' divider for everything related to podman
 %{ endfor ~}
 

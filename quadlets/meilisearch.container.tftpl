@@ -12,6 +12,8 @@ UserNS=keep-id:uid=1000,gid=1000
 Environment=MEILI_NO_ANALYTICS=true
 Secret=meili-master-key,type=env,target=MEILI_MASTER_KEY
 
+Exec=/bin/sh -c "meilisearch --experimental-dumpless-upgrade"
+
 Volume=/var/mnt/docker/app_data/meilisearch:/meili_data:Z
 
 Network=hoarder.network

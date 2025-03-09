@@ -1,0 +1,44 @@
+[Unit]
+Description=Bluesky PDS Quadlet
+
+[Container]
+Image=ghcr.io/bluesky-social/pds:latest
+AutoUpdate=registry
+ContainerName=bluesky-pds
+
+User=1000:1000
+UserNS=keep-id:uid=1000,gid=1000
+
+Environment=PDS_HOSTNAME=pds.${base_domain}
+Environment=PDS_DATA_DIRECTORY=/pds
+Environment=PDS_BLOBSTORE_DISK_LOCATION=/pds/blocks
+Environment=PDS_DID_PLC_URL=https://plc.directory
+Environment=PDS_BSKY_APP_VIEW_URL=https://api.bsky.app
+Environment=PDS_BSKY_APP_VIEW_DID=did:web:api.bsky.app
+Environment=PDS_REPORT_SERVICE_URL=https://mod.bsky.app
+Environment=PDS_REPORT_SERVICE_DID=did:plc:ar7c4by46qjdydhdevvrndac
+Environment=PDS_CRAWLERS=https://bsky.network
+Environment=LOG_ENABLED=true
+Environment=PDS_EMAIL_FROM_ADDRESS="noreply@pds.${base_domain}"
+Secret=pds-jwt-secret,type=env,target=PDS_JWT_SECRET
+Secret=pds-admin-password,type=env,target=PDS_ADMIN_PASSWORD
+Secret=pds-plc-rotation-key-k256-private-key-hex,type=env,target=PDS_PLC_ROTATION_KEY_K256_PRIVATE_KEY_HEX
+Secret=pds-email-smtp-url,type=env,target=PDS_EMAIL_SMTP_URL
+
+Label="traefik.enable=true"
+Label="traefik.http.routers.pds.rule=Host(`pds.${base_domain}`) || HostRegexp(`{subdomain:[a-z]+}.pds.${base_domain}`)"
+Label="traefik.http.routers.pds.tls.domains[0].main=pds.${base_domain}"
+Label="traefik.http.routers.pds.tls.domains[0].sans=*.pds.${base_domain}"
+Label="traefik.http.routers.pds.tls.options=http3@file"
+Label="traefik.http.routers.pds.tls.certresolver=leresolver"
+
+Volume=/var/mnt/docker/app_data/bluesky/pds:/pds:Z
+
+Network=reverse-proxy.network
+
+[Service]
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target

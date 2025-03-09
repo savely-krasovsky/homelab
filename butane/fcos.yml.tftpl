@@ -155,6 +155,14 @@ storage:
           net.core.default_qdisc = cake
           net.ipv4.tcp_congestion_control = bbr
 
+    - path: /etc/ssh/sshd_config.d/20-increase-max-auth-tries.conf
+      mode: 0644
+      contents:
+        inline: |
+          # I have a lot of SSH keys, unfortunately Terraform hasn't "IdentitiesOnly yes" alternative, so it just tries
+          # all keys on machine, reaching the limit.
+          MaxAuthTries 10
+
 systemd:
   units:
     - name: install-additional-software.service

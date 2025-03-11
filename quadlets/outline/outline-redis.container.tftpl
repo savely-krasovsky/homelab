@@ -1,0 +1,24 @@
+[Unit]
+Description=Outline Redis Quadlet
+
+[Container]
+Image=docker.io/redis:7-alpine
+AutoUpdate=registry
+ContainerName=outline-redis
+
+User=1000:1000
+UserNS=keep-id:uid=1000,gid=1000
+
+HealthCmd=redis-cli ping || exit 1
+
+Volume=/var/mnt/docker/app_data/outline/redis:/data:Z
+
+Pod=outline.pod
+Notify=healthy
+
+[Service]
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target

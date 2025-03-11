@@ -1,0 +1,54 @@
+[Unit]
+Description=Outline Server Quadlet
+Wants=outline-postgres.service outline-redis.service
+After=outline-postgres.service outline-redis.service
+
+[Container]
+Image=docker.io/outlinewiki/outline:latest
+AutoUpdate=registry
+ContainerName=outline-server
+
+User=1000:1000
+UserNS=keep-id:uid=1000,gid=1000
+
+Environment=NODE_ENV=production
+Environment=PGSSLMODE=disable
+Environment=REDIS_URL=redis://outline-redis:6379
+Environment=URL=https://outline.${base_domain}
+Environment=FILE_STORAGE=local
+Environment=FILE_STORAGE_LOCAL_ROOT_DIR=/var/lib/outline/data
+Environment=FILE_STORAGE_UPLOAD_MAX_SIZE=26214400
+Environment=OIDC_CLIENT_ID=cff5018f-9911-42fc-9226-b4d2326b72a8
+Environment=OIDC_AUTH_URI=https://id.${base_domain}/authorize
+Environment=OIDC_TOKEN_URI=https://id.${base_domain}/api/oidc/token
+Environment=OIDC_USERINFO_URI=https://id.${base_domain}/api/oidc/userinfo
+Environment=OIDC_USERNAME_CLAIM=preferred_username
+Environment=OIDC_DISPLAY_NAME="Pocket ID"
+Environment=OIDC_SCOPES="openid profile email"
+Environment=WEB_CONCURRENCY=1
+Environment=SMTP_HOST=smtps-proxy.fastmail.com
+Environment=SMTP_PORT=443
+Environment=SMTP_USERNAME=savely@${base_domain}
+Environment=SMTP_FROM_EMAIL=noreply@outline.${base_domain}
+Environment=SMTP_REPLY_EMAIL=noreply@outline.${base_domain}
+Environment=SMTP_SECURE=true
+Secret=outline-secret-key,type=env,target=SECRET_KEY
+Secret=outline-utils-secret,type=env,target=UTILS_SECRET
+Secret=outline-database-url,type=env,target=DATABASE_URL
+Secret=outline-oidc-client-secret,type=env,target=OIDC_CLIENT_SECRET
+Secret=outline-smtp-password,type=env,target=SMTP_PASSWORD
+
+Label="traefik.enable=true"
+Label="traefik.http.routers.outline.rule=Host(`outline.${base_domain}`)"
+Label="traefik.http.services.outline.loadbalancer.server.port=3000"
+
+Volume=/var/mnt/docker/app_data/outline/data:/var/lib/outline/data:Z
+
+Pod=outline.pod
+
+[Service]
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target

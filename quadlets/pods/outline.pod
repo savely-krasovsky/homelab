@@ -1,0 +1,6 @@
+[Unit]
+Description=Outline Pod
+
+[Pod]
+PodName=outline
+Network=outline.network

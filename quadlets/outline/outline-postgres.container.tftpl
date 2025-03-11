@@ -1,24 +1,24 @@
 [Unit]
-Description=Miniflux Postgres Quadlet
+Description=Outline Postgres Quadlet
 
 [Container]
 Image=docker.io/postgres:16-bookworm
 AutoUpdate=registry
-ContainerName=miniflux-postgres
+ContainerName=outline-postgres
 
 User=1000:1000
 UserNS=keep-id:uid=1000,gid=1000
 
-Environment=POSTGRES_USER=miniflux
-Environment=POSTGRES_DB=miniflux
-Secret=miniflux-postgres-password,type=env,target=POSTGRES_PASSWORD
+Environment=POSTGRES_USER=outline
+Environment=POSTGRES_DB=outline
+Secret=outline-postgres-password,type=env,target=POSTGRES_PASSWORD
 
 HealthCmd=pg_isready --dbname="$$${POSTGRES_DB}" --username="$$${POSTGRES_USER}" || exit 1;
 HealthStartupInterval=5s
 
-Volume=/var/mnt/docker/app_data/miniflux/postgres:/var/lib/postgresql/data:Z
+Volume=/var/mnt/docker/app_data/outline/postgres:/var/lib/postgresql/data:Z
 
-Pod=miniflux.pod
+Pod=outline.pod
 Notify=healthy
 
 [Service]

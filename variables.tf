@@ -43,6 +43,12 @@ variable "quadlets_secret_config" {
     pds_admin_password                        = "00e810b5-6d8b-4342-8189-b29a017dca5e"
     pds_plc_rotation_key_k256_private_key_hex = "e0825e62-8d49-4b4a-99cd-b29a017def90"
     pds_email_smtp_url                        = "5a940d99-28cb-4792-9825-b29a017e11ad"
+    outline_secret_key                        = "501e040c-5574-4058-a0c0-b29d01010c09"
+    outline_utils_secret                      = "b032948f-bce3-46bb-bd26-b29d01012dde"
+    outline_database_url                      = "5887f243-6332-4041-8457-b29d0104be2e"
+    outline_postgres_password                 = "4212e3a7-acd3-4804-ac0e-b29d01015850"
+    outline_oidc_client_secret                = "9c8cae9a-db6d-45d0-8cc0-b29d0101844c"
+    outline_smtp_password                     = "5fdbfb32-257e-4cc3-8b07-b29d01063ba6"
   }
 }
 

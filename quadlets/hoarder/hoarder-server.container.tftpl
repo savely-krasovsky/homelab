@@ -1,15 +1,15 @@
 [Unit]
-Description=Hoarder Web Quadlet
+Description=Hoarder Server Quadlet
 
 [Container]
 Image=ghcr.io/hoarder-app/hoarder:release
 AutoUpdate=registry
-ContainerName=hoarder
+ContainerName=hoarder-server
 
 # Unfortunately Hoarder.app cannot fully under non-root user: https://github.com/hoarder-app/hoarder/issues/606
 
-Environment=MEILI_ADDR=http://meilisearch:7700
-Environment=BROWSER_WEB_URL=http://chrome:9222
+Environment=MEILI_ADDR=http://hoarder-meilisearch:7700
+Environment=BROWSER_WEB_URL=http://hoarder-chrome:9222
 Environment=NEXTAUTH_URL=https://hoarder.${base_domain}/api/auth
 Environment=DATA_DIR=/data
 Environment=DISABLE_PASSWORD_AUTH=true
@@ -28,11 +28,11 @@ Secret=hoarder-openai-api-key,type=env,target=OPENAI_API_KEY
 
 Label="traefik.enable=true"
 Label="traefik.http.routers.hoarder.rule=Host(`hoarder.${base_domain}`)"
+Label="traefik.http.services.hoarder.loadbalancer.server.port=9222"
 
 Volume=/var/mnt/docker/app_data/hoarder:/data:Z
 
-Network=reverse-proxy.network
-Network=hoarder.network
+Pod=hoarder.pod
 
 [Service]
 TimeoutStartSec=900

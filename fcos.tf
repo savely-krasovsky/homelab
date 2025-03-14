@@ -1,3 +1,7 @@
+data "bitwarden_secret" "victoria_bearer_token" {
+  id = var.quadlets_secret_config.victoria_bearer_token
+}
+
 data "bitwarden_secret" "immich_map_key" {
   id = var.quadlets_secret_config.immich_map_key
 }
@@ -5,8 +9,9 @@ data "bitwarden_secret" "immich_map_key" {
 locals {
   // Add secrets into quadlets config
   quadlets_config = merge(var.quadlets_config, {
-    immich: {
-      map_key = data.bitwarden_secret.immich_map_key.value
+    secrets: {
+      victoria_bearer_token: data.bitwarden_secret.victoria_bearer_token.value
+      immich_map_key = data.bitwarden_secret.immich_map_key.value
     }
   })
 

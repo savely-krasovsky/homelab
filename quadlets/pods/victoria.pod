@@ -1,0 +1,6 @@
+[Unit]
+Description=Victoria Pod
+
+[Pod]
+PodName=victoria
+Network=victoria.network

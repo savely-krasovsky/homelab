@@ -1,0 +1,21 @@
+[Unit]
+Description=Victoria Metrics Quadlet
+
+[Container]
+Image=docker.io/victoriametrics/victoria-metrics:stable
+AutoUpdate=registry
+ContainerName=victoria-metrics
+
+User=1000:1000
+UserNS=keep-id:uid=1000,gid=1000
+
+Volume=/var/mnt/observability/metrics:/victoria-metrics-data:Z
+
+Pod=victoria.pod
+
+[Service]
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target

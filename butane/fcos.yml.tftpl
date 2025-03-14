@@ -242,6 +242,21 @@ systemd:
         [Install]
         WantedBy=multi-user.target
 
+    - name: var-mnt-observability.mount
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Mount observability directory
+        Before=remote-fs.target
+
+        [Mount]
+        What=192.168.100.3:/mnt/spool/observability
+        Where=/var/mnt/observability
+        Type=nfs
+
+        [Install]
+        WantedBy=remote-fs.target
+
     - name: var-mnt-media.mount
       enabled: true
       contents: |

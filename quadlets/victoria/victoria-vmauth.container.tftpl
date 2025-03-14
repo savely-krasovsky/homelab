@@ -1,0 +1,34 @@
+[Unit]
+Description=Victoria vmauth Quadlet
+
+[Container]
+Image=docker.io/victoriametrics/vmauth:stable
+AutoUpdate=registry
+ContainerName=victoria-vmauth
+
+User=1000:1000
+UserNS=keep-id:uid=1000,gid=1000
+
+Label="traefik.enable=true"
+Label="traefik.http.routers.vm.rule=Host(`victoria.krasovs.ky`)"
+Label="traefik.http.routers.vm.middlewares=oauth2-proxy@file,add-victoria-bearer"
+Label="traefik.http.routers.vm.priority=1"
+Label="traefik.http.services.vm.loadbalancer.server.port=8427"
+Label="traefik.http.routers.vm-auth.rule=Host(`victoria.krasovs.ky`) && PathPrefix(`/oauth2/`)"
+Label="traefik.http.routers.vm-auth.service=oauth2-proxy"
+Label="traefik.http.middlewares.add-victoria-bearer.headers.customRequestHeaders.Authorization=Bearer ${secrets.victoria_bearer_token}"
+Label="traefik.http.routers.vm-api.rule=Host(`victoria.krasovs.ky`) && (HeaderRegexp(`Authorization`, `^Bearer `) || HeaderRegexp(`Authorization`, `^Token `))"
+Label="traefik.http.routers.vm-api.priority=2"
+
+Exec="--auth.config=/etc/auth.yml"
+
+Volume=/var/mnt/docker/app_data/victoria/vmauth/auth.yml:/etc/auth.yml:Z
+
+Pod=victoria.pod
+
+[Service]
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target

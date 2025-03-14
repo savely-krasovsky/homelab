@@ -1,16 +1,16 @@
 [Unit]
-Description=Chrome Quadlet
+Description=Hoarder Chrome Quadlet
 
 [Container]
 Image=gcr.io/zenika-hub/alpine-chrome:latest
 AutoUpdate=registry
-ContainerName=chrome
+ContainerName=hoarder-chrome
 
 User=1000:1000
 
 Exec=--no-sandbox --disable-dev-shm-usage --remote-debugging-address=0.0.0.0 --remote-debugging-port=9222 --hide-scrollbars
 
-Network=hoarder.network
+Pod=hoarder.pod
 
 AddDevice=/dev/dri
 

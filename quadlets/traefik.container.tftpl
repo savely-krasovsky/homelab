@@ -17,12 +17,8 @@ Label="traefik.enable=true"
 Label="traefik.http.routers.dashboard.rule=Host(`traefik.${base_domain}`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
 Label="traefik.http.routers.dashboard.service=api@internal"
 Label="traefik.http.routers.dashboard.middlewares=oauth2-proxy@file"
-Label="traefik.http.routers.dashboard.priority=1"
 Label="traefik.http.routers.dashboard-auth.rule=Host(`traefik.${base_domain}`) && PathPrefix(`/oauth2/`)"
 Label="traefik.http.routers.dashboard-auth.service=oauth2-proxy"
-Label="traefik.http.routers.dashboard-private.rule=Host(`traefik.${base_domain}`) && (ClientIP(`10.88.0.0/15`) || ClientIP(`192.168.0.0/16`))"
-Label="traefik.http.routers.dashboard-private.service=api@internal"
-Label="traefik.http.routers.dashboard-private.priority=2"
 
 Secret=traefik-cf-dns-api-token,type=env,target=CF_DNS_API_TOKEN
 
@@ -32,6 +28,10 @@ Volume=/var/mnt/docker/app_data/traefik/data:/data:Z
 Volume=%t/podman/podman.sock:/var/run/docker.sock
 
 Network=reverse-proxy.network
+# Internal networks should be added manually
+Network=immich.network
+Network=victoria.network
+
 Notify=true
 
 SecurityLabelDisable=true

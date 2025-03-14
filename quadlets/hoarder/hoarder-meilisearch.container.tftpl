@@ -1,10 +1,10 @@
 [Unit]
-Description=Meilisearch Quadlet
+Description=Hoarder Meilisearch Quadlet
 
 [Container]
 Image=docker.io/getmeili/meilisearch:v1
 AutoUpdate=registry
-ContainerName=meilisearch
+ContainerName=hoarder-meilisearch
 
 User=1000:1000
 UserNS=keep-id:uid=1000,gid=1000
@@ -16,7 +16,7 @@ Exec=/bin/sh -c "meilisearch --experimental-dumpless-upgrade"
 
 Volume=/var/mnt/docker/app_data/meilisearch:/meili_data:Z
 
-Network=hoarder.network
+Pod=hoarder.pod
 
 [Service]
 TimeoutStartSec=900

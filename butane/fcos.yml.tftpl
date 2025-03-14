@@ -250,7 +250,7 @@ systemd:
         Before=remote-fs.target
 
         [Mount]
-        What=192.168.100.3:/mnt/spool/observability
+        What=${truenas_ip}:/mnt/spool/observability
         Where=/var/mnt/observability
         Type=nfs
 

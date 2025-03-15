@@ -1,0 +1,6 @@
+[Unit]
+Description=Observability Pod
+
+[Pod]
+PodName=observability
+Network=observability.network

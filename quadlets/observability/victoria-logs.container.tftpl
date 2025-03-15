@@ -1,0 +1,21 @@
+[Unit]
+Description=Victoria Logs Quadlet
+
+[Container]
+Image=docker.io/victoriametrics/victoria-logs:latest
+AutoUpdate=registry
+ContainerName=victoria-logs
+
+User=1000:1000
+UserNS=keep-id:uid=1000,gid=1000
+
+Volume=/var/mnt/observability/logs:/victoria-logs-data:Z
+
+Pod=observability.pod
+
+[Service]
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target

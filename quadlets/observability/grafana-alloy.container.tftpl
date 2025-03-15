@@ -1,0 +1,27 @@
+[Unit]
+Description=Grafana Alloy Quadlet
+
+[Container]
+Image=docker.io/grafana/alloy:latest
+AutoUpdate=registry
+ContainerName=grafana-alloy
+
+# Grafana Alloy doesn't work under non-root user
+
+Exec=run --storage.path=/var/lib/alloy/data /etc/alloy/config.alloy
+
+Volume=/var/mnt/docker/app_data/grafana/alloy/config.alloy:/etc/alloy/config.alloy:Z
+# requires user (!) podman.socket running
+Volume=%t/podman/podman.sock:/var/run/docker.sock
+
+Pod=observability.pod
+
+# Disable label security, otherwise it won't be able to access Podman socket.
+SecurityLabelDisable=true
+
+[Service]
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target

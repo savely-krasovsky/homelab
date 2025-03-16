@@ -10,7 +10,8 @@ ContainerName=hoarder-server
 
 Environment=MEILI_ADDR=http://hoarder-meilisearch:7700
 Environment=BROWSER_WEB_URL=http://hoarder-chrome:9222
-Environment=NEXTAUTH_URL=https://hoarder.${base_domain}/api/auth
+Environment=NEXTAUTH_URL=https://hoarder.${base_domain}
+Environment=NEXTAUTH_URL_INTERNAL=http://hoarder:3000
 Environment=DATA_DIR=/data
 Environment=DISABLE_PASSWORD_AUTH=true
 Environment=OAUTH_WELLKNOWN_URL=https://id.${base_domain}/.well-known/openid-configuration

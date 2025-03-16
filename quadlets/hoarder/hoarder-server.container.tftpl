@@ -28,7 +28,7 @@ Secret=hoarder-openai-api-key,type=env,target=OPENAI_API_KEY
 
 Label="traefik.enable=true"
 Label="traefik.http.routers.hoarder.rule=Host(`hoarder.${base_domain}`)"
-Label="traefik.http.services.hoarder.loadbalancer.server.port=9222"
+Label="traefik.http.services.hoarder.loadbalancer.server.port=3000"
 
 Volume=/var/mnt/docker/app_data/hoarder:/data:Z
 

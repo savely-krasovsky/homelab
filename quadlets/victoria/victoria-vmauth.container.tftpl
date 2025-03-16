@@ -9,6 +9,11 @@ ContainerName=victoria-vmauth
 User=1000:1000
 UserNS=keep-id:uid=1000,gid=1000
 
+Label="glance.name=vmauth"
+Label="glance.icon=di:victoriametrics-light"
+Label="glance.description=VictoriaMetrics Auth Proxy"
+Label="glance.hide=false"
+
 Label="traefik.enable=true"
 Label="traefik.http.routers.vm.rule=Host(`metrics.${base_domain}`) || Host(`logs.${base_domain}`)"
 Label="traefik.http.routers.vm.middlewares=oauth2-proxy@file,add-victoria-bearer"
@@ -24,7 +29,7 @@ Exec="--auth.config=/etc/auth.yml"
 
 Volume=/var/mnt/docker/app_data/victoria/vmauth/auth.yml:/etc/auth.yml:Z
 
-Pod=observability.pod
+Pod=victoria.pod
 
 [Service]
 TimeoutStartSec=900

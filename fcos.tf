@@ -49,7 +49,6 @@ resource "proxmox_virtual_environment_vm" "fcos" {
 
   cpu {
     cores = 8
-    affinity = "6-7,24-29"
     type = "host"
   }
 

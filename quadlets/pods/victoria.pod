@@ -1,0 +1,7 @@
+[Unit]
+Description=Victoria Pod
+
+[Pod]
+PodName=victoria
+Network=victoria.network
+Network=reverse-proxy.network

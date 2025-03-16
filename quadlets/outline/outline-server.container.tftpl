@@ -38,6 +38,13 @@ Secret=outline-database-url,type=env,target=DATABASE_URL
 Secret=outline-oidc-client-secret,type=env,target=OIDC_CLIENT_SECRET
 Secret=outline-smtp-password,type=env,target=SMTP_PASSWORD
 
+Label="glance.id=outline"
+Label="glance.name=Outline"
+Label="glance.icon=di:outline"
+Label="glance.url=https://outline.${base_domain}"
+Label="glance.description=Personal knowledge base"
+Label="glance.hide=false"
+
 Label="traefik.enable=true"
 Label="traefik.http.routers.outline.rule=Host(`outline.${base_domain}`)"
 Label="traefik.http.services.outline.loadbalancer.server.port=3000"

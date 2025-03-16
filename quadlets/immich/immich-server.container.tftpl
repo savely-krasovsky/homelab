@@ -18,6 +18,13 @@ Environment=DB_DATABASE_NAME=immich
 Environment=REDIS_HOSTNAME=immich-redis
 Secret=immich-postgres-password,type=env,target=DB_PASSWORD
 
+Label="glance.id=immich"
+Label="glance.name=Immich"
+Label="glance.icon=di:immich"
+Label="glance.url=https://immich.${base_domain}"
+Label="glance.description=Image & Video management"
+Label="glance.hide=false"
+
 Label="traefik.enable=true"
 Label="traefik.http.routers.immich.rule=Host(`immich.${base_domain}`)"
 Label="traefik.http.services.immich.loadbalancer.server.port=2283"

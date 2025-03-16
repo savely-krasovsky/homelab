@@ -1,7 +1,7 @@
 [Unit]
 Description=Traefik Quadlet
-Requires=http.socket https.socket
-After=http.socket https.socket
+Requires=http.socket https.socket podman.socket
+After=http.socket https.socket podman.socket
 
 [Container]
 Image=docker.io/library/traefik
@@ -12,6 +12,12 @@ User=1000:1000
 UserNS=keep-id:uid=1000,gid=1000
 
 Environment=LEGO_DISABLE_CNAME_SUPPORT=true
+
+Label="glance.name=Traefik"
+Label="glance.icon=di:traefik"
+Label="glance.url=https://traefik.${base_domain}/dashboard/"
+Label="glance.description=Reverse Proxy"
+Label="glance.hide=false"
 
 Label="traefik.enable=true"
 Label="traefik.http.routers.dashboard.rule=Host(`traefik.${base_domain}`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
@@ -24,14 +30,13 @@ Secret=traefik-cf-dns-api-token,type=env,target=CF_DNS_API_TOKEN
 
 Volume=/var/mnt/docker/app_data/traefik/traefik.yml:/etc/traefik/traefik.yml:Z
 Volume=/var/mnt/docker/app_data/traefik/data:/data:Z
-# requires user (!) podman.socket running
 Volume=%t/podman/podman.sock:/var/run/docker.sock
 
 Network=reverse-proxy.network
 
 Notify=true
 
-# Disable label security, otherwise it won't be able to access Podman socket.
+# Disable label security to access Podman socket.
 SecurityLabelDisable=true
 
 [Service]

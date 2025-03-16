@@ -18,6 +18,11 @@ Environment=OPENID_PROVIDER_URL=https://id.${base_domain}/.well-known/openid-con
 Environment=OAUTH_PROVIDER_NAME="Pocket ID"
 Secret=open-webui-oauth-client-secret,type=env,target=OAUTH_CLIENT_SECRET
 
+Label="glance.name=Open WebUI"
+Label="glance.url=https://ai.${base_domain}"
+Label="glance.description=AI Interface"
+Label="glance.hide=false"
+
 Label="traefik.enable=true"
 Label="traefik.http.routers.open-webui.rule=Host(`ai.${base_domain}`)"
 

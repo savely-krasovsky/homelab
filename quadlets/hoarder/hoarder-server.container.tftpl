@@ -27,6 +27,13 @@ Secret=meili-master-key,type=env,target=MEILI_MASTER_KEY
 Secret=hoarder-oauth-client-secret,type=env,target=OAUTH_CLIENT_SECRET
 Secret=hoarder-openai-api-key,type=env,target=OPENAI_API_KEY
 
+Label="glance.id=hoarder"
+Label="glance.name=Hoarder"
+Label="glance.icon=di:hoarder-light"
+Label="glance.url=https://hoarder.${base_domain}"
+Label="glance.description=Bookmark App"
+Label="glance.hide=false"
+
 Label="traefik.enable=true"
 Label="traefik.http.routers.hoarder.rule=Host(`hoarder.${base_domain}`)"
 Label="traefik.http.services.hoarder.loadbalancer.server.port=3000"

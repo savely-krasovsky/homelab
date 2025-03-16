@@ -9,6 +9,10 @@ ContainerName=outline-redis
 User=1000:1000
 UserNS=keep-id:uid=1000,gid=1000
 
+Label="glance.parent=outline"
+Label="glance.name=Redis"
+Label="glance.hide=false"
+
 HealthCmd=redis-cli ping || exit 1
 
 Volume=/var/mnt/docker/app_data/outline/redis:/data:Z

@@ -1,5 +1,7 @@
 [Unit]
 Description=Grafana Alloy Quadlet
+Requires=podman.socket
+After=podman.socket
 
 [Container]
 Image=docker.io/grafana/alloy:latest
@@ -8,15 +10,19 @@ ContainerName=grafana-alloy
 
 # Grafana Alloy doesn't work under non-root user
 
+Label="glance.name=Grafana Alloy"
+Label="glance.icon=di:alloy"
+Label="glance.description=OpenTelemetry Collector"
+Label="glance.hide=false"
+
 Exec=run --storage.path=/var/lib/alloy/data --disable-reporting /etc/alloy/config.alloy
 
 Volume=/var/mnt/docker/app_data/grafana/alloy/config.alloy:/etc/alloy/config.alloy:Z
-# requires user (!) podman.socket running
 Volume=%t/podman/podman.sock:/var/run/docker.sock
 
-Pod=observability.pod
+Network=reverse-proxy.network
 
-# Disable label security, otherwise it won't be able to access Podman socket.
+# Disable label security to access Podman socket.
 SecurityLabelDisable=true
 
 [Service]

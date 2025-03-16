@@ -27,6 +27,10 @@ Environment=OAUTH2_PROXY_UPSTREAMS=static://202
 Secret=oauth2-proxy-cookie-secret,type=env,target=OAUTH2_PROXY_COOKIE_SECRET
 Secret=oauth2-proxy-client-secret,type=env,target=OAUTH2_PROXY_CLIENT_SECRET
 
+Label="glance.name=OAuth2 Proxy"
+Label="glance.description=Identity-Aware Proxy"
+Label="glance.hide=false"
+
 Label="traefik.enable=true"
 Label="traefik.http.routers.oauth2-proxy.rule=Host(`oauth2-proxy.${base_domain}`)"
 Label="traefik.http.services.oauth2-proxy.loadbalancer.server.port=4180"

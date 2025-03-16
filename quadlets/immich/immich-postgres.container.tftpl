@@ -14,6 +14,10 @@ Environment=POSTGRES_DB=immich
 Environment=POSTGRES_INITDB_ARGS=--data-checksums
 Secret=immich-postgres-password,type=env,target=POSTGRES_PASSWORD
 
+Label="glance.parent=immich"
+Label="glance.name=Postgres"
+Label="glance.hide=false"
+
 Exec=postgres \
       -c shared_preload_libraries=vectors.so \
       -c 'search_path="$user", public, vectors' \

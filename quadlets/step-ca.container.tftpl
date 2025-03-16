@@ -9,10 +9,16 @@ ContainerName=step-ca
 User=1000:1000
 UserNS=keep-id:uid=1000,gid=1000
 
+Label="glance.name=Step CA"
+Label="glance.icon=di:step-ca"
+Label="glance.url=https://ca.${base_domain}"
+Label="glance.description=Homelab Certificate Authority"
+Label="glance.hide=false"
+
 Label="traefik.enable=true"
-Label="traefik.tcp.routers.smallstep.rule=HostSNI(`ca.${base_domain}`)"
-Label="traefik.tcp.routers.smallstep.tls.passthrough=true"
-Label="traefik.tcp.services.smallstep.loadbalancer.server.port=9000"
+Label="traefik.tcp.routers.step-ca.rule=HostSNI(`ca.${base_domain}`)"
+Label="traefik.tcp.routers.step-ca.tls.passthrough=true"
+Label="traefik.tcp.services.step-ca.loadbalancer.server.port=9000"
 
 Environment=DOCKER_STEPCA_INIT_NAME=Homelab
 Environment=DOCKER_STEPCA_INIT_DNS_NAMES=ca.${base_domain}

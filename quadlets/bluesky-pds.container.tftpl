@@ -25,6 +25,12 @@ Secret=pds-admin-password,type=env,target=PDS_ADMIN_PASSWORD
 Secret=pds-plc-rotation-key-k256-private-key-hex,type=env,target=PDS_PLC_ROTATION_KEY_K256_PRIVATE_KEY_HEX
 Secret=pds-email-smtp-url,type=env,target=PDS_EMAIL_SMTP_URL
 
+Label="glance.name=Bluesky PDS"
+Label="glance.icon=di:bluesky"
+Label="glance.url=https://pds.${base_domain}"
+Label="glance.description=ATProto Personal Data Server"
+Label="glance.hide=false"
+
 Label="traefik.enable=true"
 Label="traefik.http.routers.pds.rule=Host(`pds.${base_domain}`) || HostRegexp(`{subdomain:[a-z]+}.pds.${base_domain}`)"
 Label="traefik.http.routers.pds.ruleSyntax=v2"

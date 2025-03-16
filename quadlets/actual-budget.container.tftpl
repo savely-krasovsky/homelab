@@ -9,6 +9,12 @@ ContainerName=actual-budget
 User=1000:1000
 UserNS=keep-id:uid=1000,gid=1000
 
+Label="glance.name=Actual Budget"
+Label="glance.icon=di:actual-budget"
+Label="glance.url=https://actual.${base_domain}"
+Label="glance.description=Budgeting App"
+Label="glance.hide=false"
+
 Label="traefik.enable=true"
 Label="traefik.http.routers.actual-budget.rule=Host(`actual.${base_domain}`)"
 

@@ -9,12 +9,16 @@ ContainerName=immich-static-web-server
 User=1000:1000
 UserNS=keep-id:uid=1000,gid=1000
 
+Environment=SERVER_PORT=8080
+
+Label="glance.parent=immich"
+Label="glance.name=Static Web Server"
+Label="glance.hide=false"
+
 Label="traefik.enable=true"
 # Protect map from using by strangers
 Label="traefik.http.routers.immich-static-web-server.rule=Host(`immich.${base_domain}`) && PathPrefix(`/pmtiles/`) && Query(`map_key`, `${secrets.immich_map_key}`)"
 Label="traefik.http.services.immich-static-web-server.loadbalancer.server.port=8080"
-
-Environment=SERVER_PORT=8080
 
 Volume=/var/mnt/media/downloads/immich/tiles:/public:ro
 

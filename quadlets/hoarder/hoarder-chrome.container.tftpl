@@ -8,6 +8,10 @@ ContainerName=hoarder-chrome
 
 User=1000:1000
 
+Label="glance.parent=hoarder"
+Label="glance.name=Chrome"
+Label="glance.hide=false"
+
 Exec=--no-sandbox --disable-dev-shm-usage --remote-debugging-address=0.0.0.0 --remote-debugging-port=9222 --hide-scrollbars
 
 Pod=hoarder.pod

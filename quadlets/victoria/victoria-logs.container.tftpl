@@ -9,9 +9,15 @@ ContainerName=victoria-logs
 User=1000:1000
 UserNS=keep-id:uid=1000,gid=1000
 
+Label="glance.name=VictoriaLogs"
+Label="glance.icon=di:victoriametrics-light"
+Label="glance.url=https://logs.${base_domain}"
+Label="glance.description=Logs Storage"
+Label="glance.hide=false"
+
 Volume=/var/mnt/observability/logs:/victoria-logs-data:Z
 
-Pod=observability.pod
+Pod=victoria.pod
 
 [Service]
 TimeoutStartSec=900

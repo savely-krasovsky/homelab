@@ -14,6 +14,12 @@ Environment=TZ=Europe/Belgrade
 # In my setup source IP is not preserved for local network (due to SNAT hairpinning rule)
 Environment=ALLOWED_NETWORKS=192.168.100.1/32
 
+Label="glance.name=Plex"
+Label="glance.icon=di:plex"
+Label="glance.url=https://app.plex.tv"
+Label="glance.description=Personal Media Server"
+Label="glance.hide=false"
+
 Volume=/var/mnt/docker/app_data/plex:/config:Z
 Volume=/var/mnt/media/tv_shows:/data/tv_shows:z
 Volume=/var/mnt/media/movies:/data/movies:z

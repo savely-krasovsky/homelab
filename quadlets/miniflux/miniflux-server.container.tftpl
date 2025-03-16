@@ -25,6 +25,13 @@ Environment=DISABLE_LOCAL_AUTH=true
 Secret=miniflux-database-url,type=env,target=DATABASE_URL
 Secret=miniflux-oauth2-client-secret,type=env,target=OAUTH2_CLIENT_SECRET
 
+Label="glance.id=miniflux"
+Label="glance.name=Miniflux"
+Label="glance.icon=di:miniflux-light"
+Label="glance.url=https://miniflux.${base_domain}"
+Label="glance.description=RSS Reader"
+Label="glance.hide=false"
+
 Label="traefik.enable=true"
 Label="traefik.http.routers.miniflux.rule=Host(`miniflux.${base_domain}`)"
 Label="traefik.http.services.miniflux.loadbalancer.server.port=8080"

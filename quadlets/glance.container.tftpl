@@ -1,5 +1,7 @@
 [Unit]
 Description=Glance Quadlet
+Requires=podman.socket
+After=podman.socket
 
 [Container]
 Image=docker.io/glanceapp/glance
@@ -8,6 +10,12 @@ ContainerName=glance
 
 User=1000:1000
 UserNS=keep-id:uid=1000,gid=1000
+
+Label="glance.name=Glance"
+Label="glance.icon=di:glance-light"
+Label="glance.url=https://glance.${base_domain}"
+Label="glance.description=Homelab Dashboard"
+Label="glance.hide=false"
 
 Label="traefik.enable=true"
 Label="traefik.http.routers.glance.rule=Host(`glance.${base_domain}`)"
@@ -20,8 +28,12 @@ Label="traefik.http.routers.glance-private.priority=2"
 
 Volume=/var/mnt/docker/app_data/glance/config:/app/config:Z
 Volume=/var/mnt/docker/app_data/glance/assets:/app/assets:Z
+Volume=%t/podman/podman.sock:/var/run/docker.sock
 
 Network=reverse-proxy.network
+
+# Disable label security to access Podman socket.
+SecurityLabelDisable=true
 
 [Service]
 TimeoutStartSec=900

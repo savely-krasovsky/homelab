@@ -19,12 +19,33 @@ I also have some observability:
   - Visualization: Grafana.
   - Traces are not supported for now.
 
+## Current services
+
+| Name                                    | Description                  | Pod |
+|-----------------------------------------|------------------------------|-----|
+| Actual Budget                           | Budgeting App                |     |
+| Bluesky PDS                             | ATProto Personal Data Server |     |
+| Glance                                  | Homelab Dashboard            |     |
+| Grafana                                 | Data-visualization Platform  |     |
+| Grafana Alloy                           | OpenTelemetry Collector      |     |
+| Hoarder                                 | Bookmark App                 | ☑️  |
+| Immich                                  | Image & Video Management     | ☑️  |
+| Miniflux                                | RSS Reader                   | ☑️  |
+| OAuth2 Proxy                            | Identity-Aware Proxy         |     |
+| Open WebUI                              | Chatbot UI                   |     |
+| Outline                                 | Personal Knowledge Base      | ☑️  |
+| Plex                                    | Personal Media Server        |     |
+| Pocket ID                               | Single Sign-on Portal        |     |
+| qBittorrent                             | BitTorrent Client            |     |
+| Traefik                                 | Application Proxy            |     |
+| VictoriaMetrics / VictoriaLogs / vmauth | Metrics and Logs Storage     | ☑️  |
+
 ## Caveats
 
-This is not a ready-to-use configuration that you can just apply. It requires initialized state.
-You can apply it, then go to Pocket ID, generate OAuth2 Client IDs, and paste them into container templates.
-Technically, it's possible to make it as generic as possible, but I don't think anyone wants to copy my setup entirely.
-I see this more as a template for your own setups.
+This is not a ready-to-use configuration that you can just apply. It requires additional configuration files
+and initialized state. You can apply it, write those configs, then go to Pocket ID, generate OAuth2 Client IDs,
+and paste them into container templates. Technically, it's possible to make it as generic as possible,
+but I don't think anyone wants to copy my setup entirely. I see this more as a template for your own setups.
 
 ## Future plans
 

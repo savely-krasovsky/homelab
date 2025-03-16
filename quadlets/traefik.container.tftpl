@@ -28,9 +28,6 @@ Volume=/var/mnt/docker/app_data/traefik/data:/data:Z
 Volume=%t/podman/podman.sock:/var/run/docker.sock
 
 Network=reverse-proxy.network
-# Internal networks should be added manually
-Network=immich.network
-Network=victoria.network
 
 Notify=true
 

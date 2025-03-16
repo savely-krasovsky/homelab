@@ -8,7 +8,7 @@ ContainerName=grafana-alloy
 
 # Grafana Alloy doesn't work under non-root user
 
-Exec=run --storage.path=/var/lib/alloy/data /etc/alloy/config.alloy
+Exec=run --storage.path=/var/lib/alloy/data --disable-reporting /etc/alloy/config.alloy
 
 Volume=/var/mnt/docker/app_data/grafana/alloy/config.alloy:/etc/alloy/config.alloy:Z
 # requires user (!) podman.socket running

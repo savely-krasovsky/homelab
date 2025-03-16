@@ -50,6 +50,7 @@ variable "quadlets_secret_config" {
     outline_postgres_password                 = "4212e3a7-acd3-4804-ac0e-b29d01015850"
     outline_oidc_client_secret                = "9c8cae9a-db6d-45d0-8cc0-b29d0101844c"
     outline_smtp_password                     = "5fdbfb32-257e-4cc3-8b07-b29d01063ba6"
+    grafana_oauth2_client_secret = "697cf367-a80c-41f6-b975-b2a200a986d8"
   }
 }
 

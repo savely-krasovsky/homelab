@@ -27,6 +27,7 @@ Environment=GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_PATH=grafanaRole
 Environment=GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_STRICT=true
 Environment=GF_LOG_MODE=console
 Environment=GF_LOG_CONSOLE_FORMAT=json
+Environment=GF_PLUGINS_PREINSTALL=victoriametrics-metrics-datasource,victoriametrics-logs-datasource
 Secret=grafana-oauth2-client-secret,type=env,target=GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET
 
 Label="traefik.enable=true"

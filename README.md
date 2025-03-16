@@ -12,6 +12,13 @@
 - Stores media and downloads on NFS share.
 - SELinux support.
 
+I also have some observability:
+
+  - Storage: VictoriaMetrics and VictoriaLogs.
+  - Scrapping and writing: Grafana Alloy.
+  - Visualization: Grafana.
+  - Traces are not supported for now.
+
 ## Caveats
 
 This is not a ready-to-use configuration that you can just apply. It requires initialized state.
@@ -24,3 +31,8 @@ I see this more as a template for your own setups.
 I would like to switch to Flatcar Linux, but for now it doesn't include the `i915` kernel driver,
 which is a dealbreaker for me. However, it's [already merged](https://github.com/flatcar/scripts/pull/2349)
 and will soon be available in the Alpha channel.
+
+Also, I want to move my Traefik, Grafana Alloy and Victoria vmauth configurations to this repo
+at some point, but I didn't figure out how to do it properly now.
+
+And finally I want to harden my network setup, since for now it's pretty permissive.

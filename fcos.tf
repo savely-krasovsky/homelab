@@ -1,5 +1,9 @@
-data "bitwarden_secret" "victoria_bearer_token" {
-  id = var.containers_secret_config.victoria_bearer_token
+data "bitwarden_secret" "vmauth_traefik_bearer_token" {
+  id = var.containers_secret_config.vmauth_traefik_bearer_token
+}
+
+data "bitwarden_secret" "vmauth_proxmox_bearer_token" {
+  id = var.containers_secret_config.vmauth_proxmox_bearer_token
 }
 
 data "bitwarden_secret" "immich_map_key" {
@@ -13,8 +17,9 @@ locals {
     proxmox_ip : var.proxmox_config.host,
     truenas_ip : var.fcos_config.truenas_ip,
     secrets : {
-      victoria_bearer_token : data.bitwarden_secret.victoria_bearer_token.value
-      immich_map_key = data.bitwarden_secret.immich_map_key.value
+      vmauth_traefik_bearer_token : data.bitwarden_secret.vmauth_traefik_bearer_token.value
+      vmauth_proxmox_bearer_token : data.bitwarden_secret.vmauth_proxmox_bearer_token.value
+      immich_map_key : data.bitwarden_secret.immich_map_key.value
     }
   })
 
@@ -35,14 +40,14 @@ locals {
   ])
 
   butane_config = merge(var.fcos_config, {
-    config_files  = local.config_files
-    directories   = local.directories,
+    config_files = local.config_files
+    directories  = local.directories,
   })
 
   init_script_path = "${path.module}/scripts/init_fcos.sh.tftpl"
 }
 
-output "test" {
+output "directories_to_create" {
   value = local.directories
 }
 

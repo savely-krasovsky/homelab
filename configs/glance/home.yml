@@ -1,0 +1,86 @@
+- name: Startpage
+  width: slim
+  hide-desktop-navigation: true
+  center-vertically: true
+  columns:
+    - size: full
+      widgets:
+        - type: search
+          search-engine: google
+          autofocus: true
+
+        - type: docker-containers
+          hide-by-default: true
+
+        - type: monitor
+          cache: 1m
+          title: TLS Passthrough
+          sites:
+            - title: Proxmox
+              url: https://pve.${base_domain}/
+              icon: di:proxmox-light
+            - title: TrueNAS
+              url: https://truenas.${base_domain}/
+              icon: di:truenas
+
+        - type: bookmarks
+          groups:
+            - title: General
+              links:
+                - title: Fastmail
+                  icon: di:fastmail
+                  url: https://app.fastmail.com/
+                - title: Github
+                  icon: di:github-light
+                  url: https://github.com/
+            - title: Social
+              links:
+                - title: Reddit
+                  icon: di:reddit
+                  url: https://www.reddit.com/
+                - title: Bluesky
+                  icon: di:bluesky
+                  url: https://bsky.app/
+                - title: DTF
+                  icon: https://dtf.ru/assets/favicon-32x32.png
+                  url: https://dtf.ru/
+            - title: Entertainment
+              links:
+                - title: YouTube
+                  icon: di:youtube
+                  url: https://www.youtube.com/
+
+    - size: small
+      widgets:
+        - type: weather
+          location: Belgrade, Serbia
+
+        - type: releases
+          show-source-icon: true
+          limit: 20
+          collapse-after: 10
+          repositories:
+            - actualbudget/actual
+            - glanceapp/glance
+            - grafana/alloy
+            - grafana/grafana
+            - hoarder-app/hoarder
+            - immich-app/immich
+            - miniflux/miniflux
+            - oauth2-proxy/oauth2-proxy
+            - open-webui/open-webui
+            - outline/outline
+            - pocket-id/pocket-id
+            - dockerhub:qbittorrentofficial/qbittorrent-nox
+            - traefik/traefik
+            - VictoriaMetrics/VictoriaMetrics
+
+        - type: server-stats
+          servers:
+            - type: local
+              name: Services
+              hide-mountpoints-by-default: true
+              mountpoints:
+                "/app/config":
+                  name: iSCSI
+                  hide: false

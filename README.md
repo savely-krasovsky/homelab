@@ -42,18 +42,16 @@ I also have some observability:
 
 ## Caveats
 
-This is not a ready-to-use configuration that you can just apply. It requires additional configuration files
-and initialized state. You can apply it, write those configs, then go to Pocket ID, generate OAuth2 Client IDs,
-and paste them into container templates. Technically, it's possible to make it as generic as possible,
-but I don't think anyone wants to copy my setup entirely. I see this more as a template for your own setups.
+This is not a ready-to-use configuration that you can just apply. It requires initialized state.
+You can apply it, then go to Pocket ID, generate OAuth2 Client IDs, and paste them into container templates.
+Technically, it's possible to make it as generic as possible, but I don't think anyone wants to copy my setup entirely.
+I see this more as a template for your own setups.
 
 ## Future plans
 
-I would like to switch to Flatcar Linux, but for now it doesn't include the `i915` kernel driver,
-which is a dealbreaker for me. However, it's [already merged](https://github.com/flatcar/scripts/pull/2349)
-and will soon be available in the Alpha channel.
-
-Also, I want to move my Traefik, Grafana Alloy and Victoria vmauth configurations to this repo
-at some point, but I didn't figure out how to do it properly now.
-
-And finally I want to harden my network setup, since for now it's pretty permissive.
+- [x] Move Traefik, Graana Alloy and other configs to repository. 
+- [ ] Consider switching to Flatcar Linux. Personally I like it more, but in the current version they didn't ship
+     `i915` driver, which is a dealbreaker for me. However, it's [already merged](https://github.com/flatcar/scripts/pull/2349)
+      and will soon be available in the Alpha channel.
+- [ ] Harden network setup; for now it's pretty permissive.
+- [ ] Monitor uptime and setup alerts with Uptime Kuma.

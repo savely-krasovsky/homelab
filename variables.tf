@@ -25,7 +25,8 @@ variable "containers_secret_config" {
   type = map(string)
   default = {
     traefik_cf_dns_api_token                  = "e9e0f0f0-abc8-4bde-b05f-b292018179bb"
-    victoria_bearer_token                     = "fba802cf-948f-4ff7-8965-b29f00e2da48"
+    vmauth_traefik_bearer_token             = "fba802cf-948f-4ff7-8965-b29f00e2da48"
+    vmauth_proxmox_bearer_token             = "bb281df0-e5e8-4348-a92e-b2a300a30117"
     oauth2_proxy_cookie_secret                = "289c0832-27c2-463b-97b7-b29200a8cebd"
     oauth2_proxy_client_secret                = "afdb8ef2-a3d4-4a17-b839-b29200ab6f87"
     pocket_id_maxmind_license_key             = "08c549a4-bf48-4998-8cb0-b29200ac845d"
@@ -50,7 +51,8 @@ variable "containers_secret_config" {
     outline_postgres_password                 = "4212e3a7-acd3-4804-ac0e-b29d01015850"
     outline_oidc_client_secret                = "9c8cae9a-db6d-45d0-8cc0-b29d0101844c"
     outline_smtp_password                     = "5fdbfb32-257e-4cc3-8b07-b29d01063ba6"
-    grafana_oauth2_client_secret = "697cf367-a80c-41f6-b975-b2a200a986d8"
+    grafana_oauth2_client_secret              = "697cf367-a80c-41f6-b975-b2a200a986d8"
+    glance_github_token                       = "de3353d8-09d9-4063-b513-b2a3008cc2c9"
   }
 }
 

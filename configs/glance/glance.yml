@@ -1,0 +1,5 @@
+server:
+  assets-path: /app/assets
+
+pages:
+  !include: home.yml

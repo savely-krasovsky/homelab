@@ -17,7 +17,7 @@ Label="glance.hide=false"
 
 Exec=run --storage.path=/var/lib/alloy/data --disable-reporting /etc/alloy/config.alloy
 
-Volume=/var/mnt/docker/app_data/grafana/alloy/config.alloy:/etc/alloy/config.alloy:Z
+Volume=%E/alloy/config.alloy:/etc/alloy/config.alloy:Z
 Volume=%t/podman/podman.sock:/var/run/docker.sock
 
 Network=reverse-proxy.network

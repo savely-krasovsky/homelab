@@ -1,0 +1,61 @@
+logging {
+  level  = "info"
+  format = "json"
+}
+
+discovery.docker "fcos" {
+  host = "unix:///var/run/docker.sock"
+}
+
+discovery.relabel "docker" {
+  targets = discovery.docker.fcos.targets
+  
+  rule {
+    action = "labelmap"
+    regex  = "^__meta_docker_(.*)$"
+  }
+}
+
+loki.source.docker "podman" {
+  host          = "unix:///var/run/docker.sock"
+  targets       = discovery.docker.fcos.targets
+  labels        = { "source_name" = "podman" } 
+  forward_to    = [loki.process.copy_msg.receiver]
+  relabel_rules = discovery.relabel.docker.rules
+}
+
+loki.process "copy_msg" {
+  forward_to = [loki.write.victoria_logs.receiver]
+
+  // Bluesky logs plain json, so we need to manually remap msg to _msg.
+  stage.match {
+    selector = "{_msg=\"\"}"
+
+    stage.json {
+      expressions = { "msg" = "" }
+    }
+
+    stage.labels {
+      values = { "_msg" = "msg" }
+    }
+  }
+}
+
+loki.write "victoria_logs" {
+  endpoint {
+    url = "http://victoria:9428/insert/loki/api/v1/push?_stream_fields=source_name,container_name"
+  }
+}
+
+// Just Traefik for now
+prometheus.scrape "scrape_metrics" {
+  targets         = [{ __address__ = "traefik:8082" }]
+  forward_to      = [prometheus.remote_write.victoria_metrics.receiver]
+  scrape_interval = "10s"
+}
+
+prometheus.remote_write "victoria_metrics" {
+  endpoint {
+    url = "http://victoria:8428/prometheus/api/v1/write"
+  }
+}

@@ -1,32 +1,49 @@
 data "bitwarden_secret" "victoria_bearer_token" {
-  id = var.quadlets_secret_config.victoria_bearer_token
+  id = var.containers_secret_config.victoria_bearer_token
 }
 
 data "bitwarden_secret" "immich_map_key" {
-  id = var.quadlets_secret_config.immich_map_key
+  id = var.containers_secret_config.immich_map_key
 }
 
 locals {
   // Add secrets into quadlets config
-  quadlets_config = merge(var.quadlets_config, {
-    secrets: {
-      victoria_bearer_token: data.bitwarden_secret.victoria_bearer_token.value
+  containers_config = merge(var.containers_config, {
+    email : var.containers_config.email,
+    proxmox_ip : var.proxmox_config.host,
+    truenas_ip : var.fcos_config.truenas_ip,
+    secrets : {
+      victoria_bearer_token : data.bitwarden_secret.victoria_bearer_token.value
       immich_map_key = data.bitwarden_secret.immich_map_key.value
     }
   })
 
   # Get a list of all files in the specified directory
-  quadlet_paths = fileset(path.module, "quadlets/**")
-  quadlet_files = {
-    for path in local.quadlet_paths :
-    replace(basename(path), ".tftpl", "") => templatefile(path, local.quadlets_config)
+  config_paths = fileset(path.module, "configs/**")
+  config_files = {
+    for path in local.config_paths :
+    replace(trimprefix(path, "configs/"), ".tftpl", "") => templatefile(path, local.containers_config)
   }
 
+  // I use trimsuffix+basename instead of dirname because on Windows dirname replaces slashes with backslashes.
+  possible_paths = [
+    for path in fileset(path.module, "configs/**") :trimsuffix(trimprefix(path, "configs/"), "/${basename(path)}")
+  ]
+  // Because Terraform/Tofu doesn't interacting with real filesystem, I cannot check if directory is actually directory.
+  directories = distinct([
+    for path in local.possible_paths : path if !strcontains(basename(path), ".")
+  ])
+
   butane_config = merge(var.fcos_config, {
-    quadlet_files = local.quadlet_files
+    config_files  = local.config_files
+    directories   = local.directories,
   })
 
   init_script_path = "${path.module}/scripts/init_fcos.sh.tftpl"
+}
+
+output "test" {
+  value = local.directories
 }
 
 data "ct_config" "fcos_ignition" {
@@ -49,7 +66,7 @@ resource "proxmox_virtual_environment_vm" "fcos" {
 
   cpu {
     cores = 8
-    type = "host"
+    type  = "host"
   }
 
   memory {
@@ -74,8 +91,8 @@ resource "proxmox_virtual_environment_vm" "fcos" {
   }
 
   network_device {
-    bridge = "vmbr0"
-    vlan_id = 100
+    bridge      = "vmbr0"
+    vlan_id     = 100
     mac_address = var.fcos_config.mac_address
   }
 
@@ -115,18 +132,18 @@ resource "null_resource" "fcos_provision_secrets" {
   }
 
   connection {
-    type = "ssh"
-    user = "core"
+    type  = "ssh"
+    user  = "core"
     agent = true
-    host = var.fcos_config.ip
+    host  = var.fcos_config.ip
   }
 
   provisioner "file" {
     destination = "/tmp/init.sh"
     content = templatefile(local.init_script_path, {
-      bws_access_token: var.bws_access_token
-      quadlet_files: local.quadlet_files
-      secrets: var.quadlets_secret_config
+      bws_access_token : var.bws_access_token
+      config_files : local.config_files
+      secrets : var.containers_secret_config
     })
   }
 

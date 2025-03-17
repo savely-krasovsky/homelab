@@ -1,0 +1,16 @@
+{{ $baseDomain := ".${base_domain}" }}
+{{ $rules := dict "pve.${base_domain}" "${proxmox_ip}:8006" "truenas.${base_domain}" "${truenas_ip}:443" }}
+tcp:
+  routers:
+    {{ range $key, $value := $rules }}{{ $name := trimSuffix $baseDomain $key }}{{ $name }}:
+      rule: HostSNI(`{{ $key }}`)
+      service: {{ $name }}
+      tls:
+        passthrough: true
+    {{ end }}
+  services:
+    {{ range $key, $value := $rules }}{{ trimSuffix $baseDomain $key }}:
+      loadBalancer:
+        servers:
+          - address: {{ $value }}
+    {{ end }}

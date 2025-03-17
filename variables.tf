@@ -7,20 +7,20 @@ variable "bws_access_token" {
 variable "proxmox_config" {
   description = "Proxmox credentials"
   type = object({
-    endpoint = string
+    host = string
     password_secret_id = string
   })
 }
 
-# Just base domain for now
-variable "quadlets_config" {
-  description = "Shared Quadlets configuration"
+variable "containers_config" {
+  description = "Shared configuration"
   type = object({
+    email = string
     base_domain = string
   })
 }
 
-variable "quadlets_secret_config" {
+variable "containers_secret_config" {
   description = "Quadlet Ssecret"
   type = map(string)
   default = {

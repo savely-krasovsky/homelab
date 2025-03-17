@@ -1,0 +1,9 @@
+http:
+  middlewares:
+    oauth2-proxy:
+      forwardAuth:
+        address: http://oauth2-proxy:4180/
+        trustForwardHeader: true
+        authResponseHeaders:
+          - X-Auth-Request-Access-Token
+          - Authorization

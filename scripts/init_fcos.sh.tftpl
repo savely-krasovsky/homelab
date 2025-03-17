@@ -12,11 +12,11 @@ podman run --rm -it -v /var/home/core:/home/app --user 1000:1000 --uidmap +1000:
 
 echo "Starting Quadlets..."
 # Quadlets are "enabled" using their configurations, it's enough to just start them.
-%{ for name, content in quadlet_files ~}
-%{ if strcontains(name, ".container") && !strcontains(content, "\nPod=") ~}
-systemctl --user start ${replace(name, ".container", "")}
+%{ for path, content in config_files ~}
+%{ if strcontains(basename(path), ".container") && !strcontains(content, "\nPod=") ~}
+systemctl --user start ${replace(basename(path), ".container", "")}
 %{ endif ~}
-%{ if strcontains(name, ".pod") ~}
-systemctl --user start ${replace(name, ".pod", "")}-pod
+%{ if strcontains(basename(path), ".pod") ~}
+systemctl --user start ${replace(basename(path), ".pod", "")}-pod
 %{ endif ~}
 %{ endfor ~}

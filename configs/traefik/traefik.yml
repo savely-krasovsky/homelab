@@ -1,0 +1,45 @@
+entryPoints:
+  web:
+    address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+  websecure:
+    address: ":443"
+    http:
+      middlewares:
+        - security-headers@file
+      tls:
+        certResolver: leresolver
+  metrics:
+    address: ":8082"
+
+providers:
+  docker:
+    exposedByDefault: false
+  file:
+    directory: /etc/traefik/file
+    watch: true
+
+certificatesResolvers:
+  leresolver:
+    acme:
+      email: ${email}
+      storage: /etc/traefik/acme/acme.json
+      dnsChallenge:
+        provider: cloudflare
+      keyType: EC256
+
+api:
+  dashboard: true
+
+metrics:
+  prometheus:
+    entryPoint: metrics
+
+log:
+  format: json
+
+accessLog:
+  format: json

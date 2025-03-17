@@ -35,7 +35,7 @@ data "bitwarden_secret" "proxmox_password" {
 }
 
 provider "proxmox" {
-  endpoint = var.proxmox_config.endpoint
+  endpoint = "https://${var.proxmox_config.host}:8006"
   insecure = true
 
   // Unfortunately Proxmox can execute a lot of actions only under root user...

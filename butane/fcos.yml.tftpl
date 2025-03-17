@@ -14,18 +14,20 @@ storage:
         name: core
       group:
         name: core
-
-    # Quadlets dir
     - path: /var/home/core/.config/containers
       user:
         name: core
       group:
         name: core
-    - path: /var/home/core/.config/containers/systemd
+
+    # Config dirs
+%{ for _, path in directories ~}
+    - path: /var/home/core/.config/${path}
       user:
         name: core
       group:
         name: core
+%{ endfor ~}
 
     # Systemd user dir
     - path: /var/home/core/.config/systemd
@@ -108,9 +110,9 @@ storage:
           driver = "overlay"
           rootless_storage_path = "/var/mnt/docker/$USER"
 
-    # Quadlets block
-%{ for name, content in quadlet_files ~}
-    - path: /var/home/core/.config/containers/systemd/${name}
+    # Configs block
+%{ for name, content in config_files ~}
+    - path: /var/home/core/.config/${name}
       contents:
         inline: |
           ${indent(10, content)}

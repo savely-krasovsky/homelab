@@ -37,7 +37,6 @@ Label="traefik.http.routers.pds.ruleSyntax=v2"
 Label="traefik.http.routers.pds.entrypoints=websecure"
 Label="traefik.http.routers.pds.tls.domains[0].main=pds.${base_domain}"
 Label="traefik.http.routers.pds.tls.domains[0].sans=*.pds.${base_domain}"
-Label="traefik.http.routers.pds.tls.options=http3@file"
 Label="traefik.http.routers.pds.tls.certresolver=leresolver"
 
 Volume=/var/mnt/docker/app_data/bluesky/pds:/pds:Z

@@ -11,7 +11,11 @@ ContainerName=traefik
 User=1000:1000
 UserNS=keep-id:uid=1000,gid=1000
 
+# I use CNAMEs to point to my homelab;
+# Variable name could be misleading, since overwise
+# Lego tries to issue cert for you CNAME host.
 Environment=LEGO_DISABLE_CNAME_SUPPORT=true
+Secret=traefik-cf-dns-api-token,type=env,target=CF_DNS_API_TOKEN
 
 Label="glance.name=Traefik"
 Label="glance.icon=di:traefik"
@@ -26,10 +30,10 @@ Label="traefik.http.routers.dashboard.middlewares=oauth2-proxy@file"
 Label="traefik.http.routers.dashboard-auth.rule=Host(`traefik.${base_domain}`) && PathPrefix(`/oauth2/`)"
 Label="traefik.http.routers.dashboard-auth.service=oauth2-proxy"
 
-Secret=traefik-cf-dns-api-token,type=env,target=CF_DNS_API_TOKEN
+Volume=%E/traefik/traefik.yml:/etc/traefik/traefik.yml:Z
+Volume=%E/traefik/file:/etc/traefik/file:Z
+Volume=/var/mnt/docker/app_data/traefik/acme:/etc/traefik/acme:Z
 
-Volume=/var/mnt/docker/app_data/traefik/traefik.yml:/etc/traefik/traefik.yml:Z
-Volume=/var/mnt/docker/app_data/traefik/data:/data:Z
 Volume=%t/podman/podman.sock:/var/run/docker.sock
 
 Network=reverse-proxy.network

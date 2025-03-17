@@ -49,7 +49,7 @@ I see this more as a template for your own setups.
 
 ## Future plans
 
-- [x] Move Traefik, Graana Alloy and other configs to repository. 
+- [x] Move Traefik, Grafana Alloy and other configs to the repository. 
 - [ ] Consider switching to Flatcar Linux. Personally I like it more, but in the current version they didn't ship
      `i915` driver, which is a dealbreaker for me. However, it's [already merged](https://github.com/flatcar/scripts/pull/2349)
       and will soon be available in the Alpha channel.

@@ -30,18 +30,12 @@ locals {
     replace(trimprefix(path, "configs/"), ".tftpl", "") => templatefile(path, local.containers_config)
   }
 
-  // I use trimsuffix+basename instead of dirname because on Windows dirname replaces slashes with backslashes.
-  possible_paths = [
-    for path in fileset(path.module, "configs/**") :trimsuffix(trimprefix(path, "configs/"), "/${basename(path)}")
-  ]
-  // Because Terraform/Tofu doesn't interacting with real filesystem, I cannot check if directory is actually directory.
-  directories = distinct([
-    for path in local.possible_paths : path if !strcontains(basename(path), ".")
-  ])
+  // Automatically scans and selects all nested directories
+  directories = provider::homelab-helpers::directories("${path.module}/configs", true)
 
   butane_config = merge(var.fcos_config, {
-    config_files = local.config_files
-    directories  = local.directories,
+    config_files : local.config_files
+    directories  : local.directories,
   })
 
   init_script_path = "${path.module}/scripts/init_fcos.sh.tftpl"

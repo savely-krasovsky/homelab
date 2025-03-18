@@ -9,18 +9,12 @@ passwd:
 
 storage:
   directories:
+    # Config dir
     - path: /var/home/core/.config
       user:
         name: core
       group:
         name: core
-    - path: /var/home/core/.config/containers
-      user:
-        name: core
-      group:
-        name: core
-
-    # Config dirs
 %{ for _, path in directories ~}
     - path: /var/home/core/.config/${path}
       user:

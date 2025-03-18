@@ -95,3 +95,18 @@ provider "registry.opentofu.org/poseidon/ct" {
     "zh:63455a68fee4ba0c9b131eb7e267eb17707184c55a5feb9e2bad2d9de5889d6a",
   ]
 }
+
+provider "registry.terraform.io/savely-krasovsky/homelab-helpers" {
+  version     = "0.0.5"
+  constraints = "0.0.5"
+  hashes = [
+    "h1:f+ApFgqs5MEt5UUa9/RWkiExbC0wqWEAr91AaHymaO8=",
+    "zh:44dfe4c42c99cc39f4154073a67969accf041c0d3ee31f3e3a145dc09b3c23fd",
+    "zh:4fa99c4d6f88544a93df3862840ef662b22401cfbd800495bf962564acccc29a",
+    "zh:890df766e9b839623b1f0437355032a3c006226a6c200cd911e15ee1a9014e9f",
+    "zh:b749f23053aefbe92b5ed2bbb0ce793cd16a807b56267a16bf4749e07d5e7903",
+    "zh:be6b668767e1b88f845f5906eea7809383e366523e79a7bdbf46a4158e6be8fd",
+    "zh:c2af59bab14023c1d771798777561c00889f125ac7104659275d8a5320f35c43",
+    "zh:ce5fb97728f4425b9cabc613dd109bb18a9cd0d88cf2a6777b1db1d373424006",
+  ]
+}

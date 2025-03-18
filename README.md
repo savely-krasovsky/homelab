@@ -55,3 +55,4 @@ I see this more as a template for your own setups.
       and will soon be available in the Alpha channel.
 - [ ] Harden network setup; for now it's pretty permissive.
 - [ ] Monitor uptime and setup alerts with Uptime Kuma.
+- [ ] Integrate `bschaatsbergen/assert` support.

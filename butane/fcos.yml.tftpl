@@ -15,7 +15,7 @@ storage:
         name: core
       group:
         name: core
-%{ for _, path in directories ~}
+%{ for _, path in config_dirs ~}
     - path: /var/home/core/.config/${path}
       user:
         name: core

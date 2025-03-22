@@ -24,25 +24,24 @@ locals {
   })
 
   # Get a list of all files in the specified directory
-  config_paths = fileset(path.module, "configs/**")
+  config_paths = fileset("${path.module}/configs", "**")
   config_files = {
-    for path in local.config_paths :
-    replace(trimprefix(path, "configs/"), ".tftpl", "") => templatefile(path, local.containers_config)
+    for cfgpath in local.config_paths :
+    replace(cfgpath, ".tftpl", "") => templatefile("${path.module}/configs/${cfgpath}", local.containers_config)
   }
-
-  // Automatically scans and selects all nested directories
-  directories = provider::homelab-helpers::directories("${path.module}/configs", true)
+  # Terraform hasn't directory alternative for fileset method
+  config_dirs = provider::homelab-helpers::dirset("${path.module}/configs", "**")
 
   butane_config = merge(var.fcos_config, {
     config_files : local.config_files
-    directories  : local.directories,
+    config_dirs  : local.config_dirs,
   })
 
   init_script_path = "${path.module}/scripts/init_fcos.sh.tftpl"
 }
 
 output "directories_to_create" {
-  value = local.directories
+  value = local.config_dirs
 }
 
 data "ct_config" "fcos_ignition" {

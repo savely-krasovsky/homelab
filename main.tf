@@ -22,7 +22,7 @@ terraform {
     }
     homelab-helpers = {
       source = "registry.terraform.io/savely-krasovsky/homelab-helpers"
-      version = "0.0.5"
+      version = "0.0.6"
     }
   }
 }

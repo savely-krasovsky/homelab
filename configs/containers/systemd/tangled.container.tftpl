@@ -1,0 +1,36 @@
+[Unit]
+Description=Tangled Knot Quadlet
+
+[Container]
+Image=ghcr.io/savely-krasovsky/tangled:latest
+AutoUpdate=registry
+ContainerName=tangled
+
+# Unfortunately Tangled cannot fully work under non-root user
+
+Environment=KNOT_REPO_SCAN_PATH=/home/git/repositories
+Environment=KNOT_SERVER_HOSTNAME=knot.${base_domain}
+Environment=KNOT_SERVER_DB_PATH=/app/knotserver.db
+Secret=tangled-knot-server-secret,type=env,target=KNOT_SERVER_SECRET
+
+Label="glance.name=Tangled Knot"
+Label="glance.url=https://knot.${base_domain}"
+Label="glance.hide=false"
+
+Label="traefik.enable=true"
+Label="traefik.http.routers.tangled.rule=Host(`knot.${base_domain}`)"
+Label="traefik.http.services.tangled.loadbalancer.server.port=5555"
+
+Volume=/var/mnt/docker/app_data/tangled/keys:/etc/ssh/keys:Z
+Volume=/var/mnt/docker/app_data/tangled/repositories:/home/git/repositories:Z
+Volume=/var/mnt/docker/app_data/tangled/server:/app:Z
+
+Network=reverse-proxy.network
+PublishPort=2222:22/tcp
+
+[Service]
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target

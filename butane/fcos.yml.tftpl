@@ -66,6 +66,10 @@ storage:
       group:
         name: core
 
+    # Hometown timezone
+    - path: /etc/localtime
+      target: ../usr/share/zoneinfo/Europe/Belgrade
+
   files:
     # http and https sockets for traefik
     - path: /var/home/core/.config/systemd/user/http.socket

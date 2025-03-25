@@ -57,6 +57,6 @@ I see this more as a template for your own setups.
 - [ ] Consider switching to Flatcar Linux. Personally I like it more, but in the current version they didn't ship
      `i915` driver, which is a dealbreaker for me. However, it's [already merged](https://github.com/flatcar/scripts/pull/2349)
       and will soon be available in the Alpha channel.
+- [x] Monitor uptime and setup alerts with Uptime Kuma.
 - [ ] Harden network setup; for now it's pretty permissive.
-- [ ] Monitor uptime and setup alerts with Uptime Kuma.
-- [ ] Integrate `bschaatsbergen/assert` support.
+- [ ] Integrate `hashicorp/assert` support.

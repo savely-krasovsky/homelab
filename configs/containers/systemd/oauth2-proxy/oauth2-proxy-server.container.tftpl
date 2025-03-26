@@ -1,5 +1,5 @@
 [Unit]
-Description=OAuth2 Proxy Quadlet
+Description=OAuth2 Proxy Server Quadlet
 # OAuth2 Proxy requests OIDC configuration after launch, Pocket-ID should be ready
 Wants=pocket-id.service
 After=pocket-id.service
@@ -7,7 +7,7 @@ After=pocket-id.service
 [Container]
 Image=quay.io/oauth2-proxy/oauth2-proxy:latest
 AutoUpdate=registry
-ContainerName=oauth2-proxy
+ContainerName=oauth2-proxy-server
 
 User=1000:1000
 
@@ -24,9 +24,12 @@ Environment=OAUTH2_PROXY_COOKIE_REFRESH=59m
 Environment=OAUTH2_PROXY_COOKIE_EXPIRE=720h
 Environment=OAUTH2_PROXY_REVERSE_PROXY=true
 Environment=OAUTH2_PROXY_UPSTREAMS=static://202
+Environment=OAUTH2_PROXY_SESSION_STORE_TYPE=redis
+Environment=OAUTH2_PROXY_REDIS_CONNECTION_URL=redis://oauth2-proxy-redis
 Secret=oauth2-proxy-cookie-secret,type=env,target=OAUTH2_PROXY_COOKIE_SECRET
 Secret=oauth2-proxy-client-secret,type=env,target=OAUTH2_PROXY_CLIENT_SECRET
 
+Label="glance.id=oauth2-proxy"
 Label="glance.name=OAuth2 Proxy"
 Label="glance.icon=di:oauth2-proxy"
 Label="glance.description=Identity-Aware Proxy"
@@ -36,7 +39,7 @@ Label="traefik.enable=true"
 Label="traefik.http.routers.oauth2-proxy.rule=Host(`oauth2-proxy.${base_domain}`)"
 Label="traefik.http.services.oauth2-proxy.loadbalancer.server.port=4180"
 
-Network=reverse-proxy.network
+Pod=oauth2-proxy.pod
 
 [Service]
 TimeoutStartSec=900

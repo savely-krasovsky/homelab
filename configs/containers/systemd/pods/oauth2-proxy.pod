@@ -1,0 +1,7 @@
+[Unit]
+Description=OAuth2 Proxy Pod
+
+[Pod]
+PodName=oauth2-proxy
+Network=oauth2-proxy.network
+Network=reverse-proxy.network

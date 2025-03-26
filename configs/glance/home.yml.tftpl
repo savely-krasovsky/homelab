@@ -1,8 +1,45 @@
 - name: Startpage
-  width: slim
   hide-desktop-navigation: true
   center-vertically: true
   columns:
+    - size: small
+      widgets:
+        - type: weather
+          location: Belgrade, Serbia
+
+        - type: releases
+          token: ${GITHUB_TOKEN}
+          show-source-icon: true
+          limit: 30
+          collapse-after: 5
+          repositories:
+            - actualbudget/actual
+            - glanceapp/glance
+            - grafana/alloy
+            - grafana/grafana
+            - hoarder-app/hoarder
+            - immich-app/immich
+            - miniflux/miniflux
+            - oauth2-proxy/oauth2-proxy
+            - open-webui/open-webui
+            - outline/outline
+            - pocket-id/pocket-id
+            - dockerhub:qbittorrentofficial/qbittorrent-nox
+            - traefik/traefik
+            - repository: louislam/uptime-kuma
+              include-prereleases: true
+            - VictoriaMetrics/VictoriaMetrics
+
+        - type: server-stats
+          servers:
+            - type: local
+              name: Services
+              hide-mountpoints-by-default: true
+              mountpoints:
+                "/app/config":
+                  name: iSCSI
+                  hide: false
+
     - size: full
       widgets:
         - type: search
@@ -52,35 +89,11 @@
 
     - size: small
       widgets:
-        - type: weather
-          location: Belgrade, Serbia
-
-        - type: releases
-          show-source-icon: true
-          limit: 20
-          collapse-after: 10
-          repositories:
-            - actualbudget/actual
-            - glanceapp/glance
-            - grafana/alloy
-            - grafana/grafana
-            - hoarder-app/hoarder
-            - immich-app/immich
-            - miniflux/miniflux
-            - oauth2-proxy/oauth2-proxy
-            - open-webui/open-webui
-            - outline/outline
-            - pocket-id/pocket-id
-            - dockerhub:qbittorrentofficial/qbittorrent-nox
-            - traefik/traefik
-            - VictoriaMetrics/VictoriaMetrics
-
-        - type: server-stats
-          servers:
-            - type: local
-              name: Services
-              hide-mountpoints-by-default: true
-              mountpoints:
-                "/app/config":
-                  name: iSCSI
-                  hide: false
+        - type: clock
+          hour-format: 24h
+          timezones:
+            - timezone: Europe/Moscow
+              label: Kazan
+            - timezone: Asia/Yekaterinburg
+              label: Novotroitsk
+        - type: calendar

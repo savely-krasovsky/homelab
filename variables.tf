@@ -32,6 +32,7 @@ variable "containers_secret_config" {
     pocket_id_maxmind_license_key             = "08c549a4-bf48-4998-8cb0-b29200ac845d"
     actual_budget_openid_client_secret        = "5754702b-d9d5-4127-b5ab-b29200abdd6a"
     open_webui_oauth_client_secret            = "b595040b-a23a-44af-8bff-b29200ad6258"
+    open_webui_google_drive_api_key           = "d24bf77b-622d-4ef0-88ae-b2b200d67ee1"
     hoarder_oauth_client_secret               = "784d379b-bcaf-424f-bc77-b29500ff1be6"
     hoarder_openai_api_key                    = "98f5ccdf-d4b1-4883-b4e3-b295010ba589"
     meili_master_key                          = "a67874c5-95c2-4f7a-b335-b295010010e0"

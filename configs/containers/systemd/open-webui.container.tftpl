@@ -16,7 +16,9 @@ Environment=ENABLE_OAUTH_SIGNUP=True
 Environment=OAUTH_CLIENT_ID=d4979561-8290-49c9-878e-0d325f7f06a6
 Environment=OPENID_PROVIDER_URL=https://id.${base_domain}/.well-known/openid-configuration
 Environment=OAUTH_PROVIDER_NAME="Pocket ID"
+Environment=GOOGLE_DRIVE_CLIENT_ID=293635092583-enecgfjflms6guru80qsd4etgi3o02q8.apps.googleusercontent.com
 Secret=open-webui-oauth-client-secret,type=env,target=OAUTH_CLIENT_SECRET
+Secret=open-webui-google-drive-api-key,type=env,target=GOOGLE_DRIVE_API_KEY
 
 Label="glance.name=Open WebUI"
 Label="glance.icon=di:open-webui-light"

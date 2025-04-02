@@ -1,0 +1,27 @@
+[Unit]
+Description=RMQTT Broker Quadlet
+
+[Container]
+Image=docker.io/rmqtt/rmqtt:latest
+AutoUpdate=registry
+ContainerName=rmqtt
+
+User=1000:1000
+UserNS=keep-id:uid=1000,gid=1000
+
+Label="glance.parent=victoria-metrics"
+Label="glance.name=MQTT Broker"
+Label="glance.hide=false"
+
+Volume=/var/mnt/docker/app_data/rmqtt/logs:/var/log/rmqtt:Z
+
+Network=reverse-proxy.network
+PublishPort=1883:1883
+PublishPort=6060:6060
+
+[Service]
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target

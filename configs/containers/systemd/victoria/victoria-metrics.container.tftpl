@@ -9,11 +9,14 @@ ContainerName=victoria-metrics
 User=1000:1000
 UserNS=keep-id:uid=1000,gid=1000
 
+Label="glance.id=victoria-metrics"
 Label="glance.name=VictoriaMetrics"
 Label="glance.icon=di:victoriametrics-light"
 Label="glance.url=https://metrics.${base_domain}"
 Label="glance.description=Metrics Storage"
 Label="glance.hide=false"
+
+Exec="--graphiteListenAddr=:2003"
 
 Volume=/var/mnt/observability/metrics:/victoria-metrics-data:Z
 

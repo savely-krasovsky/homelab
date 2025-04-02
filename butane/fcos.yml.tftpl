@@ -163,6 +163,69 @@ storage:
           # all keys on machine, reaching the limit.
           MaxAuthTries 10
 
+    # Firewall configuration
+    - path: /etc/sysconfig/nftables.conf
+      overwrite: true
+      mode: 0644
+      contents:
+        inline: |
+          include "/etc/nftables/main.nft"
+
+    - path: /etc/nftables/main.nft
+      overwrite: true
+      mode: 0644
+      contents:
+        inline: |
+          #!/usr/sbin/nft -f
+
+          flush ruleset
+
+          table inet filter {
+          	chain input {
+          		type filter hook input priority filter; policy drop;
+
+          		# allow established/related connections
+          		ct state {established, related} accept
+
+          		# early drop of invalid connections
+          		ct state invalid drop
+
+          		# allow from loopback
+          		iifname lo accept
+
+          		# allow icmp
+          		ip protocol icmp accept
+          		ip6 nexthdr icmpv6 counter accept
+
+          		# allow ssh
+          		tcp dport ssh accept
+
+          		# allow http and https
+          		tcp dport 8080 accept
+          		tcp dport 8443 accept
+
+          		# allow truenas to report metrics using graphite
+          		ip saddr 192.168.100.3 tcp dport 2003 accept
+          		ip saddr 192.168.100.3 udp dport 2003 accept
+
+          		# allow plugs to access mqtt broker
+          		ip saddr 192.168.100.1 tcp dport 1883 accept
+          	}
+
+          	chain forward {
+          		type filter hook forward priority filter; policy drop;
+
+          		ct state {established, related} accept
+          		ct state invalid drop
+
+          		ct status dnat accept
+          	}
+
+          	chain output {
+          		type filter hook output priority 0; policy accept;
+          	}
+          }
+
 systemd:
   units:
     - name: install-additional-software.service
@@ -286,6 +349,9 @@ systemd:
 
         [Install]
         WantedBy=remote-fs.target
+
+    - name: nftables.service
+      enabled: true
 
 kernel_arguments:
   should_exist:

@@ -5,3 +5,6 @@ Description=Victoria Pod
 PodName=victoria
 Network=victoria.network
 Network=reverse-proxy.network
+# Publish Graphite collector ports
+PublishPort=2003:2003/tcp
+PublishPort=2003:2003/udp

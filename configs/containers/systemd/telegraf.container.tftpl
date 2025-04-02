@@ -1,0 +1,26 @@
+[Unit]
+Description=Telegraf Agent Quadlet
+
+[Container]
+Image=docker.io/telegraf:alpine
+AutoUpdate=registry
+ContainerName=telegraf
+HostName=telegraf
+
+User=1000:1000
+UserNS=keep-id:uid=1000,gid=1000
+
+Label="glance.parent=victoria-metrics"
+Label="glance.name=Telegraf Agent"
+Label="glance.hide=false"
+
+Volume=%E/telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:Z
+
+Network=reverse-proxy.network
+
+[Service]
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target

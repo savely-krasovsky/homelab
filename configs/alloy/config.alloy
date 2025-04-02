@@ -9,7 +9,7 @@ discovery.docker "fcos" {
 
 discovery.relabel "docker" {
   targets = discovery.docker.fcos.targets
-  
+
   rule {
     action = "labelmap"
     regex  = "^__meta_docker_(.*)$"
@@ -19,7 +19,7 @@ discovery.relabel "docker" {
 loki.source.docker "podman" {
   host          = "unix:///var/run/docker.sock"
   targets       = discovery.docker.fcos.targets
-  labels        = { "source_name" = "podman" } 
+  labels        = { "source_name" = "podman" }
   forward_to    = [loki.process.copy_msg.receiver]
   relabel_rules = discovery.relabel.docker.rules
 }
@@ -47,9 +47,8 @@ loki.write "victoria_logs" {
   }
 }
 
-// Just Traefik for now
 prometheus.scrape "scrape_metrics" {
-  targets         = [{ __address__ = "traefik:8082" }]
+  targets         = [{ __address__ = "traefik:8082" }, {__address__ = "rmqtt:6060", __metrics_path__ = "/api/v1/metrics/prometheus" }]
   forward_to      = [prometheus.remote_write.victoria_metrics.receiver]
   scrape_interval = "10s"
 }
@@ -57,5 +56,27 @@ prometheus.scrape "scrape_metrics" {
 prometheus.remote_write "victoria_metrics" {
   endpoint {
     url = "http://victoria:8428/prometheus/api/v1/write"
+  }
+}
+
+// Receive metrics from MQTT
+otelcol.receiver.otlp "telegraf" {
+  http {}
+  grpc {}
+
+  output {
+    metrics = [otelcol.processor.batch.telegraf.input]
+  }
+}
+
+otelcol.processor.batch "telegraf" {
+  output {
+    metrics = [otelcol.exporter.otlphttp.victoria_metrics.input]
+  }
+}
+
+otelcol.exporter.otlphttp "victoria_metrics" {
+  client {
+    endpoint = "http://victoria:8428/opentelemetry"
   }
 }

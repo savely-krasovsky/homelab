@@ -12,8 +12,6 @@ entryPoints:
         - security-headers@file
       tls:
         certResolver: leresolver
-  metrics:
-    address: ":8082"
 
 providers:
   docker:
@@ -35,11 +33,22 @@ api:
   dashboard: true
 
 metrics:
-  prometheus:
-    entryPoint: metrics
+  otlp:
+    grpc:
+      endpoint: grafana-alloy:4317
+      insecure: true
 
 log:
-  format: json
+  otlp:
+    grpc:
+      endpoint: grafana-alloy:4317
+      insecure: true
 
 accessLog:
-  format: json
+  otlp:
+    grpc:
+      endpoint: grafana-alloy:4317
+      insecure: true
+
+experimental:
+  otlpLogs: true

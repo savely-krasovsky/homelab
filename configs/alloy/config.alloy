@@ -48,7 +48,7 @@ loki.write "victoria_logs" {
 }
 
 prometheus.scrape "scrape_metrics" {
-  targets         = [{ __address__ = "traefik:8082" }, {__address__ = "rmqtt:6060", __metrics_path__ = "/api/v1/metrics/prometheus" }]
+  targets         = [{ __address__ = "rmqtt:6060", __metrics_path__ = "/api/v1/metrics/prometheus" }]
   forward_to      = [prometheus.remote_write.victoria_metrics.receiver]
   scrape_interval = "10s"
 }
@@ -59,24 +59,31 @@ prometheus.remote_write "victoria_metrics" {
   }
 }
 
-// Receive metrics from MQTT
-otelcol.receiver.otlp "telegraf" {
+otelcol.receiver.otlp "default" {
   http {}
   grpc {}
 
   output {
-    metrics = [otelcol.processor.batch.telegraf.input]
+    metrics = [otelcol.processor.batch.default.input]
+    logs    = [otelcol.processor.batch.default.input]
   }
 }
 
-otelcol.processor.batch "telegraf" {
+otelcol.processor.batch "default" {
   output {
     metrics = [otelcol.exporter.otlphttp.victoria_metrics.input]
+    logs    = [otelcol.exporter.otlphttp.victoria_logs.input]
   }
 }
 
 otelcol.exporter.otlphttp "victoria_metrics" {
   client {
     endpoint = "http://victoria:8428/opentelemetry"
+  }
+}
+
+otelcol.exporter.otlphttp "victoria_logs" {
+  client {
+    endpoint = "http://victoria:9428/insert/opentelemetry"
   }
 }

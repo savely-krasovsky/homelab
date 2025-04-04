@@ -12,5 +12,5 @@ users:
   - bearer_token: "${secrets.vmauth_proxmox_bearer_token}"
     url_map:
       - src_hosts:
-        - "metrics\\.${replace(base_domain, ".", "\\\\.")}"
+        - "metrics\\.${replace(base_domain, ".", "\\\\.")}:443"
         url_prefix: "http://victoria-metrics:8428/"

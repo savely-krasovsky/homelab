@@ -1,0 +1,6 @@
+[Unit]
+Description=Karakeep Pod
+
+[Pod]
+PodName=karakeep
+Network=karakeep.network

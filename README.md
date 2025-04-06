@@ -28,7 +28,7 @@ I also have some observability:
 | Glance                                  | Homelab Dashboard             |     |
 | Grafana                                 | Data-visualization Platform   |     |
 | Grafana Alloy                           | OpenTelemetry Collector       |     |
-| Hoarder                                 | Bookmark App                  | ☑️  |
+| Karakeep                                | Bookmark App                  | ☑️  |
 | Immich                                  | Image & Video Management      | ☑️  |
 | Miniflux                                | RSS Reader                    | ☑️  |
 | OAuth2 Proxy                            | Identity-Aware Proxy          |     |

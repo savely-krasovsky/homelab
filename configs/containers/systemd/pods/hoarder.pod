@@ -1,6 +1,0 @@
-[Unit]
-Description=Hoarder Pod
-
-[Pod]
-PodName=hoarder
-Network=hoarder.network

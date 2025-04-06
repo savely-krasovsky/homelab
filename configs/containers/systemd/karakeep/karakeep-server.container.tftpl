@@ -1,0 +1,51 @@
+[Unit]
+Description=Karakeep Server Quadlet
+
+[Container]
+Image=ghcr.io/karakeep-app/karakeep:release
+AutoUpdate=registry
+ContainerName=karakeep-server
+
+# Unfortunately Karakeep cannot fully under non-root user: https://github.com/karakeep-app/karakeep/issues/606
+
+Environment=MEILI_ADDR=http://karakeep-meilisearch:7700
+Environment=BROWSER_WEB_URL=http://karakeep-chrome:9222
+Environment=NEXTAUTH_URL=https://karakeep.${base_domain}
+Environment=NEXTAUTH_URL_INTERNAL=http://karakeep:3000
+Environment=DATA_DIR=/data
+Environment=DISABLE_PASSWORD_AUTH=true
+Environment=OAUTH_WELLKNOWN_URL=https://id.${base_domain}/.well-known/openid-configuration
+Environment=OAUTH_CLIENT_ID=415213ad-ceba-4601-a6ab-1e99fa7ed80b
+Environment=OAUTH_PROVIDER_NAME="Pocket ID"
+Environment=OPENAI_BASE_URL=https://openrouter.ai/api/v1
+Environment=CRAWLER_FULL_PAGE_SCREENSHOT=true
+Environment=CRAWLER_FULL_PAGE_ARCHIVE=true
+Environment=CRAWLER_VIDEO_DOWNLOAD=true
+Environment=CRAWLER_VIDEO_DOWNLOAD_MAX_SIZE=-1
+Environment=OCR_LANGS=eng,rus
+Secret=nextauth-secret,type=env,target=NEXTAUTH_SECRET
+Secret=meili-master-key,type=env,target=MEILI_MASTER_KEY
+Secret=karakeep-oauth-client-secret,type=env,target=OAUTH_CLIENT_SECRET
+Secret=karakeep-openai-api-key,type=env,target=OPENAI_API_KEY
+
+Label="glance.id=karakeep"
+Label="glance.name=karakeep"
+Label="glance.icon=di:karakeep-light"
+Label="glance.url=https://karakeep.${base_domain}"
+Label="glance.description=Bookmark App"
+Label="glance.hide=false"
+
+Label="traefik.enable=true"
+Label="traefik.http.routers.karakeep.rule=Host(`karakeep.${base_domain}`)"
+Label="traefik.http.services.karakeep.loadbalancer.server.port=3000"
+
+Volume=/var/mnt/docker/app_data/karakeep:/data:Z
+
+Pod=karakeep.pod
+
+[Service]
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target

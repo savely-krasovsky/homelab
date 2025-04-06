@@ -1,10 +1,10 @@
 [Unit]
-Description=Hoarder Meilisearch Quadlet
+Description=Karakeep Meilisearch Quadlet
 
 [Container]
 Image=docker.io/getmeili/meilisearch:v1
 AutoUpdate=registry
-ContainerName=hoarder-meilisearch
+ContainerName=karakeep-meilisearch
 
 User=1000:1000
 UserNS=keep-id:uid=1000,gid=1000
@@ -12,7 +12,7 @@ UserNS=keep-id:uid=1000,gid=1000
 Environment=MEILI_NO_ANALYTICS=true
 Secret=meili-master-key,type=env,target=MEILI_MASTER_KEY
 
-Label="glance.parent=hoarder"
+Label="glance.parent=karakeep"
 Label="glance.name=Meilisearch"
 Label="glance.hide=false"
 
@@ -20,7 +20,7 @@ Exec=/bin/sh -c "meilisearch --experimental-dumpless-upgrade --experimental-logs
 
 Volume=/var/mnt/docker/app_data/meilisearch:/meili_data:Z
 
-Pod=hoarder.pod
+Pod=karakeep.pod
 
 [Service]
 TimeoutStartSec=900

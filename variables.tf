@@ -55,6 +55,7 @@ variable "containers_secret_config" {
     grafana_oauth2_client_secret              = "697cf367-a80c-41f6-b975-b2a200a986d8"
     glance_github_token                       = "de3353d8-09d9-4063-b513-b2a3008cc2c9"
     tangled_knot_server_secret                = "a58caac0-1c07-4152-89e6-b2a900c8fe8f"
+    forward_info_bot_telegram_token           = "f8eda775-f945-4eb8-b48a-b2b80092cf54"
   }
 }
 

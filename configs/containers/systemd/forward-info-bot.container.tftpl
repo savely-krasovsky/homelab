@@ -1,0 +1,18 @@
+[Unit]
+Description=Forward Info Bot Quadlet
+
+[Container]
+Image=ghcr.io/savely-krasovsky/forward-info-bot:latest
+AutoUpdate=registry
+ContainerName=forward-info-bot
+
+Secret=forward-info-bot-telegram-token,type=env,target=FORWARD_INFO_BOT_TELEGRAM_TOKEN
+
+Network=reverse-proxy.network
+
+[Service]
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target

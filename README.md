@@ -42,7 +42,7 @@ I also have some observability:
 | Uptime Kuma                             | Uptime Monitoring[^1]         |     |
 | VictoriaMetrics / VictoriaLogs / vmauth | Metrics and Logs Storage      | ☑️  |
 
-[^1]: Temporary, will be moved from Homeleb.
+[^1]: It lives outside Homeleb.
 
 ## Caveats
 

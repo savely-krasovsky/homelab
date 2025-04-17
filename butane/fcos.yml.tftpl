@@ -204,6 +204,14 @@ storage:
           		tcp dport 8080 accept
           		tcp dport 8443 accept
 
+          		# allow plex
+          		tcp dport 32400 accept
+          		udp dport 1900 accept
+          		udp dport 5353 accept
+          		tcp dport 8324 accept
+          		udp dport { 32410, 32412, 32413, 32414 } accept
+          		tcp dport 32469 accept
+
           		# allow truenas to report metrics using graphite
           		ip saddr 192.168.100.3 tcp dport 2003 accept
           		ip saddr 192.168.100.3 udp dport 2003 accept

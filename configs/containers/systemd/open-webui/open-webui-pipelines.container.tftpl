@@ -1,0 +1,24 @@
+[Unit]
+Description=Open WebUI Pipelines Quadlet
+
+[Container]
+Image=ghcr.io/open-webui/pipelines:main
+AutoUpdate=registry
+ContainerName=open-webui-pipelines
+
+# Unfortunately open-webui cannot work under non-root user
+
+Label="glance.parent=open-webui"
+Label="glance.name=Pipelines"
+Label="glance.hide=false"
+
+Volume=/var/mnt/docker/app_data/open-webui/pipelines:/app/pipelines:Z
+
+Pod=open-webui.pod
+
+[Service]
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target

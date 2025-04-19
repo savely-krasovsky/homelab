@@ -32,7 +32,7 @@ I also have some observability:
 | Immich                                  | Image & Video Management      | ☑️  |
 | Miniflux                                | RSS Reader                    | ☑️  |
 | OAuth2 Proxy                            | Identity-Aware Proxy          |     |
-| Open WebUI                              | Chatbot UI                    |     |
+| Open WebUI                              | Chatbot UI                    | ☑️  |
 | Outline                                 | Personal Knowledge Base       | ☑️  |
 | Plex                                    | Personal Media Server         |     |
 | Pocket ID                               | Single Sign-on Portal         |     |

@@ -249,7 +249,7 @@ systemd:
         [Service]
         Type=oneshot
         RemainAfterExit=yes
-        ExecStart=/usr/bin/rpm-ostree install --allow-inactive --assumeyes --reboot qemu-guest-agent intel-gpu-tools
+        ExecStart=/usr/bin/rpm-ostree install --allow-inactive --assumeyes --reboot qemu-guest-agent restic intel-gpu-tools
         ExecStart=/bin/touch /var/lib/%N.stamp
 
         [Install]
@@ -360,6 +360,70 @@ systemd:
 
     - name: nftables.service
       enabled: true
+
+    - name: restic-backblaze.service
+      contents: |
+        [Unit]
+        Description=Backup Docker data to Backblaze
+        Wants=network-online.target
+        After=network-online.target iscsi.service
+
+        [Service]
+        Type=oneshot
+        LoadCredential=restic-b2-account-id
+        LoadCredential=restic-b2-account-key
+        LoadCredential=restic-password
+        Environment=RESTIC_PASSWORD_FILE=%d/restic-password
+        ExecStart=/bin/bash -c "export B2_ACCOUNT_ID=$(cat $CREDENTIALS_DIRECTORY/restic-b2-account-id); export B2_ACCOUNT_KEY=$(cat $CREDENTIALS_DIRECTORY/restic-b2-account-key); restic -r b2:krasovsky-homelab:app-data --verbose backup /var/mnt/docker/app_data"
+
+        [Install]
+        WantedBy=multi-user.target
+
+    - name: restic-backblaze.timer
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Daily backup to Backblaze
+
+        [Timer]
+        OnCalendar=daily
+        RandomizedDelaySec=3600
+        Unit=restic-backblaze.service
+
+        [Install]
+        WantedBy=timers.target
+
+    - name: restic-storj.service
+      contents: |
+        [Unit]
+        Description=Backup Docker data to Storj
+        Wants=network-online.target
+        After=network-online.target iscsi.service
+
+        [Service]
+        Type=oneshot
+        LoadCredential=restic-aws-access-key-id
+        LoadCredential=restic-aws-secret-access-key
+        LoadCredential=restic-password
+        Environment=RESTIC_PASSWORD_FILE=%d/restic-password
+        ExecStart=/bin/bash -c "export AWS_ACCESS_KEY_ID=$(cat $CREDENTIALS_DIRECTORY/restic-aws-access-key-id); export AWS_SECRET_ACCESS_KEY=$(cat $CREDENTIALS_DIRECTORY/restic-aws-secret-access-key); restic -r s3:https://gateway.eu1.storjshare.io/homelab-backup/app-data --verbose backup /var/mnt/docker/app_data"
+
+        [Install]
+        WantedBy=multi-user.target
+
+    - name: restic-storj.timer
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Daily backup to Storj
+
+        [Timer]
+        OnCalendar=daily
+        RandomizedDelaySec=3600
+        Unit=restic-storj.service
+
+        [Install]
+        WantedBy=timers.target
 
 kernel_arguments:
   should_exist:

@@ -8,6 +8,10 @@ ContainerName=open-webui-pipelines
 
 # Unfortunately open-webui cannot work under non-root user
 
+Secret=open-webui-anthropic-api-key,type=env,target=ANTHROPIC_API_KEY
+Secret=open-webui-google-api-key,type=env,target=GOOGLE_API_KEY
+Secret=open-webui-openai-api-key,type=env,target=OPENAI_API_KEY
+
 Label="glance.parent=open-webui"
 Label="glance.name=Pipelines"
 Label="glance.hide=false"

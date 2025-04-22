@@ -1,13 +1,20 @@
 #!/bin/bash
 set -e
 
-echo "Importing secrets..."
+echo "Importing Podman and Restic secrets..."
 # Bitwarden Secrets Manager CLI requires to save state in order to work correctly, but
 # Fedora CoreOS has strict SELinux policies, so we need to make proper adjustments.
 %{ for name, id in secrets ~}
+%{ if !startswith(name, "restic_") ~}
 podman run --rm -it -v /var/home/core:/home/app --user 1000:1000 --uidmap +1000:@1000:1 --security-opt=label=disable \
   docker.io/bitwarden/bws secret get --color=no --access-token=${bws_access_token} ${id} | jq -r .value | tr -d '\n' | \
   podman secret create --replace ${replace(name, "_", "-")} - # I prefer '-' divider for everything related to podman
+%{ else ~}
+podman run --rm -it -v /var/home/core:/home/app --user 1000:1000 --uidmap +1000:@1000:1 --security-opt=label=disable \
+  docker.io/bitwarden/bws secret get --color=no --access-token=${bws_access_token} ${id} | jq -r .value | tr -d '\n' | \
+  sudo dd status=none of=/etc/credstore/${replace(name, "_", "-")}
+sudo chmod 0600 /etc/credstore/${replace(name, "_", "-")}
+%{ endif ~}
 %{ endfor ~}
 
 echo "Starting Quadlets..."

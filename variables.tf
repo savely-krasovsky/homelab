@@ -33,6 +33,9 @@ variable "containers_secret_config" {
     actual_budget_openid_client_secret        = "5754702b-d9d5-4127-b5ab-b29200abdd6a"
     open_webui_oauth_client_secret            = "b595040b-a23a-44af-8bff-b29200ad6258"
     open_webui_google_drive_api_key           = "d24bf77b-622d-4ef0-88ae-b2b200d67ee1"
+    open_webui_anthropic_api_key              = "104a349b-a4be-4d3a-9c0b-b2c700e64c9a"
+    open_webui_google_api_key                 = "3016f3ef-c14c-4f4c-8439-b2c700e62f21"
+    open_webui_openai_api_key                 = "24fd45e2-0fd3-42cd-8fd5-b2c700e66731"
     karakeep_oauth_client_secret              = "784d379b-bcaf-424f-bc77-b29500ff1be6"
     karakeep_openai_api_key                   = "98f5ccdf-d4b1-4883-b4e3-b295010ba589"
     meili_master_key                          = "a67874c5-95c2-4f7a-b335-b295010010e0"
@@ -56,6 +59,11 @@ variable "containers_secret_config" {
     glance_github_token                       = "de3353d8-09d9-4063-b513-b2a3008cc2c9"
     tangled_knot_server_secret                = "a58caac0-1c07-4152-89e6-b2a900c8fe8f"
     forward_info_bot_telegram_token           = "f8eda775-f945-4eb8-b48a-b2b80092cf54"
+    restic_aws_access_key_id                  = "2743cf63-05ae-45b4-997f-b2c700dfabef"
+    restic_aws_secret_access_key              = "134279a9-b3ee-4309-ae9e-b2c700dfe86c"
+    restic_b2_account_id                      = "3e058bd3-e13d-4b6a-9d48-b2c700e00d62"
+    restic_b2_account_key                     = "ddc2f07b-47ca-49b2-ae41-b2c700e02f01"
+    restic_password                           = "52ce5eb2-98ae-4243-ba08-b2c700e04b7e"
   }
 }
 

@@ -35,6 +35,13 @@ storage:
       group:
         name: core
 
+    # For local binaries
+    - path: /var/home/core/.local/bin
+      user:
+        name: core
+      group:
+        name: core
+
   links:
     # Enable Podman socket for Traefik
     - path: /var/home/core/.config/systemd/user/timers.target.wants/podman.socket
@@ -69,6 +76,14 @@ storage:
     # Hometown timezone
     - path: /etc/localtime
       target: ../usr/share/zoneinfo/Europe/Belgrade
+
+    # Enable systemd_exporter
+    - path: /var/home/core/.config/systemd/user/default.target.wants/systemd-exporter.service
+      target: /var/home/core/.config/systemd/user/systemd-exporter.service
+      user:
+        name: core
+      group:
+        name: core
 
   files:
     # http and https sockets for traefik
@@ -233,6 +248,35 @@ storage:
           		type filter hook output priority 0; policy accept;
           	}
           }
+
+    # download systemd_exporter and create systemd user service
+    - path: /var/home/core/.local/bin/systemd_exporter.tar.gz
+      contents:
+        source: https://github.com/prometheus-community/systemd_exporter/releases/download/v0.7.0/systemd_exporter-0.7.0.linux-amd64.tar.gz
+        verification:
+          hash: sha256-2d995ca20249aeeac8f507173176ce5d162f17470a98ca66e289c85b388480c3
+      user:
+        name: core
+      group:
+        name: core
+    - path: /var/home/core/.config/systemd/user/systemd-exporter.service
+      contents:
+        inline: |
+          [Unit]
+          Description=Systemd Exporter
+
+          [Service]
+          Type=simple
+          WorkingDirectory=/var/home/core/.local/bin
+          ExecStartPre=/usr/bin/tar -xvf systemd_exporter.tar.gz systemd_exporter-0.7.0.linux-amd64/systemd_exporter --strip-components=1
+          ExecStart=/var/home/core/.local/bin/systemd_exporter
+
+          [Install]
+          WantedBy=default.target
+      user:
+        name: core
+      group:
+        name: core
 
 systemd:
   units:

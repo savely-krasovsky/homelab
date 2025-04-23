@@ -48,7 +48,10 @@ loki.write "victoria_logs" {
 }
 
 prometheus.scrape "scrape_metrics" {
-  targets         = [{ __address__ = "rmqtt:6060", __metrics_path__ = "/api/v1/metrics/prometheus" }]
+  targets         = [
+    { __address__ = "rmqtt:6060", __metrics_path__ = "/api/v1/metrics/prometheus" },
+    { __address__ = "host.containers.internal:9558" },
+  ]
   forward_to      = [prometheus.remote_write.victoria_metrics.receiver]
   scrape_interval = "10s"
 }

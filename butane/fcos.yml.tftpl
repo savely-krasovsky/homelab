@@ -419,7 +419,12 @@ systemd:
         LoadCredential=restic-b2-account-key
         LoadCredential=restic-password
         Environment=RESTIC_PASSWORD_FILE=%d/restic-password
+        # Create LVM snapshot and do backup
+        ExecStart=/usr/sbin/lvcreate --size 1G --snapshot --name restic-backblaze vg0/lv0
+        ExecStart=/usr/bin/mount -o nouuid /dev/vg0/restic-backblaze /mnt/snapshots/backblaze
         ExecStart=/bin/bash -c "export B2_ACCOUNT_ID=$(cat $CREDENTIALS_DIRECTORY/restic-b2-account-id); export B2_ACCOUNT_KEY=$(cat $CREDENTIALS_DIRECTORY/restic-b2-account-key); restic -r b2:krasovsky-homelab:app-data --verbose backup /var/mnt/docker/app_data"
+        ExecStart=/usr/bin/umount /mnt/snapshots/backblaze
+        ExecStart=/usr/sbin/lvremove -y vg0/restic-backblaze
 
         [Install]
         WantedBy=multi-user.target
@@ -451,7 +456,12 @@ systemd:
         LoadCredential=restic-aws-secret-access-key
         LoadCredential=restic-password
         Environment=RESTIC_PASSWORD_FILE=%d/restic-password
+        # Create LVM snapshot and do backup
+        ExecStart=/usr/sbin/lvcreate --size 1G --snapshot --name restic-storj vg0/lv0
+        ExecStart=/usr/bin/mount -o nouuid /dev/vg0/restic-storj /mnt/snapshots/storj
         ExecStart=/bin/bash -c "export AWS_ACCESS_KEY_ID=$(cat $CREDENTIALS_DIRECTORY/restic-aws-access-key-id); export AWS_SECRET_ACCESS_KEY=$(cat $CREDENTIALS_DIRECTORY/restic-aws-secret-access-key); restic -r s3:https://gateway.eu1.storjshare.io/homelab-backup/app-data --verbose backup /var/mnt/docker/app_data"
+        ExecStart=/usr/bin/umount /mnt/snapshots/storj
+        ExecStart=/usr/sbin/lvremove -y vg0/restic-storj
 
         [Install]
         WantedBy=multi-user.target

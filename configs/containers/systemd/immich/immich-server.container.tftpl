@@ -1,7 +1,7 @@
 [Unit]
 Description=Immich Server Quadlet
-Wants=immich-redis.service immich-postgres.service
-After=immich-redis.service immich-postgres.service
+Wants=immich-valkey.service immich-postgres.service
+After=immich-valkey.service immich-postgres.service
 
 [Container]
 Image=ghcr.io/immich-app/immich-server:release
@@ -15,7 +15,7 @@ Environment=TZ=Europe/Belgrade
 Environment=DB_HOSTNAME=immich-postgres
 Environment=DB_USERNAME=postgres
 Environment=DB_DATABASE_NAME=immich
-Environment=REDIS_HOSTNAME=immich-redis
+Environment=REDIS_HOSTNAME=immich-valkey
 Secret=immich-postgres-password,type=env,target=DB_PASSWORD
 
 Label="glance.id=immich"

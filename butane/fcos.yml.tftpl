@@ -42,6 +42,10 @@ storage:
       group:
         name: core
 
+    # Backup snapshot mounting points
+    - path: /var/mnt/snapshots/backblaze
+    - path: /var/mnt/snapshots/storj
+
   links:
     # Enable Podman socket for Traefik
     - path: /var/home/core/.config/systemd/user/timers.target.wants/podman.socket
@@ -482,4 +486,4 @@ systemd:
 
 kernel_arguments:
   should_exist:
-    - pcie_aspm.policy=powersupersave ip=${ip}::${gateway}:${mask}::enp6s18:none:${nameserver}
+    - pcie_aspm.policy=powersupersave ifname=infra:${mac_address} ip=${ip}::${gateway}:${mask}:${hostname}:infra:none:${nameserver}

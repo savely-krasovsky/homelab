@@ -12,12 +12,8 @@ UserNS=keep-id:uid=1000,gid=1000
 
 Environment=OC_ADD_RUN_SERVICES=notifications
 Environment=OC_URL=https://cloud.${base_domain}
-Environment=PROXY_TLS=false
-Environment=GATEWAY_GRPC_ADDR=0.0.0.0:9142
 Environment=OC_INSECURE=false
-Environment=MICRO_REGISTRY_ADDRESS=127.0.0.1:9233
-Environment=NATS_NATS_HOST=0.0.0.0
-Environment=NATS_NATS_PORT=9233
+Environment=PROXY_TLS=false
 Environment=PROXY_CSP_CONFIG_FILE_LOCATION=/etc/opencloud/csp.yaml
 
 # Notifications
@@ -30,13 +26,13 @@ Environment=FRONTEND_ARCHIVER_MAX_SIZE=10000000000
 Secret=opencloud-smtp-password,type=env,target=NOTIFICATIONS_SMTP_PASSWORD
 
 # Pocket-ID related
+Environment=PROXY_OIDC_REWRITE_WELLKNOWN=true
 Environment=PROXY_AUTOPROVISION_ACCOUNTS=true
 Environment=PROXY_ROLE_ASSIGNMENT_DRIVER=oidc
 Environment=PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM=opencloud_role
 Environment=OC_OIDC_ISSUER=https://id.${base_domain}
-Environment=OC_EXCLUDE_RUN_SERVICES=idp
-Environment=PROXY_OIDC_REWRITE_WELLKNOWN=true
 Environment=OC_OIDC_CLIENT_ID=d87f8406-8c9b-4c2a-a38b-125734e95733
+Environment=OC_EXCLUDE_RUN_SERVICES=idp
 
 # Collabora related
 Environment=FRONTEND_APP_HANDLER_SECURE_VIEW_APP_ADDR=eu.opencloud.api.collaboration.CollaboraOnline

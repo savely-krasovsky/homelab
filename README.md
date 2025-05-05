@@ -21,26 +21,27 @@ I also have some observability:
 
 ## Current services
 
-| Name                                    | Description                   | Pod |
-|-----------------------------------------|-------------------------------|-----|
-| Actual Budget                           | Budgeting App                 |     |
-| Bluesky PDS                             | ATProto Personal Data Server  |     |
-| Glance                                  | Homelab Dashboard             |     |
-| Grafana                                 | Data-visualization Platform   |     |
-| Grafana Alloy                           | OpenTelemetry Collector       |     |
-| Karakeep                                | Bookmark App                  | ☑️  |
-| Immich                                  | Image & Video Management      | ☑️  |
-| Miniflux                                | RSS Reader                    | ☑️  |
-| OAuth2 Proxy                            | Identity-Aware Proxy          |     |
-| Open WebUI                              | Chatbot UI                    | ☑️  |
-| Outline                                 | Personal Knowledge Base       | ☑️  |
-| Plex                                    | Personal Media Server         |     |
-| Pocket ID                               | Single Sign-on Portal         |     |
-| qBittorrent                             | BitTorrent Client             |     |
-| Tangled Knot                            | Git Platform based on ATProto |     |
-| Traefik                                 | Application Proxy             |     |
-| Uptime Kuma                             | Uptime Monitoring[^1]         |     |
-| VictoriaMetrics / VictoriaLogs / vmauth | Metrics and Logs Storage      | ☑️  |
+| Name                                    | Description                                | Pod |
+|-----------------------------------------|--------------------------------------------|-----|
+| Actual Budget                           | Budgeting App                              |     |
+| Bluesky PDS                             | ATProto Personal Data Server               |     |
+| Glance                                  | Homelab Dashboard                          |     |
+| Grafana                                 | Data-visualization Platform                |     |
+| Grafana Alloy                           | OpenTelemetry Collector                    |     |
+| Karakeep                                | Bookmark App                               | ☑️  |
+| Immich                                  | Image & Video Management                   | ☑️  |
+| Miniflux                                | RSS Reader                                 | ☑️  |
+| OAuth2 Proxy                            | Identity-Aware Proxy                       |     |
+| OpenCloud                               | File Management and Collaboration platform | ☑️  |
+| Open WebUI                              | Chatbot UI                                 | ☑️  |
+| Outline                                 | Personal Knowledge Base                    | ☑️  |
+| Plex                                    | Personal Media Server                      |     |
+| Pocket ID                               | Single Sign-on Portal                      |     |
+| qBittorrent                             | BitTorrent Client                          |     |
+| Tangled Knot                            | Git Platform based on ATProto              |     |
+| Traefik                                 | Application Proxy                          |     |
+| Uptime Kuma                             | Uptime Monitoring[^1]                      |     |
+| VictoriaMetrics / VictoriaLogs / vmauth | Metrics and Logs Storage                   | ☑️  |
 
 [^1]: It lives outside Homeleb.
 

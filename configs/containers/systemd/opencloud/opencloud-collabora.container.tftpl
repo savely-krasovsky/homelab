@@ -24,8 +24,9 @@ Label="traefik.http.services.collabora.loadbalancer.server.port=9980"
 Entrypoint=/bin/bash
 Exec=-c "coolconfig generate-proof-key && /start-collabora-online.sh"
 
-HealthCmd=CMD curl -f http://localhost:9980/hosting/discovery
+# This allows to implement depends_on alternative
 Notify=healthy
+HealthCmd=curl -f http://localhost:9980/hosting/discovery
 
 Pod=opencloud.pod
 

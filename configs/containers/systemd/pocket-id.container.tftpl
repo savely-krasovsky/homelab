@@ -28,6 +28,8 @@ Label="traefik.http.services.pocket-id.loadbalancer.server.port=3000"
 Label="traefik.http.routers.pocket-id-backend.rule=Host(`id.${base_domain}`) && (PathPrefix(`/api/`) || PathPrefix(`/.well-known/`))"
 Label="traefik.http.routers.pocket-id-backend.service=pocket-id-backend"
 Label="traefik.http.services.pocket-id-backend.loadbalancer.server.port=8080"
+Label="traefik.http.middlewares.cors.headers.accesscontrolalloworiginlist=https://cloud.${base_domain}"
+Label="traefik.http.routers.pocket-id-backend.middlewares=cors"
 
 Volume=/var/mnt/docker/app_data/pocket-id:/app/backend/data:Z
 

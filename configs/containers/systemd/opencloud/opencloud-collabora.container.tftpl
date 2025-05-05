@@ -1,0 +1,39 @@
+[Unit]
+Description=OpenCloud Collabora Quadlet
+
+[Container]
+Image=docker.io/collabora/code:24.04.13.2.1
+AutoUpdate=registry
+ContainerName=opencloud-collabora
+
+Environment=aliasgroup1=https://wopiserver.${base_domain}:443
+Environment=username=admin
+Environment=DONT_GEN_SSL_CERT=YES
+Environment=extra_params="--o:ssl.enable=false --o:ssl.ssl_verification=false --o:ssl.termination=true --o:welcome.enable=false --o:net.frame_ancestors=cloud.${base_domain}"
+Secret=opencloud-collabora-password,type=env,target=password
+
+Label="glance.parent=opencloud"
+Label="glance.name=Collabora"
+Label="glance.hide=false"
+
+Label="traefik.enable=true"
+Label="traefik.http.routers.collabora.rule=Host(`collabora.${base_domain}`)"
+Label="traefik.http.routers.collabora.service=collabora"
+Label="traefik.http.services.collabora.loadbalancer.server.port=9980"
+
+Entrypoint=/bin/bash
+Exec=-c "coolconfig generate-proof-key && /start-collabora-online.sh"
+
+HealthCmd=CMD curl -f http://localhost:9980/hosting/discovery
+Notify=healthy
+
+Pod=opencloud.pod
+
+AddCapability=MKNOD
+
+[Service]
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target

@@ -1,0 +1,6 @@
+[Unit]
+Description=OpenCloud Pod
+
+[Pod]
+PodName=opencloud
+Network=opencloud.network

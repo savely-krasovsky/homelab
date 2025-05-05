@@ -1,0 +1,46 @@
+[Unit]
+Description=OpenCloud Collaboration Quadlet
+Requires=opencloud-collabora.service
+After=opencloud-server.service opencloud-collabora.service
+
+[Container]
+Image=docker.io/opencloudeu/opencloud-rolling:latest
+AutoUpdate=registry
+ContainerName=opencloud-collaboration
+
+User=1000:1000
+UserNS=keep-id:uid=1000,gid=1000
+
+Environment=COLLABORATION_GRPC_ADDR=0.0.0.0:9301
+Environment=COLLABORATION_HTTP_ADDR=0.0.0.0:9300
+Environment=MICRO_REGISTRY=nats-js-kv
+Environment=MICRO_REGISTRY_ADDRESS=opencloud-server:9233
+Environment=COLLABORATION_WOPI_SRC=https://wopiserver.${base_domain}
+Environment=COLLABORATION_APP_NAME=CollaboraOnline
+Environment=COLLABORATION_APP_PRODUCT=Collabora
+Environment=COLLABORATION_APP_ADDR=https://collabora.${base_domain}
+Environment=COLLABORATION_APP_ICON=https://collabora.${base_domain}/favicon.ico
+Environment=OC_URL="https://cloud.${base_domain}"
+
+Entrypoint=/bin/sh
+Exec=-c "opencloud collaboration server"
+
+Label="glance.parent=opencloud"
+Label="glance.name=Collaboration"
+Label="glance.hide=false"
+
+Label="traefik.enable=true"
+Label="traefik.http.routers.collaboration.rule=Host(`wopiserver.${base_domain}`)"
+Label="traefik.http.routers.collaboration.service=collaboration"
+Label="traefik.http.services.collaboration.loadbalancer.server.port=9300"
+
+Volume=/var/mnt/docker/app_data/opencloud:/etc/opencloud:z
+
+Pod=opencloud.pod
+
+[Service]
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target

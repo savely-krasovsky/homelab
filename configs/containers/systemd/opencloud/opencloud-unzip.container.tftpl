@@ -1,0 +1,25 @@
+[Unit]
+Description=OpenCloud Unzip Extension Quadlet
+
+[Container]
+Image=docker.io/opencloudeu/web-extensions:unzip-latest
+AutoUpdate=registry
+ContainerName=opencloud-unzip
+
+User=1000:1000
+UserNS=keep-id:uid=1000,gid=1000
+
+Entrypoint=/bin/sh
+Exec=-c "cp -R /usr/share/nginx/html/unzip/ /apps"
+
+Volume=opencloud-apps:/apps
+
+Pod=opencloud.pod
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+TimeoutStartSec=900
+
+[Install]
+WantedBy=multi-user.target default.target

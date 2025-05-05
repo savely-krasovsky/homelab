@@ -64,6 +64,8 @@ variable "containers_secret_config" {
     restic_b2_account_id                      = "3e058bd3-e13d-4b6a-9d48-b2c700e00d62"
     restic_b2_account_key                     = "ddc2f07b-47ca-49b2-ae41-b2c700e02f01"
     restic_password                           = "52ce5eb2-98ae-4243-ba08-b2c700e04b7e"
+    opencloud_collabora_password              = "bced1168-9741-4b8e-abf4-b2d4000e2c9e"
+    opencloud_smtp_password = "5e0889ac-3b11-4fc4-81ca-b2d400170e85"
   }
 }
 

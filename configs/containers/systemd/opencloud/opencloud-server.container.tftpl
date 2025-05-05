@@ -1,0 +1,72 @@
+[Unit]
+Description=OpenCloud Server Quadlet
+After=opencloud-drawio.service opencloud-jsonviewer.service opencloud-unzip.service
+
+[Container]
+Image=docker.io/opencloudeu/opencloud-rolling:latest
+AutoUpdate=registry
+ContainerName=opencloud-server
+
+User=1000:1000
+UserNS=keep-id:uid=1000,gid=1000
+
+Environment=OC_ADD_RUN_SERVICES=notifications
+Environment=OC_URL=https://cloud.${base_domain}
+Environment=PROXY_TLS=false
+Environment=GATEWAY_GRPC_ADDR=0.0.0.0:9142
+Environment=OC_INSECURE=false
+Environment=MICRO_REGISTRY_ADDRESS=127.0.0.1:9233
+Environment=NATS_NATS_HOST=0.0.0.0
+Environment=NATS_NATS_PORT=9233
+Environment=PROXY_CSP_CONFIG_FILE_LOCATION=/etc/opencloud/csp.yaml
+
+# Notifications
+Environment=NOTIFICATIONS_SMTP_HOST=smtps-proxy.fastmail.com
+Environment=NOTIFICATIONS_SMTP_PORT=443
+Environment=NOTIFICATIONS_SMTP_SENDER="OpenCloud <noreply@cloud.${base_domain}>"
+Environment=NOTIFICATIONS_SMTP_USERNAME=savely@${base_domain}
+Environment=NOTIFICATIONS_SMTP_ENCRYPTION=ssltls
+Environment=FRONTEND_ARCHIVER_MAX_SIZE=10000000000
+Secret=opencloud-smtp-password,type=env,target=NOTIFICATIONS_SMTP_PASSWORD
+
+# Pocket-ID related
+Environment=PROXY_AUTOPROVISION_ACCOUNTS=true
+Environment=PROXY_ROLE_ASSIGNMENT_DRIVER=oidc
+Environment=PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM=opencloud_role
+Environment=OC_OIDC_ISSUER=https://id.${base_domain}
+Environment=OC_EXCLUDE_RUN_SERVICES=idp
+Environment=PROXY_OIDC_REWRITE_WELLKNOWN=true
+Environment=OC_OIDC_CLIENT_ID=d87f8406-8c9b-4c2a-a38b-125734e95733
+
+# Collabora related
+Environment=FRONTEND_APP_HANDLER_SECURE_VIEW_APP_ADDR=eu.opencloud.api.collaboration.CollaboraOnline
+Environment=GRAPH_AVAILABLE_ROLES=b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5,a8d5fe5e-96e3-418d-825b-534dbdf22b99,fb6c3e19-e378-47e5-b277-9732f9de6e21,58c63c02-1d89-4572-916a-870abc5a1b7d,2d00ce52-1fc2-4dbc-8b95-a73b73395f5a,1c996275-f1c9-4e71-abdf-a42f6495e960,312c0871-5ef7-4b3a-85b6-0e4074c64049,aa97fe03-7980-45ac-9e50-b325749fd7e6
+
+Entrypoint=/bin/sh
+Exec=-c "opencloud init || true; opencloud server"
+
+Label="glance.id=opencloud"
+Label="glance.name=OpenCloud"
+Label="glance.icon=di:owncloud-light"
+Label="glance.description=Cloud Storage"
+Label="glance.hide=false"
+
+Label="traefik.enable=true"
+Label="traefik.http.routers.opencloud.rule=Host(`cloud.${base_domain}`)"
+Label="traefik.http.routers.opencloud.service=opencloud"
+Label="traefik.http.services.opencloud.loadbalancer.server.port=9200"
+
+Volume=%E/opencloud/app-registry.yaml:/etc/opencloud/app-registry.yaml:Z
+Volume=%E/opencloud/csp.yaml:/etc/opencloud/csp.yaml:Z
+Volume=/var/mnt/docker/app_data/opencloud:/etc/opencloud:z
+Volume=/var/mnt/personal/opencloud:/var/lib/opencloud:Z
+Volume=opencloud-apps:/var/lib/opencloud/web/assets/apps
+
+Pod=opencloud.pod
+
+[Service]
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target

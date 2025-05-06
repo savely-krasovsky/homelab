@@ -14,6 +14,7 @@ Label="glance.name=MQTT Broker"
 Label="glance.hide=false"
 
 Volume=/var/mnt/docker/app_data/rmqtt/logs:/var/log/rmqtt:Z
+Volume=/dev/null:/var/log/rmqtt/hook.log
 
 Network=reverse-proxy.network
 PublishPort=1883:1883

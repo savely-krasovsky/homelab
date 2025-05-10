@@ -1,0 +1,29 @@
+[Unit]
+Description=Prometheus Podman Exporter Quadlet
+Requires=podman.socket
+After=podman.socket
+
+[Container]
+Image=quay.io/navidys/prometheus-podman-exporter:latest
+AutoUpdate=registry
+ContainerName=prometheus-podman-exporter
+
+UserNS=keep-id:uid=65534
+
+Environment=CONTAINER_HOST=unix:///run/podman/podman.sock
+
+Exec=--collector.enable-all
+
+Volume=%t/podman/podman.sock:/run/podman/podman.sock
+
+Network=reverse-proxy.network
+
+# Disable label security to access Podman socket.
+SecurityLabelDisable=true
+
+[Service]
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target

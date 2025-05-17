@@ -223,6 +223,9 @@ storage:
           		# allow http and https
           		tcp dport 8080 accept
           		tcp dport 8443 accept
+          		udp dport 8443 accept
+          		tcp dport 9443 accept
+          		udp dport 9443 accept
 
           		# allow plex
           		tcp dport 32400 accept

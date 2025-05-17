@@ -1,0 +1,31 @@
+[Unit]
+Description=3X UI Quadlet
+
+[Container]
+Image=ghcr.io/mhsanaei/3x-ui:latest
+AutoUpdate=registry
+ContainerName=3x-ui
+
+Label="glance.name=3X"
+Label="glance.url=https://3x.${base_domain}"
+Label="glance.description=Xray Web Panel"
+Label="glance.hide=false"
+
+Label="traefik.enable=true"
+Label="traefik.http.routers.3x-ui.rule=Host(`3x.${base_domain}`)"
+Label="traefik.http.routers.3x-ui.service=3x-ui"
+Label="traefik.http.services.3x-ui.loadbalancer.server.port=2053"
+
+Volume=/var/mnt/docker/app_data/3x-ui/db:/etc/x-ui:Z
+Volume=/var/mnt/docker/app_data/3x-ui/cert:/root/cert:Z
+
+Network=reverse-proxy.network
+PublishPort=9443:8443/tcp
+PublishPort=9443:8443/udp
+
+[Service]
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target

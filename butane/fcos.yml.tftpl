@@ -110,6 +110,7 @@ storage:
         inline: |
           [Socket]
           ListenStream=${ip}:8443
+          ListenDatagram=${ip}:8443
           FileDescriptorName=websecure
           Service=traefik.service
 

@@ -12,6 +12,8 @@ entryPoints:
         - security-headers@file
       tls:
         certResolver: leresolver
+    http3:
+      advertisedPort: 443
 
 providers:
   docker:

@@ -9,10 +9,7 @@ ContainerName=pocket-id
 User=1000:1000
 UserNS=keep-id:uid=1000,gid=1000
 
-Environment=PUBLIC_APP_URL=https://id.${base_domain}
-Environment=PUID=1000
-Environment=PGID=1000
-Environment=CADDY_DISABLED=true
+Environment=APP_URL=https://id.${base_domain}
 Secret=pocket-id-maxmind-license-key,type=env,target=MAXMIND_LICENSE_KEY
 
 Label="glance.name=Pocket ID"
@@ -24,12 +21,8 @@ Label="glance.hide=false"
 Label="traefik.enable=true"
 Label="traefik.http.routers.pocket-id.rule=Host(`id.${base_domain}`)"
 Label="traefik.http.routers.pocket-id.service=pocket-id"
-Label="traefik.http.services.pocket-id.loadbalancer.server.port=3000"
-Label="traefik.http.routers.pocket-id-backend.rule=Host(`id.${base_domain}`) && (PathPrefix(`/api/`) || PathPrefix(`/.well-known/`))"
-Label="traefik.http.routers.pocket-id-backend.service=pocket-id-backend"
-Label="traefik.http.services.pocket-id-backend.loadbalancer.server.port=8080"
 
-Volume=/var/mnt/docker/app_data/pocket-id:/app/backend/data:Z
+Volume=/var/mnt/docker/app_data/pocket-id:/app/data:Z
 
 Network=reverse-proxy.network
 Notify=true

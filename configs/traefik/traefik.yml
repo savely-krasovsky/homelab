@@ -14,6 +14,12 @@ entryPoints:
         certResolver: leresolver
     http3:
       advertisedPort: 443
+  imaps:
+    address: ":993"
+  smtps:
+    address: ":465"
+  ldaps:
+    address: ":636"
 
 providers:
   docker:

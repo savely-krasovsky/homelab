@@ -1,7 +1,7 @@
 [Unit]
 Description=Traefik Quadlet
-Requires=http.socket https.socket podman.socket
-After=http.socket https.socket podman.socket
+Requires=http.socket https.socket imaps.socket smtps.socket ldaps.socket podman.socket
+After=http.socket https.socket imaps.socket smtps.socket ldaps.socket podman.socket
 
 [Container]
 Image=docker.io/library/traefik
@@ -46,7 +46,7 @@ SecurityLabelDisable=true
 [Service]
 TimeoutStartSec=900
 Restart=always
-Sockets=http.socket https.socket
+Sockets=http.socket https.socket imaps.socket smtps.socket ldaps.socket
 
 [Install]
 WantedBy=multi-user.target default.target

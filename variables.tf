@@ -17,6 +17,7 @@ variable "containers_config" {
   type = object({
     email = string
     base_domain = string
+    ews_domain = string
   })
 }
 

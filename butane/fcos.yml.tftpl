@@ -68,6 +68,24 @@ storage:
         name: core
       group:
         name: core
+    - path: /var/home/core/.config/systemd/user/timers.target.wants/imaps.socket
+      target: /var/home/core/.config/systemd/user/imaps.socket
+      user:
+        name: core
+      group:
+        name: core
+    - path: /var/home/core/.config/systemd/user/timers.target.wants/smtps.socket
+      target: /var/home/core/.config/systemd/user/smtps.socket
+      user:
+        name: core
+      group:
+        name: core
+    - path: /var/home/core/.config/systemd/user/timers.target.wants/ldaps.socket
+      target: /var/home/core/.config/systemd/user/ldaps.socket
+      user:
+        name: core
+      group:
+        name: core
 
     # Enable Podman auto updates
     - path: /var/home/core/.config/systemd/user/timers.target.wants/podman-auto-update.timer
@@ -112,6 +130,48 @@ storage:
           ListenStream=${ip}:8443
           ListenDatagram=${ip}:8443
           FileDescriptorName=websecure
+          Service=traefik.service
+
+          [Install]
+          WantedBy=sockets.target
+      user:
+        name: core
+      group:
+        name: core
+    - path: /var/home/core/.config/systemd/user/imaps.socket
+      contents:
+        inline: |
+          [Socket]
+          ListenStream=${ip}:8993
+          FileDescriptorName=imaps
+          Service=traefik.service
+
+          [Install]
+          WantedBy=sockets.target
+      user:
+        name: core
+      group:
+        name: core
+    - path: /var/home/core/.config/systemd/user/smtps.socket
+      contents:
+        inline: |
+          [Socket]
+          ListenStream=${ip}:8465
+          FileDescriptorName=smtps
+          Service=traefik.service
+
+          [Install]
+          WantedBy=sockets.target
+      user:
+        name: core
+      group:
+        name: core
+    - path: /var/home/core/.config/systemd/user/ldaps.socket
+      contents:
+        inline: |
+          [Socket]
+          ListenStream=${ip}:8636
+          FileDescriptorName=ldaps
           Service=traefik.service
 
           [Install]
@@ -227,6 +287,11 @@ storage:
           		udp dport 8443 accept
           		tcp dport 9443 accept
           		udp dport 9443 accept
+
+          		# allow imaps, smtps and ldaps
+          		tcp dport 8993 accept
+          		tcp dport 8465 accept
+          		tcp dport 8636 accept
 
           		# allow plex
           		tcp dport 32400 accept

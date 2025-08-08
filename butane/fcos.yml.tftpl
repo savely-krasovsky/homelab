@@ -5,7 +5,9 @@ passwd:
   users:
     - name: core
       ssh_authorized_keys:
+%{ for _, ssh_key in ssh_keys ~}
         - ${ssh_key}
+%{ endfor ~}
 
 storage:
   directories:
@@ -300,6 +302,9 @@ storage:
           		tcp dport 8324 accept
           		udp dport { 32410, 32412, 32413, 32414 } accept
           		tcp dport 32469 accept
+
+          		# allow minecraft bds
+              udp dport 19132 accept
 
           		# allow truenas to report metrics using graphite
           		ip saddr 192.168.100.3 tcp dport 2003 accept

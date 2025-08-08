@@ -32,6 +32,7 @@ variable "containers_secret_config" {
     oauth2_proxy_client_secret                = "afdb8ef2-a3d4-4a17-b839-b29200ab6f87"
     pocket_id_maxmind_license_key             = "08c549a4-bf48-4998-8cb0-b29200ac845d"
     actual_budget_openid_client_secret        = "5754702b-d9d5-4127-b5ab-b29200abdd6a"
+    open_webui_secret_key                     = "aeeb7cdd-d10e-41d4-abb4-b33300dabc1a"
     open_webui_oauth_client_secret            = "b595040b-a23a-44af-8bff-b29200ad6258"
     open_webui_google_drive_api_key           = "d24bf77b-622d-4ef0-88ae-b2b200d67ee1"
     open_webui_anthropic_api_key              = "104a349b-a4be-4d3a-9c0b-b2c700e64c9a"
@@ -74,7 +75,7 @@ variable "fcos_config" {
   description = "Fedora CoreOS Configuration"
   type = object({
     hostname = string
-    ssh_key = string
+    ssh_keys = list(string)
     root_ca = string
 
     mac_address = string

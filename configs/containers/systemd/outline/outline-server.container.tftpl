@@ -19,9 +19,7 @@ Environment=FILE_STORAGE=local
 Environment=FILE_STORAGE_LOCAL_ROOT_DIR=/var/lib/outline/data
 Environment=FILE_STORAGE_UPLOAD_MAX_SIZE=26214400
 Environment=OIDC_CLIENT_ID=cff5018f-9911-42fc-9226-b4d2326b72a8
-Environment=OIDC_AUTH_URI=https://id.${base_domain}/authorize
-Environment=OIDC_TOKEN_URI=https://id.${base_domain}/api/oidc/token
-Environment=OIDC_USERINFO_URI=https://id.${base_domain}/api/oidc/userinfo
+Environment=OIDC_ISSUER_URL=https://id.${base_domain}
 Environment=OIDC_USERNAME_CLAIM=preferred_username
 Environment=OIDC_DISPLAY_NAME="Pocket ID"
 Environment=OIDC_SCOPES="openid profile email"

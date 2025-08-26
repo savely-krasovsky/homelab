@@ -68,6 +68,8 @@ variable "containers_secret_config" {
     restic_password                           = "52ce5eb2-98ae-4243-ba08-b2c700e04b7e"
     opencloud_collabora_password              = "bced1168-9741-4b8e-abf4-b2d4000e2c9e"
     opencloud_smtp_password                   = "5e0889ac-3b11-4fc4-81ca-b2d400170e85"
+    simplex_smp_pass                          = "ebc8a3cb-4b85-44d6-b61c-b33800e45456"
+    simplex_xftp_pass                         = "c6feec9d-2622-4322-acbf-b338013f79e9"
   }
 }
 

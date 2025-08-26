@@ -2,7 +2,7 @@
 Description=Tangled Knot Quadlet
 
 [Container]
-Image=docker.io/hqnna/knot:v1.6.0-alpha
+Image=docker.io/tngl/knot:v1.8.0-alpha
 AutoUpdate=registry
 ContainerName=tangled
 
@@ -11,7 +11,7 @@ ContainerName=tangled
 Environment=KNOT_REPO_SCAN_PATH=/home/git/repositories
 Environment=KNOT_SERVER_HOSTNAME=knot.${base_domain}
 Environment=KNOT_SERVER_DB_PATH=/app/knotserver.db
-Secret=tangled-knot-server-secret,type=env,target=KNOT_SERVER_SECRET
+Environment=KNOT_SERVER_OWNER="did:web:krasovs.ky"
 
 Label="glance.name=Tangled Knot"
 Label="glance.url=https://knot.${base_domain}"

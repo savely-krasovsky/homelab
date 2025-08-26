@@ -1,0 +1,8 @@
+[Unit]
+Description=SimpleX Pod
+
+[Pod]
+PodName=simplex
+Network=simplex.network
+PublishPort=5223:5223/tcp
+PublishPort=5223:5223/udp

@@ -1,0 +1,36 @@
+[Unit]
+Description=SimpleX XFTP Quadlet
+
+[Container]
+Image=docker.io/simplexchat/xftp-server:latest
+ContainerName=simplex-xftp
+
+User=1000:1000
+UserNS=keep-id:uid=1000,gid=1000
+
+Label="glance.parent=simplex"
+Label="glance.name=XFTP Server"
+Label="glance.hide=false"
+
+Environment=ADDR=xftp.${base_domain}
+Environment=QUOTA=10gb
+Secret=simplex-xftp-pass,type=env,target=PASS
+
+Label="traefik.enable=true"
+Label="traefik.tcp.routers.simplex-xftp.rule=ALPN(`xftp/1`)"
+Label="traefik.tcp.routers.simplex-xftp.service=simplex-xftp"
+Label="traefik.tcp.routers.simplex-xftp.tls.passthrough=true"
+Label="traefik.tcp.services.simplex-xftp.loadbalancer.server.port=6223"
+
+Volume=/var/mnt/docker/app_data/simplex/xftp/config:/etc/opt/simplex-xftp:Z
+Volume=/var/mnt/docker/app_data/simplex/xftp/state:/var/opt/simplex-xftp:Z
+Volume=/var/mnt/docker/app_data/simplex/xftp/files:/srv/xftp:Z
+
+Pod=simplex.pod
+
+[Service]
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target

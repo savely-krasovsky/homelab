@@ -15,6 +15,7 @@ Environment=OC_URL=https://cloud.${base_domain}
 Environment=OC_INSECURE=false
 Environment=PROXY_TLS=false
 Environment=PROXY_CSP_CONFIG_FILE_LOCATION=/etc/opencloud/csp.yaml
+Environment=PROXY_DEBUG_ADDR=0.0.0.0:9205
 
 # Notifications
 Environment=NOTIFICATIONS_SMTP_HOST=smtps-proxy.fastmail.com
@@ -26,13 +27,13 @@ Environment=FRONTEND_ARCHIVER_MAX_SIZE=10000000000
 Secret=opencloud-smtp-password,type=env,target=NOTIFICATIONS_SMTP_PASSWORD
 
 # Pocket-ID related
-Environment=PROXY_OIDC_REWRITE_WELLKNOWN=true
 Environment=PROXY_AUTOPROVISION_ACCOUNTS=true
 Environment=PROXY_ROLE_ASSIGNMENT_DRIVER=oidc
 Environment=PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM=opencloud_role
 Environment=OC_OIDC_ISSUER=https://id.${base_domain}
-Environment=OC_OIDC_CLIENT_ID=d87f8406-8c9b-4c2a-a38b-125734e95733
 Environment=OC_EXCLUDE_RUN_SERVICES=idp
+Environment=PROXY_OIDC_REWRITE_WELLKNOWN=true
+Environment=OC_OIDC_CLIENT_ID=d87f8406-8c9b-4c2a-a38b-125734e95733
 
 # Collabora related
 Environment=FRONTEND_APP_HANDLER_SECURE_VIEW_APP_ADDR=eu.opencloud.api.collaboration.CollaboraOnline
@@ -49,9 +50,16 @@ Label="glance.description=Cloud Storage"
 Label="glance.hide=false"
 
 Label="traefik.enable=true"
+
 Label="traefik.http.routers.opencloud.rule=Host(`cloud.${base_domain}`)"
 Label="traefik.http.routers.opencloud.service=opencloud"
 Label="traefik.http.services.opencloud.loadbalancer.server.port=9200"
+
+Label="traefik.http.routers.opencloud-monitoring.rule=Host(`cloud.krasovs.ky`) && PathPrefix(`/debug`)"
+Label="traefik.http.routers.opencloud-monitoring.service=opencloud-monitoring"
+Label="traefik.http.routers.opencloud-monitoring.middlewares=strip-debug-prefix"
+Label="traefik.http.middlewares.strip-debug-prefix.stripprefix.prefixes=/debug"
+Label="traefik.http.services.opencloud-monitoring.loadbalancer.server.port=9205"
 
 Volume=%E/opencloud/app-registry.yaml:/etc/opencloud/app-registry.yaml:Z
 Volume=%E/opencloud/csp.yaml:/etc/opencloud/csp.yaml:Z

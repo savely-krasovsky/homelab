@@ -28,6 +28,7 @@ I also have some observability:
 | Glance                                  | Homelab Dashboard                          |     |
 | Grafana                                 | Data-visualization Platform                |     |
 | Grafana Alloy                           | OpenTelemetry Collector                    |     |
+| Davmail                                 | Exchange to IMAP/SMTP Gateway              |     |
 | Karakeep                                | Bookmark App                               | ☑️  |
 | Immich                                  | Image & Video Management                   | ☑️  |
 | Miniflux                                | RSS Reader                                 | ☑️  |
@@ -37,8 +38,12 @@ I also have some observability:
 | Outline                                 | Personal Knowledge Base                    | ☑️  |
 | Plex                                    | Personal Media Server                      |     |
 | Pocket ID                               | Single Sign-on Portal                      |     |
+| Podman Exporter                         | Podman Prometheus Metrics Exporter         |     |
+| rmqtt                                   | MQTT Broker Server                         |     |
 | qBittorrent                             | BitTorrent Client                          |     |
+| SimpleX                                 | Secure Messaging App                       | ☑️  |
 | Tangled Knot                            | Git Platform based on ATProto              |     |
+| Telegraf                                | Only for MQTT to OpenTelemetry conversion  |     |
 | Traefik                                 | Application Proxy                          |     |
 | Uptime Kuma                             | Uptime Monitoring[^1]                      |     |
 | VictoriaMetrics / VictoriaLogs / vmauth | Metrics and Logs Storage                   | ☑️  |

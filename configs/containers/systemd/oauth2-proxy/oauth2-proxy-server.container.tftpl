@@ -26,6 +26,8 @@ Environment=OAUTH2_PROXY_REVERSE_PROXY=true
 Environment=OAUTH2_PROXY_UPSTREAMS=static://202
 Environment=OAUTH2_PROXY_SESSION_STORE_TYPE=redis
 Environment=OAUTH2_PROXY_REDIS_CONNECTION_URL=redis://oauth2-proxy-redis
+Environment=OAUTH2_PROXY_SKIP_JWT_BEARER_TOKENS=true
+Environment=OAUTH2_PROXY_EXTRA_JWT_ISSUERS=https://id.${base_domain}=6ab0d4e0-db54-4404-ad25-003aa4c9d208
 Secret=oauth2-proxy-cookie-secret,type=env,target=OAUTH2_PROXY_COOKIE_SECRET
 Secret=oauth2-proxy-client-secret,type=env,target=OAUTH2_PROXY_CLIENT_SECRET
 

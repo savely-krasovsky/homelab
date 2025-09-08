@@ -88,5 +88,8 @@ variable "fcos_config" {
 
     truenas_ip = string
     truenas_iqn = string
+
+    # To sync configs afterwards
+    ssh_private_key_path = string
   })
 }

@@ -97,16 +97,24 @@ provider "registry.opentofu.org/poseidon/ct" {
 }
 
 provider "registry.terraform.io/savely-krasovsky/homelab-helpers" {
-  version     = "0.0.6"
-  constraints = "0.0.6"
+  version     = "0.0.8"
+  constraints = "0.0.8"
   hashes = [
-    "h1:j7/q76/9NBWVqpkIC+TgcB+oUK7rKXO6xLkvHqxP3nA=",
-    "zh:09dfb4cb05a6459f093e140d7f9e96d6d8727c231d81d1f75f0fa695926b4a7b",
-    "zh:2ca2d94bdf5df62f13afbec07d35a60e1cd4f6423d6cc1d9f4fcb049df6caa57",
-    "zh:3b4448f673e7826cf60da57d3f6df83f45fe5aaad8dd7bfde987fbc2ec6cddbc",
-    "zh:890df766e9b839623b1f0437355032a3c006226a6c200cd911e15ee1a9014e9f",
-    "zh:e1e16e61af2e830ae648c642c96afa6cc6db43ab9a9bc3b89a2b54bfd3619e2d",
-    "zh:e878b69edfc68e0aa513b6781e58ffc27e2bcaa1cb198f1cb528c713aab618b0",
-    "zh:f91e09f4f47780771dd674df6903022bf19fbaed3615955d7a6799cc6ec7f530",
+    "h1:ozsaWEiU0lry4hj7pKQneSdpQqH5Ir4XNrqDhxddnMI=",
+    "zh:00cefc422a58ceafa02bfa6ae871b6688bbc9d25e7714b4d09e8d00255dbe084",
+    "zh:18486ff9d6e95ff948d10c1349208452308fe1a288457d9463dacf634899337a",
+    "zh:3ecad51e88ca79017f85679fe5b04a0ee8ab00c80825620d28386d4a5acf083e",
+    "zh:3f356999a75cdd2c76cba1d2d20df629b01bec4592fe8eca91e7ec8eb427ce5d",
+    "zh:44cda4f7b2cb617d8f40dc80594805675638f9dcb35966bbec11c1f8e92548ec",
+    "zh:57b5b2884b4929a97982e691c9341d02842edb0f2257f25bd681a92fe7298006",
+    "zh:a9cfb8b9647acbb15eddfc8e4d9797e887d89256a0822ec69943ef07a8d98013",
+    "zh:adab1a261a39e27e7373ea8dc4f191cca518e7ccd99cf74595a9117f74257019",
+    "zh:ba0cace75d97e2916036d7f06c0d96b8b6b719d60312b1c8c0d2c0bbcea50a86",
+    "zh:bdca835ce487f0c2e60cdf5b0f5f00e19fa613522366f95dee9eb1328442b1ee",
+    "zh:bf97e26e67972f9b39698f0bb31b701d11c911e724ac996a23a9c77ca084db4c",
+    "zh:c918ea7fdcc22e45361b1760f507e79e3b85f608a5a36d91ce2d8c5209f9a4c8",
+    "zh:e0a39fa7bdf66d18eefc9e6578a629aa7b83106a6c90a27d817389760aaa0165",
+    "zh:eb0c57ad948ab449c8125d91bfc85e4ae3e78df3f9899d117cd7f38d4395f7c5",
+    "zh:f809ab383cca0a5f83072981c64208cbd7fa67e986a86ee02dd2c82333221e32",
   ]
 }

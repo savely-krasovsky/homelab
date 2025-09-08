@@ -13,7 +13,6 @@ data "bitwarden_secret" "immich_map_key" {
 locals {
   // Add secrets into quadlets config
   containers_config = merge(var.containers_config, {
-    email : var.containers_config.email,
     proxmox_ip : var.proxmox_config.host,
     truenas_ip : var.fcos_config.truenas_ip,
     secrets : {
@@ -37,6 +36,12 @@ locals {
     config_dirs  : local.config_dirs,
   })
 
+  quadlet_rendered_files = {
+    for path, content in local.config_files :
+    path => content
+    if startswith(path, "containers/systemd/")
+  }
+
   init_script_path = "${path.module}/scripts/init_fcos.sh.tftpl"
 }
 
@@ -54,22 +59,29 @@ resource "proxmox_virtual_environment_vm" "fcos" {
   name      = "fcos"
   description = "Managed by OpenTofu"
 
+  lifecycle {
+    ignore_changes = [
+      disk["file_id"],
+      kvm_arguments
+    ]
+  }
+
   # Use modern platform
   machine = "q35"
   bios    = "ovmf"
 
   startup {
-    order = 11
+    order = 20
   }
 
   cpu {
-    cores = 8
+    cores = 16
     type  = "host"
   }
 
   memory {
-    dedicated = 32768
-    floating  = 32768
+    dedicated = 49152
+    floating  = 49152
   }
 
   efi_disk {
@@ -148,5 +160,45 @@ resource "null_resource" "fcos_provision_secrets" {
   provisioner "remote-exec" {
     inline = ["sh /tmp/init.sh"]
     on_failure = fail
+  }
+}
+
+resource "null_resource" "sync_quadlets" {
+  depends_on = [proxmox_virtual_environment_vm.fcos]
+
+  triggers = {
+    quadlets_hash = provider::homelab-helpers::dirhash("${path.module}/configs", "**")
+  }
+
+  connection {
+    type = "ssh"
+    user = "core"
+    private_key = file(pathexpand(var.fcos_config.ssh_private_key_path))
+    host = var.fcos_config.ip
+  }
+
+  // Create directories if not exist
+  provisioner "remote-exec" {
+    inline = distinct([
+      for path, _ in local.quadlet_rendered_files :
+      "mkdir -p /var/home/core/.config/${replace(dirname(path), "\\", "/")}"
+    ])
+  }
+
+  // Copy files, but remove the last byte to avoid double newline
+  provisioner "remote-exec" {
+    inline = [
+      for path, content in local.quadlet_rendered_files : <<-EOT
+        cat <<'EOF' | head -c -1 > "/var/home/core/.config/${path}"
+        ${content}
+        EOF
+      EOT
+    ]
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "systemctl --user daemon-reload"
+    ]
   }
 }

@@ -2,7 +2,7 @@
 Description=Immich Postgres Quadlet
 
 [Container]
-Image=ghcr.io/immich-app/postgres:14-vectorchord0.3.0-pgvectors0.3.0
+Image=ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.3.0
 AutoUpdate=registry
 ContainerName=immich-postgres
 
@@ -18,8 +18,8 @@ Label="glance.parent=immich"
 Label="glance.name=Postgres"
 Label="glance.hide=false"
 
-HealthCmd=pg_isready --dbname="$${POSTGRES_DB}" --username="$${POSTGRES_USER}" || exit 1; \
-        Chksum="$(psql --dbname="$${POSTGRES_DB}" --username="$${POSTGRES_USER}" --tuples-only --no-align \
+HealthCmd=pg_isready --dbname="$$${POSTGRES_DB}" --username="$$${POSTGRES_USER}" || exit 1; \
+        Chksum="$(psql --dbname="$$${POSTGRES_DB}" --username="$$${POSTGRES_USER}" --tuples-only --no-align \
         --command='SELECT COALESCE(SUM(checksum_failures), 0) FROM pg_stat_database')"; \
         echo "checksum failure count is $Chksum"; \
         [ "$Chksum" = '0' ] || exit 1

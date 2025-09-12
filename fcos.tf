@@ -36,10 +36,9 @@ locals {
     config_dirs  : local.config_dirs,
   })
 
-  quadlet_rendered_files = {
+  config_rendered_files = {
     for path, content in local.config_files :
     path => content
-    if startswith(path, "containers/systemd/")
   }
 
   init_script_path = "${path.module}/scripts/init_fcos.sh.tftpl"
@@ -163,11 +162,11 @@ resource "null_resource" "fcos_provision_secrets" {
   }
 }
 
-resource "null_resource" "sync_quadlets" {
+resource "null_resource" "sync_configs" {
   depends_on = [proxmox_virtual_environment_vm.fcos]
 
   triggers = {
-    quadlets_hash = provider::homelab-helpers::dirhash("${path.module}/configs", "**")
+    configs_hash = provider::homelab-helpers::dirhash("${path.module}/configs", "**")
   }
 
   connection {
@@ -180,7 +179,7 @@ resource "null_resource" "sync_quadlets" {
   // Create directories if not exist
   provisioner "remote-exec" {
     inline = distinct([
-      for path, _ in local.quadlet_rendered_files :
+      for path, _ in local.config_rendered_files :
       "mkdir -p /var/home/core/.config/${replace(dirname(path), "\\", "/")}"
     ])
   }
@@ -188,7 +187,7 @@ resource "null_resource" "sync_quadlets" {
   // Copy files, but remove the last byte to avoid double newline
   provisioner "remote-exec" {
     inline = [
-      for path, content in local.quadlet_rendered_files : <<-EOT
+      for path, content in local.config_rendered_files : <<-EOT
         cat <<'EOF' | head -c -1 > "/var/home/core/.config/${path}"
         ${content}
         EOF

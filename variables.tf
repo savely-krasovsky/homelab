@@ -70,6 +70,8 @@ variable "containers_secret_config" {
     opencloud_smtp_password                   = "5e0889ac-3b11-4fc4-81ca-b2d400170e85"
     simplex_smp_pass                          = "ebc8a3cb-4b85-44d6-b61c-b33800e45456"
     simplex_xftp_pass                         = "c6feec9d-2622-4322-acbf-b338013f79e9"
+    tuwunel-turn-secret                       = "5b69585c-03e8-454f-94e0-b357000002d4"
+    tuwunel-registration-token                = "92e470e2-c88e-43d3-ae0c-b3570039c4c9"
   }
 }
 

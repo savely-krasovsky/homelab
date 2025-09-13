@@ -45,6 +45,7 @@ I also have some observability:
 | Tangled Knot                            | Git Platform based on ATProto              |     |
 | Telegraf                                | Only for MQTT to OpenTelemetry conversion  |     |
 | Traefik                                 | Application Proxy                          |     |
+| Tuwunel                                 | Matrix Homeserver                          |     |
 | Gatus                                   | Uptime Monitoring[^1]                      |     |
 | VictoriaMetrics / VictoriaLogs / vmauth | Metrics and Logs Storage                   | ☑️  |
 

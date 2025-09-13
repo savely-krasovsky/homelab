@@ -1,0 +1,45 @@
+[Unit]
+Description=Tuwunel Quadlet
+Requires=podman.socket
+After=podman.socket
+
+[Container]
+Image=ghcr.io/matrix-construct/tuwunel:latest
+AutoUpdate=registry
+ContainerName=tuwunel
+
+User=1000:1000
+UserNS=keep-id:uid=1000,gid=1000
+
+Environment=TUWUNEL_CONFIG=
+Environment=TUWUNEL_SERVER_NAME=${base_domain}
+Environment=TUWUNEL_DATABASE_PATH=/var/lib/tuwunel/
+Environment=TUWUNEL_ADDRESS=0.0.0.0
+Environment=TUWUNEL_PORT=6167
+Environment=TUWUNEL_ALLOW_FEDERATION=true
+Environment=TUWUNEL_ALLOW_REGISTRATION=true
+Environment=TUWUNEL_LOG=info
+Environment=TUWUNEL_TURN_URIS="[\"turn:turn.${base_domain}?transport=udp\", \"turn:turn.${base_domain}?transport=tcp\"]"
+Secret=tuwunel-registration-token,type=env,target=TUWUNEL_REGISTRATION_TOKEN
+Secret=tuwunel-turn-secret,type=env,target=TUWUNEL_TURN_SECRET
+
+Label="glance.name=Tuwunel"
+Label="glance.icon=di:matrix-light"
+Label="glance.description=Matrix Homeserver"
+Label="glance.hide=false"
+
+Label="traefik.enable=true"
+Label="traefik.http.routers.tuwunel.rule=Host(`matrix.${base_domain}`)"
+Label="traefik.http.services.tuwunel.loadbalancer.server.port=6167"
+
+Volume=/var/mnt/docker/app_data/tuwunel:/var/lib/tuwunel/:Z
+
+Network=reverse-proxy.network
+
+[Service]
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target
+

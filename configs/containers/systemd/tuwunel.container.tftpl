@@ -20,6 +20,7 @@ Environment=TUWUNEL_ALLOW_FEDERATION=true
 Environment=TUWUNEL_ALLOW_REGISTRATION=true
 Environment=TUWUNEL_LOG=info
 Environment=TUWUNEL_TURN_URIS="[\"turn:turn.${base_domain}?transport=udp\", \"turn:turn.${base_domain}?transport=tcp\"]"
+Environment=TUWUNEL_ALLOW_LEGACY_MEDIA=true
 Secret=tuwunel-registration-token,type=env,target=TUWUNEL_REGISTRATION_TOKEN
 Secret=tuwunel-turn-secret,type=env,target=TUWUNEL_TURN_SECRET
 

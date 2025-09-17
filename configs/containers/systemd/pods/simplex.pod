@@ -3,5 +3,6 @@ Description=SimpleX Pod
 
 [Pod]
 PodName=simplex
+UserNS=keep-id:uid=1000,gid=1000
 Network=simplex.network
 Network=reverse-proxy.network

@@ -3,6 +3,7 @@ Description=Victoria Pod
 
 [Pod]
 PodName=victoria
+UserNS=keep-id:uid=1000,gid=1000
 Network=victoria.network
 Network=reverse-proxy.network
 # Publish Graphite collector ports

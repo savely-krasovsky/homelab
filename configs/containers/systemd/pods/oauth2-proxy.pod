@@ -3,5 +3,6 @@ Description=OAuth2 Proxy Pod
 
 [Pod]
 PodName=oauth2-proxy
+UserNS=keep-id:uid=1000,gid=1000
 Network=oauth2-proxy.network
 Network=reverse-proxy.network

@@ -2,11 +2,12 @@
 Description=Immich Machine Learning Quadlet
 
 [Container]
-Image=ghcr.io/immich-app/immich-machine-learning:release-openvino
+Image=ghcr.io/immich-app/immich-machine-learning:v2.0.1-openvino
 AutoUpdate=registry
 ContainerName=immich-machine-learning
 
 User=1000:1000
+GroupAdd=keep-groups
 
 Label="glance.parent=immich"
 Label="glance.name=Machine Learning"

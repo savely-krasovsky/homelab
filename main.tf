@@ -2,11 +2,11 @@ terraform {
   required_providers {
     proxmox = {
       source  = "bpg/proxmox"
-      version = "0.76.0"
+      version = "0.85.0"
     }
     bitwarden = {
       source = "maxlaverse/bitwarden"
-      version = "0.13.6"
+      version = "0.16.0"
     }
     ct = {
       source  = "poseidon/ct"
@@ -14,11 +14,11 @@ terraform {
     }
     null = {
       source  = "hashicorp/null"
-      version = "3.2.3"
+      version = "3.2.4"
     }
     local = {
       source  = "hashicorp/local"
-      version = "2.5.2"
+      version = "2.5.3"
     }
     homelab-helpers = {
       source = "registry.terraform.io/savely-krasovsky/homelab-helpers"

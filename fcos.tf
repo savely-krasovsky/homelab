@@ -75,7 +75,8 @@ resource "proxmox_virtual_environment_vm" "fcos" {
 
   cpu {
     cores = 16
-    type  = "host"
+    type  = "Skylake-Client-v4"
+    units = 1024
   }
 
   memory {

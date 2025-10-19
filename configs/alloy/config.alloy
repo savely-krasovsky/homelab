@@ -36,7 +36,7 @@ loki.process "copy_msg" {
     selector = "{_msg=\"\"}"
 
     stage.match {
-      selector = "{container_name=\"/synapse\"}"
+      selector = "{container_name=\"/matrix-synapse\"}"
 
       stage.json {
         expressions = { "log" = "" }

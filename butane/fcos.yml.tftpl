@@ -237,6 +237,11 @@ storage:
           net.core.default_qdisc = cake
           net.ipv4.tcp_congestion_control = bbr
 
+    - path: /etc/sysctl.d/90-inotify.conf
+      contents:
+        inline: |
+          fs.inotify.max_user_instances = 1024
+
     - path: /etc/ssh/sshd_config.d/20-increase-max-auth-tries.conf
       mode: 0644
       contents:

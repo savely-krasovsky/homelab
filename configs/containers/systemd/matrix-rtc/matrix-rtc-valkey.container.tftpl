@@ -1,0 +1,27 @@
+[Unit]
+Description=MatrixRTC Valkey Quadlet
+
+[Container]
+Image=docker.io/valkey/valkey:8-alpine
+AutoUpdate=registry
+ContainerName=matrix-rtc-valkey
+
+User=1000:1000
+
+Label="glance.parent=matrix-rtc"
+Label="glance.name=Valkey"
+Label="glance.hide=false"
+
+HealthCmd=valkey-cli ping || exit 1
+
+Volume=/var/mnt/docker/app_data/matrix-rtc/valkey:/data:Z
+
+Pod=matrix-rtc.pod
+Notify=healthy
+
+[Service]
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target

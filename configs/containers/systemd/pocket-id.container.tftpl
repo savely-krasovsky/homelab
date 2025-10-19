@@ -10,6 +10,10 @@ User=1000:1000
 UserNS=keep-id:uid=1000,gid=1000
 
 Environment=APP_URL=https://id.${base_domain}
+Environment=METRICS_ENABLED=true
+Environment=OTEL_LOGS_EXPORTER=otlp
+Environment=OTEL_EXPORTER_OTLP_ENDPOINT=http://grafana-alloy:4317
+Environment=OTEL_EXPORTER_OTLP_PROTOCOL=grpc
 Secret=pocket-id-maxmind-license-key,type=env,target=MAXMIND_LICENSE_KEY
 
 Label="glance.name=Pocket ID"
@@ -20,7 +24,6 @@ Label="glance.hide=false"
 
 Label="traefik.enable=true"
 Label="traefik.http.routers.pocket-id.rule=Host(`id.${base_domain}`)"
-Label="traefik.http.routers.pocket-id.service=pocket-id"
 
 Volume=/var/mnt/docker/app_data/pocket-id:/app/data:Z
 

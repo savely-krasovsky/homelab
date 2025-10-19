@@ -1,8 +1,8 @@
 [Unit]
-Description=Immich Pod
+Description=Matrix Pod
 
 [Pod]
-PodName=immich
+PodName=matrix
 UserNS=keep-id:uid=1000,gid=1000
-Network=immich.network
+Network=matrix.network
 Network=reverse-proxy.network

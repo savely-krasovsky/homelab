@@ -1,0 +1,28 @@
+[Unit]
+Description=Element Call Quadlet
+
+[Container]
+Image=ghcr.io/element-hq/element-call:v0.16.0
+AutoUpdate=registry
+ContainerName=element-call
+
+User=1000:1000
+UserNS=keep-id:uid=1000,gid=1000
+
+Label="glance.parent=element-web"
+Label="glance.name=Element Call"
+Label="glance.hide=false"
+
+Label="traefik.enable=true"
+Label="traefik.http.routers.element-call.rule=Host(`call.element.${base_domain}`)"
+
+Volume=%E/element/call.json:/app/config.json:Z
+
+Network=reverse-proxy.network
+
+[Service]
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target

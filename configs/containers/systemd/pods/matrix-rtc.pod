@@ -1,0 +1,7 @@
+[Unit]
+Description=MatrixRTC Pod
+
+[Pod]
+PodName=matrix-rtc
+UserNS=keep-id:uid=1000,gid=1000
+Network=host

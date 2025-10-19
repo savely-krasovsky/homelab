@@ -1,0 +1,27 @@
+[Unit]
+Description=Matrix Valkey Quadlet
+
+[Container]
+Image=docker.io/valkey/valkey:8-alpine
+AutoUpdate=registry
+ContainerName=matrix-valkey
+
+User=1000:1000
+
+Label="glance.parent=matrix"
+Label="glance.name=Valkey"
+Label="glance.hide=false"
+
+HealthCmd=valkey-cli ping || exit 1
+
+Volume=/var/mnt/docker/app_data/matrix/valkey:/data:Z
+
+Pod=matrix.pod
+Notify=healthy
+
+[Service]
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target

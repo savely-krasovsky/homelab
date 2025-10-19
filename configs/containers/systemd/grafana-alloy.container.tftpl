@@ -15,7 +15,14 @@ Label="glance.icon=di:alloy"
 Label="glance.description=OpenTelemetry Collector"
 Label="glance.hide=false"
 
-Exec=run --storage.path=/var/lib/alloy/data --disable-reporting /etc/alloy/config.alloy
+Exec=run --server.http.listen-addr=0.0.0.0:12345 --storage.path=/var/lib/alloy/data --disable-reporting /etc/alloy/config.alloy
+
+Label="traefik.enable=true"
+Label="traefik.http.routers.grafana-alloy.rule=Host(`alloy.${base_domain}`)"
+Label="traefik.http.routers.grafana-alloy.middlewares=oauth2-proxy@file"
+Label="traefik.http.services.grafana-alloy.loadbalancer.server.port=12345"
+Label="traefik.http.routers.grafana-alloy-auth.rule=Host(`alloy.${base_domain}`) && PathPrefix(`/oauth2/`)"
+Label="traefik.http.routers.grafana-alloy-auth.service=oauth2-proxy"
 
 Volume=%E/alloy/config.alloy:/etc/alloy/config.alloy:Z
 Volume=%t/podman/podman.sock:/var/run/docker.sock

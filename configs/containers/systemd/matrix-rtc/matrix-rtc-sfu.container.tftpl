@@ -1,0 +1,43 @@
+[Unit]
+Description=MatrixRTC Livekit Quadlet
+Wants=matrix-rtc-valkey.service
+After=matrix-rtc-valkey.service
+
+[Container]
+Image=docker.io/livekit/livekit-server:v1.9
+AutoUpdate=registry
+ContainerName=matrix-rtc-sfu
+
+User=1000:1000
+
+Label="glance.id=matrix-rtc"
+Label="glance.icon=di:matrix-light"
+Label="glance.description=Matrix Realtime Stack"
+Label="glance.name=MatrixRTC"
+Label="glance.hide=false"
+
+Label="traefik.enable=true"
+Label="traefik.http.routers.matrix-rtc-sfu.rule=Host(`matrix-rtc.${base_domain}`) && PathPrefix(`/livekit/sfu`)"
+Label="traefik.http.routers.matrix-rtc-sfu.middlewares=strip-sfu-prefix"
+Label="traefik.http.middlewares.strip-sfu-prefix.stripprefix.prefixes=/livekit/sfu"
+Label="traefik.http.services.matrix-rtc-sfu.loadbalancer.server.port=7880"
+
+Label="traefik.tcp.routers.matrix-rtc-turn.rule=HostSNI(`turn.${base_domain}`)"
+Label="traefik.tcp.routers.matrix-rtc-turn.tls=true"
+Label="traefik.tcp.routers.matrix-rtc-turn.tls.certresolver=leresolver"
+Label="traefik.tcp.routers.matrix-rtc-turn.service=matrix-rtc-turn"
+Label="traefik.tcp.services.matrix-rtc-turn.loadbalancer.server.port=5349"
+
+Exec=--config /etc/livekit.yaml
+
+Volume=%E/matrix-rtc/livekit.yaml:/etc/livekit.yaml:Z
+
+Pod=matrix-rtc.pod
+
+[Service]
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target
+

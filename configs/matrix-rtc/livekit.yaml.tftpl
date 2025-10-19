@@ -1,0 +1,23 @@
+port: 7880
+log_level: info
+
+rtc:
+  tcp_port: 7881
+  port_range_start: 59900
+  port_range_end: 60000
+  use_external_ip: true
+
+redis:
+  address: localhost:6379
+
+turn:
+  enabled: true
+  domain: turn.${base_domain}
+  udp_port: 3478
+  tls_port: 5349
+  relay_range_start: 59000
+  relay_range_end: 59100
+  external_tls: true
+
+keys:
+  ${secrets.matrix_rtc_livekit_key}: ${secrets.matrix_rtc_livekit_secret}

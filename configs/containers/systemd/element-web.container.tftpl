@@ -1,0 +1,31 @@
+[Unit]
+Description=Element Web Quadlet
+
+[Container]
+Image=docker.io/vectorim/element-web:latest
+AutoUpdate=registry
+ContainerName=element-web
+
+User=1000:1000
+UserNS=keep-id:uid=1000,gid=1000
+
+Label="glance.id=element-web"
+Label="glance.name=Element"
+Label="glance.icon=di:element"
+Label="glance.url=https://element.${base_domain}"
+Label="glance.description=Matrix web client"
+Label="glance.hide=false"
+
+Label="traefik.enable=true"
+Label="traefik.http.routers.element-web.rule=Host(`element.${base_domain}`)"
+
+Volume=%E/element/web.json:/app/config.json:Z
+
+Network=reverse-proxy.network
+
+[Service]
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target

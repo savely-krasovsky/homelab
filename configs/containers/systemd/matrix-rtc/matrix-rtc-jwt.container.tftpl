@@ -1,0 +1,35 @@
+[Unit]
+Description=MatrixRTC Authorization Service Quadlet
+
+[Container]
+Image=ghcr.io/element-hq/lk-jwt-service:0.3.0
+AutoUpdate=registry
+ContainerName=matrix-rtc-jwt
+
+User=1000:1000
+
+Environment=LIVEKIT_URL=wss://matrix-rtc.${base_domain}/livekit/sfu
+Environment=LIVEKIT_JWT_PORT=9090
+Environment=LIVEKIT_FULL_ACCESS_HOMESERVERS=${base_domain}
+Secret=matrix-rtc-livekit-key,type=env,target=LIVEKIT_KEY
+Secret=matrix-rtc-livekit-secret,type=env,target=LIVEKIT_SECRET
+
+Label="glance.parent=matrix-rtc"
+Label="glance.name=MatrixRTC Authorization Service"
+Label="glance.hide=false"
+
+Label="traefik.enable=true"
+Label="traefik.http.routers.matrix-rtc-jwt.rule=Host(`matrix-rtc.${base_domain}`) && PathPrefix(`/livekit/jwt`)"
+Label="traefik.http.routers.matrix-rtc-jwt.middlewares=strip-jwt-prefix"
+Label="traefik.http.middlewares.strip-jwt-prefix.stripprefix.prefixes=/livekit/jwt"
+Label="traefik.http.services.matrix-rtc-jwt.loadbalancer.server.port=9090"
+
+Pod=matrix-rtc.pod
+
+[Service]
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target
+

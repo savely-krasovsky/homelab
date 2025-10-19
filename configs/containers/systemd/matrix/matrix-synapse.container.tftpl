@@ -1,0 +1,35 @@
+[Unit]
+Description=Matrix Synapse Quadlet
+Wants=matrix-valkey.service matrix-postgres.service
+After=matrix-valkey.service matrix-postgres.service
+
+[Container]
+Image=docker.io/matrixdotorg/synapse:v1.140.0
+AutoUpdate=registry
+ContainerName=matrix-synapse
+
+User=1000:1000
+
+Label="glance.id=matrix"
+Label="glance.name=Matrix"
+Label="glance.icon=di:matrix-light"
+Label="glance.description=Matrix Homeserver"
+Label="glance.hide=false"
+
+Label="traefik.enable=true"
+Label="traefik.http.routers.matrix-synapse.rule=Host(`matrix.${base_domain}`)"
+Label="traefik.http.services.matrix-synapse.loadbalancer.server.port=8008"
+
+Volume=%E/matrix/homeserver.yaml:/data/homeserver.yaml:Z
+Volume=%E/matrix/log.config:/data/${base_domain}.log.config:Z
+Volume=/var/mnt/docker/app_data/matrix/synapse:/data:Z
+
+Pod=matrix.pod
+
+[Service]
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target
+

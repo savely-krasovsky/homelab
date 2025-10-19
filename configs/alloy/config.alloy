@@ -3,6 +3,10 @@ logging {
   format = "json"
 }
 
+livedebugging {
+  enabled = true
+}
+
 discovery.docker "fcos" {
   host = "unix:///var/run/docker.sock"
 }
@@ -27,16 +31,56 @@ loki.source.docker "podman" {
 loki.process "copy_msg" {
   forward_to = [loki.write.victoria_logs.receiver]
 
-  // Bluesky logs plain json, so we need to manually remap msg to _msg.
+  // Some services require to manually remap message field to _msg.
   stage.match {
     selector = "{_msg=\"\"}"
 
-    stage.json {
-      expressions = { "msg" = "" }
+    stage.match {
+      selector = "{container_name=\"/synapse\"}"
+
+      stage.json {
+        expressions = { "log" = "" }
+      }
+
+      stage.labels {
+        values = { "_msg" = "log" }
+      }
     }
 
-    stage.labels {
-      values = { "_msg" = "msg" }
+    stage.match {
+      selector = "{container_name=\"/grafana\"}"
+
+      stage.json {
+        expressions = { "msg" = "" }
+      }
+
+      stage.labels {
+        values = { "_msg" = "msg" }
+      }
+    }
+
+    stage.match {
+      selector = "{container_name=\"/grafana-alloy\"}"
+
+      stage.json {
+        expressions = { "msg" = "" }
+      }
+
+      stage.labels {
+        values = { "_msg" = "msg" }
+      }
+    }
+
+    stage.match {
+      selector = "{container_name=\"/bluesky-pds\"}"
+
+      stage.json {
+        expressions = { "msg" = "" }
+      }
+
+      stage.labels {
+        values = { "_msg" = "msg" }
+      }
     }
   }
 }
@@ -51,6 +95,11 @@ prometheus.scrape "scrape_metrics" {
   targets         = [
     { __address__ = "host.containers.internal:9558" },
     { __address__ = "prometheus-podman-exporter:9882" },
+    { __address__ = "immich:8081" },
+    { __address__ = "immich:8082" },
+    { __address__ = "opencloud:9205" },
+    { __address__ = "opencloud:9304" },
+    { __address__ = "synapse:9000" },
     { __address__ = "rmqtt:6060", __metrics_path__ = "/api/v1/metrics/prometheus" },
   ]
   forward_to      = [prometheus.remote_write.victoria_metrics.receiver]

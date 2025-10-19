@@ -1,0 +1,34 @@
+[Unit]
+Description=Matrix Authencation Service Quadlet
+Wants=matrix-postgres.service
+After=matrix-postgres.service
+
+[Container]
+Image=ghcr.io/element-hq/matrix-authentication-service:1.4
+AutoUpdate=registry
+ContainerName=matrix-authentication-service
+
+User=1000:1000
+
+Label="glance.parent=matrix"
+Label="glance.name=Matrix Authentication Service"
+Label="glance.hide=false"
+
+Label="traefik.enable=true"
+Label="traefik.http.routers.matrix-authentication-service.rule=Host(`matrix-account.${base_domain}`) || (Host(`matrix.${base_domain}`) && PathRegexp(`^/_matrix/client/(.*)/(login|logout|refresh)`))"
+Label="traefik.http.services.matrix-authentication-service.loadbalancer.server.port=8080"
+
+Exec=--config /data/config.yaml
+
+Volume=%E/matrix/mas.yaml:/data/config.yaml:Z
+Volume=/var/mnt/docker/app_data/matrix/mas:/data:Z
+
+Pod=matrix.pod
+
+[Service]
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target
+

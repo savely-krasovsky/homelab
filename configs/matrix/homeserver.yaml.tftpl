@@ -1,0 +1,78 @@
+server_name: "${base_domain}"
+pid_file: /data/homeserver.pid
+web_client_location: "https://element.${base_domain}"
+public_baseurl: "https://matrix.${base_domain}"
+listeners:
+  - port: 8008
+    tls: false
+    type: http
+    x_forwarded: true
+    resources:
+      - names: [client, federation]
+        compress: false
+  - port: 9000
+    type: metrics
+
+database:
+  name: psycopg2
+  args:
+    user: synapse
+    password: ${secrets.synapse_postgres_password}
+    dbname: synapse
+    host: matrix-postgres
+    cp_min: 5
+    cp_max: 10
+
+redis:
+  enabled: true
+  host: matrix-valkey
+  port: 6379
+
+log_config: "/data/${base_domain}.log.config"
+media_store_path: /data/media_store
+registration_shared_secret: "${secrets.synapse_registration_shared_secret}"
+report_stats: false
+macaroon_secret_key: "${secrets.synapse_macaroon_secret_key}"
+form_secret: "${secrets.synapse_form_secret}"
+signing_key_path: "/data/${base_domain}.signing.key"
+trusted_key_servers:
+  - server_name: "matrix.org"
+
+turn_uris: [ "turn:turn.${base_domain}?transport=udp", "turn:turn.${base_domain}?transport=tcp" ]
+turn_shared_secret: "${secrets.coturn_turn_shared_secret}"
+turn_user_lifetime: 86400000
+turn_allow_guests: false
+
+password_config:
+  enabled: false
+
+matrix_authentication_service:
+  enabled: true
+  endpoint: http://matrix-authentication-service:8080/
+  secret: ${secrets.matrix_authentication_service_secret}
+
+enable_metrics: true
+
+# Support Element Call
+experimental_features:
+  # MSC3266: Room summary API. Used for knocking over federation
+  msc3266_enabled: true
+  # MSC4222 needed for syncv2 state_after. This allow clients to
+  # correctly track the state of the room.
+  msc4222_enabled: true
+
+# The maximum allowed duration by which sent events can be delayed, as
+# per MSC4140.
+max_event_delay_duration: 24h
+
+rc_message:
+  # This needs to match at least e2ee key sharing frequency plus a bit of headroom
+  # Note key sharing events are bursty
+  per_second: 0.5
+  burst_count: 30
+
+rc_delayed_event_mgmt:
+  # This needs to match at least the heart-beat frequency plus a bit of headroom
+  # Currently the heart-beat is every 5 seconds which translates into a rate of 0.2s
+  per_second: 1
+  burst_count: 20

@@ -1,0 +1,88 @@
+http:
+  public_base: https://matrix-account.${base_domain}/
+  listeners:
+  - name: web
+    resources:
+    - name: discovery
+    - name: human
+    - name: oauth
+    - name: compat
+    - name: graphql
+    - name: assets
+    binds:
+    - address: '[::]:8080'
+    proxy_protocol: false
+  - name: internal
+    resources:
+    - name: health
+    binds:
+    - host: localhost
+      port: 8081
+    proxy_protocol: false
+  trusted_proxies:
+  - 192.168.0.0/16
+  - 172.16.0.0/12
+  - 10.0.0.0/10
+  - 127.0.0.1/8
+  - fd00::/8
+  - ::1/128
+
+database:
+  uri: "postgresql://synapse:${secrets.synapse_postgres_password}@matrix-postgres/mas"
+  max_connections: 10
+  min_connections: 0
+  connect_timeout: 30
+  idle_timeout: 600
+  max_lifetime: 1800
+
+email:
+  from: '"Matrix Authentication Service" <noreply+matrix@krasovs.ky>'
+  reply_to: '"Matrix Authentication Service" <noreply+matrix@krasovs.ky>'
+  transport: smtp
+  mode: tls
+  hostname: smtps-proxy.fastmail.com
+  port: 443
+  username: savely@${base_domain}
+  password: ${secrets.matrix_authentication_service_smtp_password}
+
+secrets:
+  encryption: ${secrets.matrix_authentication_service_secrets_encryption}
+  keys:
+  - key: |
+      ${indent(6, secrets.matrix_authentication_service_secrets_rsa_key)}
+  - key: |
+      ${indent(6, secrets.matrix_authentication_service_secrets_p256_key)}
+  - key: |
+      ${indent(6, secrets.matrix_authentication_service_secrets_p384_key)}
+  - key: |
+      ${indent(6, secrets.matrix_authentication_service_secrets_secp256k1_key)}
+
+passwords:
+  enabled: false
+
+matrix:
+  kind: synapse
+  homeserver: ${base_domain}
+  secret: ${secrets.matrix_authentication_service_secret}
+  endpoint: https://matrix.${base_domain}/
+
+upstream_oauth2:
+  providers:
+  - id: 01K7WMWMAB8M7J0HR3S5FM5DR2
+    synapse_idp_id: oidc-pocket-id
+    issuer: "https://id.${base_domain}"
+    human_name: "Pocket ID"
+    client_id: "c6e8a96b-647f-47fe-8e75-2b05a6c79242"
+    client_secret: "${secrets.synapse_oidc_client_secret}"
+    token_endpoint_auth_method: client_secret_basic
+    scope: "email openid profile"
+    claims_imports:
+      localpart:
+        action: require
+        template: '{{ user.preferred_username }}'
+      displayname:
+        action: force
+        template: '{{ user.name }}'
+      email:
+        action: force
+        template: "{{ user.email }}"

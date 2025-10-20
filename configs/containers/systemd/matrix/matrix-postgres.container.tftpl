@@ -8,10 +8,8 @@ ContainerName=matrix-postgres
 
 User=1000:1000
 
-Environment=POSTGRES_USER=synapse
-Environment=POSTGRES_DB=synapse
 Environment=POSTGRES_INITDB_ARGS="--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
-Secret=synapse-postgres-password,type=env,target=POSTGRES_PASSWORD
+Secret=matrix-postgres-password,type=env,target=POSTGRES_PASSWORD
 
 Label="glance.parent=matrix"
 Label="glance.name=Postgres"
@@ -20,6 +18,7 @@ Label="glance.hide=false"
 HealthCmd=pg_isready --dbname="$$${POSTGRES_DB}" --username="$$${POSTGRES_USER}" || exit 1;
 HealthStartupInterval=5s
 
+Volume=%E/matrix/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh:Z
 Volume=/var/mnt/docker/app_data/matrix/postgres:/var/lib/postgresql/data:Z
 
 Pod=matrix.pod

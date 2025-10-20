@@ -29,6 +29,9 @@ data "bitwarden_secret" "synapse_form_secret" {
 data "bitwarden_secret" "synapse_oidc_client_secret" {
   id = var.containers_secret_config.synapse_oidc_client_secret
 }
+data "bitwarden_secret" "matrix_authentication_service_postgres_password" {
+  id = var.containers_secret_config.matrix_authentication_service_postgres_password
+}
 data "bitwarden_secret" "matrix_authentication_service_secret" {
   id = var.containers_secret_config.matrix_authentication_service_secret
 }
@@ -73,6 +76,7 @@ locals {
       synapse_macaroon_secret_key : data.bitwarden_secret.synapse_macaroon_secret_key.value
       synapse_form_secret : data.bitwarden_secret.synapse_form_secret.value
       synapse_oidc_client_secret : data.bitwarden_secret.synapse_oidc_client_secret.value
+      matrix_authentication_service_postgres_password : data.bitwarden_secret.matrix_authentication_service_postgres_password.value
       matrix_authentication_service_secret : data.bitwarden_secret.matrix_authentication_service_secret.value
       matrix_authentication_service_secrets_encryption : data.bitwarden_secret.matrix_authentication_service_secrets_encryption.value
       matrix_authentication_service_secrets_rsa_key : data.bitwarden_secret.matrix_authentication_service_secrets_rsa_key.value

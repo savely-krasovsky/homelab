@@ -28,7 +28,7 @@ http:
   - ::1/128
 
 database:
-  uri: "postgresql://synapse:${secrets.synapse_postgres_password}@matrix-postgres/mas"
+  uri: "postgresql://mas:${secrets.matrix_authentication_service_postgres_password}@matrix-postgres/mas"
   max_connections: 10
   min_connections: 0
   connect_timeout: 30

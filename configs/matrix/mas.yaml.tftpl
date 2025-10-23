@@ -9,11 +9,14 @@ http:
     - name: compat
     - name: graphql
     - name: assets
+    - name: adminapi
+    - name: health
     binds:
     - address: '[::]:8080'
     proxy_protocol: false
   - name: internal
     resources:
+    - name: prometheus
     - name: health
     binds:
     - host: localhost

@@ -2,7 +2,7 @@
 Description=Matrix Postgres Quadlet
 
 [Container]
-Image=docker.io/postgres:18-bookworm
+Image=docker.io/postgres:18-trixie
 AutoUpdate=registry
 ContainerName=matrix-postgres
 
@@ -19,7 +19,7 @@ HealthCmd=pg_isready --dbname="$$${POSTGRES_DB}" --username="$$${POSTGRES_USER}"
 HealthStartupInterval=5s
 
 Volume=%E/matrix/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh:Z
-Volume=/var/mnt/docker/app_data/matrix/postgres:/var/lib/postgresql/data:Z
+Volume=/var/mnt/docker/app_data/matrix/postgres:/var/lib/postgresql:Z
 
 Pod=matrix.pod
 Notify=healthy

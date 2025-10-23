@@ -1,22 +1,22 @@
 [Unit]
-Description=Element Call Quadlet
+Description=Element Admin Quadlet
 
 [Container]
-Image=ghcr.io/element-hq/element-call:v0.16.1
+Image=oci.element.io/element-admin:latest
 AutoUpdate=registry
-ContainerName=element-call
+ContainerName=element-admin
 
 User=1000:1000
 UserNS=keep-id:uid=1000,gid=1000
 
+Environment=SERVER_NAME=${base_domain}
+
 Label="glance.parent=element-web"
-Label="glance.name=Element Call"
+Label="glance.name=Element Admin"
 Label="glance.hide=false"
 
 Label="traefik.enable=true"
-Label="traefik.http.routers.element-call.rule=Host(`call.element.${base_domain}`)"
-
-Volume=%E/element/call.json:/app/config.json:Z
+Label="traefik.http.routers.element-admin.rule=Host(`admin.element.${base_domain}`)"
 
 Network=reverse-proxy.network
 

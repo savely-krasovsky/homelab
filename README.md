@@ -47,7 +47,6 @@ I also have some observability:
 | Podman Exporter                         | Podman Prometheus Metrics Exporter         |     |
 | rmqtt                                   | MQTT Broker Server                         |     |
 | qBittorrent                             | BitTorrent Client                          |     |
-| SimpleX                                 | Secure Messaging App                       | ☑️  |
 | Tangled Knot                            | Git Platform based on ATProto              |     |
 | Telegraf                                | Only for MQTT to OpenTelemetry conversion  |     |
 | Traefik                                 | Application Proxy                          |     |

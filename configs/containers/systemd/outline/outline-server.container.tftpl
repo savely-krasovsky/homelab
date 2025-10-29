@@ -4,7 +4,7 @@ Wants=outline-postgres.service outline-redis.service
 After=outline-postgres.service outline-redis.service
 
 [Container]
-Image=docker.io/outlinewiki/outline:latest
+Image=docker.io/outlinewiki/outline:1.0.1
 AutoUpdate=registry
 ContainerName=outline-server
 
@@ -26,8 +26,8 @@ Environment=WEB_CONCURRENCY=1
 Environment=SMTP_HOST=smtps-proxy.fastmail.com
 Environment=SMTP_PORT=443
 Environment=SMTP_USERNAME=savely@${base_domain}
-Environment=SMTP_FROM_EMAIL=noreply@outline.${base_domain}
-Environment=SMTP_REPLY_EMAIL=noreply@outline.${base_domain}
+Environment=SMTP_FROM_EMAIL=noreply+outline@${base_domain}
+Environment=SMTP_REPLY_EMAIL=noreply+outline@${base_domain}
 Environment=SMTP_SECURE=true
 Secret=outline-secret-key,type=env,target=SECRET_KEY
 Secret=outline-utils-secret,type=env,target=UTILS_SECRET

@@ -19,7 +19,7 @@ Environment=PDS_REPORT_SERVICE_URL=https://mod.bsky.app
 Environment=PDS_REPORT_SERVICE_DID=did:plc:ar7c4by46qjdydhdevvrndac
 Environment=PDS_CRAWLERS=https://bsky.network
 Environment=LOG_ENABLED=true
-Environment=PDS_EMAIL_FROM_ADDRESS="noreply@pds.${base_domain}"
+Environment=PDS_EMAIL_FROM_ADDRESS="noreply+pds@${base_domain}"
 Secret=pds-jwt-secret,type=env,target=PDS_JWT_SECRET
 Secret=pds-admin-password,type=env,target=PDS_ADMIN_PASSWORD
 Secret=pds-plc-rotation-key-k256-private-key-hex,type=env,target=PDS_PLC_ROTATION_KEY_K256_PRIVATE_KEY_HEX

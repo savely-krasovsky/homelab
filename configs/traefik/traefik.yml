@@ -14,6 +14,10 @@ entryPoints:
         certResolver: leresolver
     http3:
       advertisedPort: 443
+    # Allow long uploads
+    transport:
+      respondingTimeouts:
+        readTimeout: "0s"
   imaps:
     address: ":993"
   smtps:

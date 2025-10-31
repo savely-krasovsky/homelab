@@ -2,7 +2,7 @@
 Description=Immich Machine Learning Quadlet
 
 [Container]
-Image=ghcr.io/immich-app/immich-machine-learning:v2.1.0-openvino
+Image=ghcr.io/immich-app/immich-machine-learning:v2.2.0-openvino
 AutoUpdate=registry
 ContainerName=immich-machine-learning
 
@@ -14,6 +14,7 @@ Label="glance.name=Machine Learning"
 Label="glance.hide=false"
 
 Volume=/var/mnt/media/downloads/immich/model-cache:/cache:Z
+Volume=/var/mnt/media/downloads/immich/ocr-model-cache:/opt/venv/lib/python3.11/site-packages/rapidocr/models:Z
 Volume=immich-machine-learning:/usr/src/app/.config
 Volume=immich-machine-learning:/usr/src/app/.cache
 

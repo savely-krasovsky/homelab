@@ -1,15 +1,15 @@
 [Unit]
-Description=OpenCloud JSON Viewer Extension Quadlet
+Description=OpenCloud Maps Extension Quadlet
 
 [Container]
-Image=docker.io/opencloudeu/web-extensions:json-viewer-latest
+Image=docker.io/opencloudeu/web-extensions:maps-latest
 AutoUpdate=registry
-ContainerName=opencloud-jsonviewer
+ContainerName=opencloud-maps
 
 User=1000:1000
 
 Entrypoint=/bin/sh
-Exec=-c "cp -R /usr/share/nginx/html/apps/json-viewer/ /apps"
+Exec=-c "cp -R /usr/share/nginx/html/apps/maps/ /apps"
 
 Volume=opencloud-apps:/apps
 

@@ -382,7 +382,7 @@ systemd:
         [Service]
         Type=oneshot
         RemainAfterExit=yes
-        ExecStart=/usr/bin/rpm-ostree install --allow-inactive --assumeyes --reboot qemu-guest-agent restic intel-gpu-tools
+        ExecStart=/usr/bin/rpm-ostree install --allow-inactive --assumeyes --reboot qemu-guest-agent restic btop nvtop
         ExecStart=/bin/touch /var/lib/%N.stamp
 
         [Install]

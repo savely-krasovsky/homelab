@@ -12,8 +12,7 @@ GroupAdd=keep-groups
 Environment=PLEX_UID=1000
 Environment=PLEX_GID=1000
 Environment=TZ=Europe/Belgrade
-# In my setup source IP is not preserved for local network (due to SNAT hairpinning rule)
-Environment=ALLOWED_NETWORKS=192.168.100.1/32
+Environment=ADVERTISE_IP="https://plex.${base_domain}/"
 
 Label="glance.name=Plex"
 Label="glance.icon=di:plex"
@@ -21,14 +20,21 @@ Label="glance.url=https://app.plex.tv"
 Label="glance.description=Personal Media Server"
 Label="glance.hide=false"
 
+Label="traefik.enable=true"
+Label="traefik.http.routers.plex.rule=Host(`plex.${base_domain}`)"
+Label="traefik.http.services.plex.loadbalancer.server.port=32400"
+
 Volume=/var/mnt/docker/app_data/plex:/config:Z
 Volume=/var/mnt/media/tv_shows:/data/tv_shows:z
 Volume=/var/mnt/media/movies:/data/movies:z
 Volume=/var/mnt/media/music:/data/music:z
 Tmpfs=/transcode:size=8G,rw:Z
 
-# Host network for simplicity
-Network=host
+Network=reverse-proxy.network
+PublishPort=32410:32410/udp
+PublishPort=32412:32412/udp
+PublishPort=32413:32413/udp
+PublishPort=32414:32414/udp
 
 AddDevice=/dev/dri
 

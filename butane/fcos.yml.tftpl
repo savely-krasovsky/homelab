@@ -109,6 +109,14 @@ storage:
       group:
         name: core
 
+    # Enable node_exporter
+    - path: /var/home/core/.config/systemd/user/default.target.wants/node-exporter.service
+      target: /var/home/core/.config/systemd/user/node-exporter.service
+      user:
+        name: core
+      group:
+        name: core
+
   files:
     # http and https sockets for traefik
     - path: /var/home/core/.config/systemd/user/http.socket
@@ -361,6 +369,31 @@ storage:
         name: core
       group:
         name: core
+
+    # download node_exporter and create systemd user service
+    - path: /var/home/core/.local/bin/node_exporter.tar.gz
+      contents:
+        source: https://github.com/prometheus/node_exporter/releases/download/v1.10.2/node_exporter-1.10.2.linux-amd64.tar.gz
+        verification:
+          hash: sha256-c46e5b6f53948477ff3a19d97c58307394a29fe64a01905646f026ddc32cb65b
+      user:
+        name: core
+      group:
+        name: core
+    - path: /var/home/core/.config/systemd/user/node-exporter.service
+      contents:
+        inline: |
+          [Unit]
+          Description=Node Exporter
+
+          [Service]
+          Type=simple
+          WorkingDirectory=/var/home/core/.local/bin
+          ExecStartPre=/usr/bin/tar -xvf node_exporter.tar.gz node_exporter-1.10.2.linux-amd64/node_exporter --strip-components=1
+          ExecStart=/var/home/core/.local/bin/node_exporter --collector.systemd --collector.processes
+
+          [Install]
+          WantedBy=default.target
 
 systemd:
   units:

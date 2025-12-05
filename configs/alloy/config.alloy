@@ -93,7 +93,8 @@ loki.write "victoria_logs" {
 
 prometheus.scrape "scrape_metrics" {
   targets         = [
-    { __address__ = "host.containers.internal:9558" },
+    { __address__ = "host.containers.internal:9100" }, // node_exporter
+    { __address__ = "host.containers.internal:9558" }, // systemd_exporter
     { __address__ = "host.containers.internal:9091" }, // LiveKit
     { __address__ = "prometheus-podman-exporter:9882" },
     { __address__ = "victoria:8428" },

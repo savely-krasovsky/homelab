@@ -57,6 +57,12 @@ log:
       endpoint: grafana-alloy:4317
       insecure: true
 
+tracing:
+  otlp:
+    grpc:
+      endpoint: grafana-alloy:4317
+      insecure: true
+
 accessLog:
   otlp:
     grpc:

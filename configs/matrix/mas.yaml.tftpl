@@ -80,6 +80,7 @@ upstream_oauth2:
     token_endpoint_auth_method: client_secret_basic
     scope: "email openid profile"
     claims_imports:
+      skip_confirmation: true
       localpart:
         action: require
         template: '{{ user.preferred_username }}'

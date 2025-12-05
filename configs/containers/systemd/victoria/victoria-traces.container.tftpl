@@ -1,0 +1,25 @@
+[Unit]
+Description=Victoria Traces Quadlet
+
+[Container]
+Image=docker.io/victoriametrics/victoria-traces:v0.5.1
+ContainerName=victoria-traces
+
+User=1000:1000
+
+Label="glance.name=VictoriaTraces"
+Label="glance.icon=di:victoriametrics-light"
+Label="glance.url=https://traces.${base_domain}"
+Label="glance.description=Tracing Data Storage"
+Label="glance.hide=false"
+
+Volume=/var/mnt/observability/traces:/victoria-traces-data:Z
+
+Pod=victoria.pod
+
+[Service]
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target

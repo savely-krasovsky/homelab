@@ -8,6 +8,9 @@ users:
       - src_hosts:
         - "logs\\.${replace(base_domain, ".", "\\\\.")}"
         url_prefix: "http://victoria-logs:9428/"
+      - src_hosts:
+        - "traces\\.${replace(base_domain, ".", "\\\\.")}"
+        url_prefix: "http://victoria-traces:10428/"
   # Proxmox
   - bearer_token: "${secrets.vmauth_proxmox_bearer_token}"
     url_map:

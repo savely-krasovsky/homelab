@@ -96,6 +96,9 @@ prometheus.scrape "scrape_metrics" {
     { __address__ = "host.containers.internal:9558" },
     { __address__ = "host.containers.internal:9091" }, // LiveKit
     { __address__ = "prometheus-podman-exporter:9882" },
+    { __address__ = "victoria:8428" },
+    { __address__ = "victoria:9428" },
+    { __address__ = "victoria:10428" },
     { __address__ = "immich:8081" },
     { __address__ = "immich:8082" },
     { __address__ = "opencloud:9205" },
@@ -120,6 +123,7 @@ otelcol.receiver.otlp "default" {
   output {
     metrics = [otelcol.processor.batch.default.input]
     logs    = [otelcol.processor.batch.default.input]
+    traces  = [otelcol.processor.batch.default.input]
   }
 }
 
@@ -127,6 +131,7 @@ otelcol.processor.batch "default" {
   output {
     metrics = [otelcol.exporter.otlphttp.victoria_metrics.input]
     logs    = [otelcol.exporter.otlphttp.victoria_logs.input]
+    traces  = [otelcol.exporter.otlphttp.victoria_traces.input]
   }
 }
 
@@ -139,5 +144,11 @@ otelcol.exporter.otlphttp "victoria_metrics" {
 otelcol.exporter.otlphttp "victoria_logs" {
   client {
     endpoint = "http://victoria:9428/insert/opentelemetry"
+  }
+}
+
+otelcol.exporter.otlphttp "victoria_traces" {
+  client {
+    endpoint = "http://victoria:10428/insert/opentelemetry"
   }
 }

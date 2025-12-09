@@ -38,6 +38,16 @@ database:
   idle_timeout: 600
   max_lifetime: 1800
 
+telemetry:
+  tracing:
+    propagators:
+      - jaeger
+    exporter: otlp
+    endpoint: http://grafana-alloy:4318/v1/traces
+  metrics:
+    exporter: otlp
+    endpoint: http://grafana-alloy:4318/v1/metrics
+
 email:
   from: '"Matrix Authentication Service" <noreply+matrix@krasovs.ky>'
   reply_to: '"Matrix Authentication Service" <noreply+matrix@krasovs.ky>'

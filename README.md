@@ -23,38 +23,40 @@ I also have some observability:
 
 ## Current services
 
-| Name            | Description                                       | Pod |
-|-----------------|---------------------------------------------------|-----|
-| Actual Budget   | Budgeting App                                     |     |
-| Bluesky PDS     | ATProto Personal Data Server                      |     |
-| Element Web     | Element Web Client                                |     |
-| Element Call    | Element Call Client                               |     |
-| Glance          | Homelab Dashboard                                 |     |
-| Grafana         | Data-visualization Platform                       |     |
-| Grafana Alloy   | OpenTelemetry Collector                           |     |
-| Davmail         | Exchange to IMAP/SMTP Gateway                     |     |
-| Karakeep        | Bookmark App                                      | ☑️  |
-| Immich          | Image & Video Management                          | ☑️  |
-| Matrix          | Matrix Homeserver                                 | ☑️  |
-| MatrixRTC       | Matrix Realtime Stack                             | ☑️  |
-| Miniflux        | RSS Reader                                        | ☑️  |
-| OAuth2 Proxy    | Identity-Aware Proxy                              |     |
-| OpenCloud       | File Management and Collaboration platform        | ☑️  |
-| Open WebUI      | Chatbot UI                                        | ☑️  |
-| Outline         | Personal Knowledge Base                           | ☑️  |
-| Plex            | Personal Media Server                             |     |
-| Pocket ID       | Single Sign-on Portal                             |     |
-| Podman Exporter | Podman Prometheus Metrics Exporter                |     |
-| rmqtt           | MQTT Broker Server                                |     |
-| qBittorrent     | BitTorrent Client                                 |     |
-| Tangled Knot    | Git Platform based on ATProto                     |     |
-| Telegraf        | Only for MQTT to OpenTelemetry conversion         |     |
-| Traefik         | Application Proxy                                 |     |
-| Gatus           | Uptime Monitoring[^1]                             |     |
-| vmauth          | Authorization module for VictoriaMetrics products | ☑️  |
-| VictoriaMetrics | Metrics Storage                                   | ☑️  |
-| VictoriaLogs    | Logs Storage                                      | ☑️  |
-| VictoriaTraces  | Tracing Storage                                   | ☑️  |
+| Name            | Description                                            | Pod |
+|-----------------|--------------------------------------------------------|-----|
+| Actual Budget   | Budgeting App                                          |     |
+| Bluesky PDS     | ATProto Personal Data Server                           |     |
+| Element Web     | Element Web Client                                     |     |
+| Element Call    | Element Call Client                                    |     |
+| Glance          | Homelab Dashboard                                      |     |
+| Grafana         | Data-visualization Platform                            |     |
+| Grafana Alloy   | OpenTelemetry Collector                                |     |
+| Davmail         | Exchange to IMAP/SMTP Gateway                          |     |
+| Karakeep        | Bookmark App                                           | ☑️  |
+| Immich          | Image & Video Management                               | ☑️  |
+| Matrix          | Matrix Homeserver                                      | ☑️  |
+| MatrixRTC       | Matrix Realtime Stack                                  | ☑️  |
+| Miniflux        | RSS Reader                                             | ☑️  |
+| OAuth2 Proxy    | Identity-Aware Proxy                                   |     |
+| OpenCloud       | File Management and Collaboration platform             | ☑️  |
+| Open WebUI      | Chatbot UI                                             | ☑️  |
+| Outline         | Personal Knowledge Base                                | ☑️  |
+| Plex            | Personal Media Server                                  |     |
+| Pocket ID       | Single Sign-on Portal                                  |     |
+| Podman Exporter | Podman Prometheus Metrics Exporter                     |     |
+| Remnaware Panel | Censorship Circumvent Proxy Management Platform        | ☑️  |
+| Remnaware Node  | Node for accessing my server from totalitarian regimes |     |
+| rmqtt           | MQTT Broker Server                                     |     |
+| qBittorrent     | BitTorrent Client                                      |     |
+| Tangled Knot    | Git Platform based on ATProto                          |     |
+| Telegraf        | Only for MQTT to OpenTelemetry conversion              |     |
+| Traefik         | Application Proxy                                      |     |
+| Gatus           | Uptime Monitoring[^1]                                  |     |
+| vmauth          | Authorization module for VictoriaMetrics products      | ☑️  |
+| VictoriaMetrics | Metrics Storage                                        | ☑️  |
+| VictoriaLogs    | Logs Storage                                           | ☑️  |
+| VictoriaTraces  | Tracing Storage                                        | ☑️  |
 
 [^1]: It lives outside Homeleb.
 

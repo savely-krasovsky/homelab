@@ -112,6 +112,18 @@ prometheus.scrape "scrape_metrics" {
   scrape_interval = "10s"
 }
 
+prometheus.scrape "scrape_remnawave_metrics" {
+  targets         = [
+    { __address__ = "remnawave:3001" },
+  ]
+  basic_auth {
+    username = "admin"
+    password = "${secrets.remnawave_metrics_pass}"
+  }
+  forward_to = [prometheus.remote_write.victoria_metrics.receiver]
+  scrape_interval = "10s"
+}
+
 prometheus.remote_write "victoria_metrics" {
   endpoint {
     url = "http://victoria:8428/prometheus/api/v1/write"

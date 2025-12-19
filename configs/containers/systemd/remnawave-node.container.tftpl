@@ -1,0 +1,23 @@
+[Unit]
+Description=Remnawave Node Quadlet
+
+[Container]
+Image=docker.io/remnawave/node:latest
+AutoUpdate=registry
+ContainerName=remnawave-node
+
+Environment=NODE_PORT=2223
+Secret=remnawave-node-secret-key,type=env,target=SECRET_KEY
+
+Label="glance.parent=remnawave"
+Label="glance.name=Remnawave Node"
+Label="glance.hide=false"
+
+Network=reverse-proxy.network
+
+[Service]
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target

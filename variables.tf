@@ -88,6 +88,12 @@ variable "containers_secret_config" {
     matrix_authentication_service_secrets_p384_key      = "557701bc-7430-4dc8-98ae-b37b0000e3c1"
     matrix_authentication_service_secrets_secp256k1_key = "a6624b6b-1f2c-4883-94dd-b37b00010dc9"
     matrix_authentication_service_smtp_password         = "e25452b1-480c-4581-b407-b37b00042943"
+    remnawave_jwt_auth_secret                           = "9fb99592-a129-4669-848f-b3b800f42a01"
+    remnawave_jwt_api_tokens_secret                     = "aaec18fb-81d8-4e22-9f14-b3b800f4539a"
+    remnawave_postgres_password                         = "940eafe8-28fb-49fb-bc60-b3b800f48af5"
+    remnawave_database_url                              = "53437e56-c71e-4887-bfd1-b3b800f50ea5"
+    remnawave_metrics_pass                              = "1cb78e43-698f-48db-a76d-b3b800fb7524"
+    remnawave_node_secret_key                           = "87cadb81-1969-4625-b57e-b3b80105ce9e"
   }
 }
 

@@ -1,0 +1,32 @@
+[Unit]
+Description=Remnawave Postgres Quadlet
+
+[Container]
+Image=docker.io/postgres:18-trixie
+AutoUpdate=registry
+ContainerName=remnawave-postgres
+
+User=1000:1000
+
+Environment=POSTGRES_USER=remnawave
+Environment=POSTGRES_DB=remnawave
+Secret=remnawave-postgres-password,type=env,target=POSTGRES_PASSWORD
+
+Label="glance.parent=remnawave"
+Label="glance.name=Postgres"
+Label="glance.hide=false"
+
+HealthCmd=pg_isready --dbname="$$${POSTGRES_DB}" --username="$$${POSTGRES_USER}" || exit 1;
+HealthStartupInterval=5s
+
+Volume=/var/mnt/docker/app_data/remnawave/postgres:/var/lib/postgresql:Z
+
+Pod=remnawave.pod
+Notify=healthy
+
+[Service]
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target

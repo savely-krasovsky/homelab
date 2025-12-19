@@ -1,0 +1,27 @@
+[Unit]
+Description=Remnawave Valkey Quadlet
+
+[Container]
+Image=docker.io/valkey/valkey:8.1-alpine
+AutoUpdate=registry
+ContainerName=remnawave-valkey
+
+User=1000:1000
+
+Label="glance.parent=remnawave"
+Label="glance.name=Valkey"
+Label="glance.hide=false"
+
+HealthCmd=valkey-cli ping || exit 1
+
+Volume=/var/mnt/docker/app_data/remnawave/valkey:/data:Z
+
+Pod=remnawave.pod
+Notify=healthy
+
+[Service]
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target

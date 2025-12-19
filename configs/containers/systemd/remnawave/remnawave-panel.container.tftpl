@@ -1,0 +1,50 @@
+[Unit]
+Description=Remnawave Panel Quadlet
+Wants=remnawave-postgres.service remnawave-valkey.service
+After=remnawave-postgres.service remnawave-valkey.service
+
+[Container]
+Image=docker.io/remnawave/backend:2
+AutoUpdate=registry
+ContainerName=remnawave-panel
+
+User=1000:1000
+
+Environment=APP_PORT=3000
+Environment=METRICS_PORT=3001
+Environment=API_INSTANCES=1
+Environment=REDIS_HOST=remnawave-valkey
+Environment=REDIS_PORT=6379
+Environment=FRONT_END_DOMAIN="rw.${base_domain}"
+Environment=SUB_PUBLIC_DOMAIN="rw.${base_domain}/api/sub"
+Environment=METRICS_USER=admin
+Secret=remnawave-database-url,type=env,target=DATABASE_URL
+Secret=remnawave-jwt-auth-secret,type=env,target=JWT_AUTH_SECRET
+Secret=remnawave-jwt-api-tokens-secret,type=env,target=JWT_API_TOKENS_SECRET
+Secret=remnawave-metrics-pass,type=env,target=METRICS_PASS
+
+Label="glance.id=remnawave"
+Label="glance.name=Remnawave"
+Label="glance.icon=di:remnawave"
+Label="glance.url=https://rw.${base_domain}"
+Label="glance.description=Proxy Management Platform"
+Label="glance.hide=false"
+
+Label="traefik.enable=true"
+Label="traefik.http.routers.remnawave.rule=Host(`rw.${base_domain}`)"
+Label="traefik.http.services.remnawave.loadbalancer.server.port=3000"
+
+HealthCmd=curl -f http://localhost:3001/health
+HealthInterval=30s
+HealthTimeout=5s
+HealthRetries=3
+HealthStartPeriod=30s
+
+Pod=remnawave.pod
+
+[Service]
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target

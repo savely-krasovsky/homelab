@@ -15,8 +15,8 @@ Environment=METRICS_PORT=3001
 Environment=API_INSTANCES=1
 Environment=REDIS_HOST=remnawave-valkey
 Environment=REDIS_PORT=6379
-Environment=FRONT_END_DOMAIN="rw.${base_domain}"
-Environment=SUB_PUBLIC_DOMAIN="rw.${base_domain}/api/sub"
+Environment=FRONT_END_DOMAIN=rw.${base_domain}
+Environment=SUB_PUBLIC_DOMAIN=sub.${base_domain}
 Environment=METRICS_USER=admin
 Secret=remnawave-database-url,type=env,target=DATABASE_URL
 Secret=remnawave-jwt-auth-secret,type=env,target=JWT_AUTH_SECRET
@@ -31,8 +31,8 @@ Label="glance.description=Proxy Management Platform"
 Label="glance.hide=false"
 
 Label="traefik.enable=true"
-Label="traefik.http.routers.remnawave.rule=Host(`rw.${base_domain}`)"
-Label="traefik.http.services.remnawave.loadbalancer.server.port=3000"
+Label="traefik.http.routers.remnawave-panel.rule=Host(`rw.${base_domain}`)"
+Label="traefik.http.services.remnawave-panel.loadbalancer.server.port=3000"
 
 HealthCmd=curl -f http://localhost:3001/health
 HealthInterval=30s

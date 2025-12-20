@@ -13,6 +13,17 @@ Label="glance.parent=remnawave"
 Label="glance.name=Remnawave Node"
 Label="glance.hide=false"
 
+Label="traefik.enable=true"
+Label="traefik.http.routers.remnawave-node.rule=Host(`crypto1.${base_domain}`) && PathPrefix(`/${secrets.remnawave_xhttp_path}`)"
+Label="traefik.http.routers.remnawave-node.service=remnawave-node"
+Label="traefik.http.services.remnawave-node.loadbalancer.server.scheme=h2c"
+Label="traefik.http.services.remnawave-node.loadbalancer.server.port=8080"
+
+Label="traefik.http.routers.remnawave-fake-page.rule=Host(`crypto1.${base_domain}`)"
+Label="traefik.http.routers.remnawave-fake-page.service=remnawave-fake-page"
+Label="traefik.http.services.remnawave-fake-page.loadbalancer.server.url=https://cr.yp.to"
+Label="traefik.http.services.remnawave-fake-page.loadbalancer.passhostheader=false"
+
 Network=reverse-proxy.network
 
 [Service]

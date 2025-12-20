@@ -62,6 +62,9 @@ data "bitwarden_secret" "matrix_rtc_livekit_secret" {
 data "bitwarden_secret" "remnawave_metrics_pass" {
   id = var.containers_secret_config.remnawave_metrics_pass
 }
+data "bitwarden_secret" "remnawave_xhttp_path" {
+  id = var.containers_secret_config.remnawave_xhttp_path
+}
 
 locals {
   // Add secrets into quadlets config
@@ -90,6 +93,7 @@ locals {
       matrix_rtc_livekit_key : data.bitwarden_secret.matrix_rtc_livekit_key.value
       matrix_rtc_livekit_secret : data.bitwarden_secret.matrix_rtc_livekit_secret.value
       remnawave_metrics_pass : data.bitwarden_secret.remnawave_metrics_pass.value
+      remnawave_xhttp_path : data.bitwarden_secret.remnawave_xhttp_path.value
     }
   })
 

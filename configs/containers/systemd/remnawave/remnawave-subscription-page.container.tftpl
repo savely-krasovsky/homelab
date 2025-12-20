@@ -1,0 +1,32 @@
+[Unit]
+Description=Remnawave Subscription Page Quadlet
+Wants=remnawave-panel.service
+After=remnawave-panel.service
+
+[Container]
+Image=docker.io/remnawave/subscription-page:latest
+AutoUpdate=registry
+ContainerName=remnawave-subscription-page
+
+Environment=APP_PORT=3010
+Environment=REMNAWAVE_PANEL_URL=http://remnawave-panel:3000
+Environment=META_TITLE="Remnawave"
+Environment=META_DESCRIPTION="Remnawave Subcription Page"
+Secret=remnawave-api-token,type=env,target=REMNAWAVE_API_TOKEN
+
+Label="glance.parent=remnawave"
+Label="glance.name=Remnawave Subscription Page"
+Label="glance.hide=false"
+
+Label="traefik.enable=true"
+Label="traefik.http.routers.remnawave-subscription-page.rule=Host(`sub.${base_domain}`)"
+Label="traefik.http.services.remnawave-subscription-page.loadbalancer.server.port=3010"
+
+Pod=remnawave.pod
+
+[Service]
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target

@@ -9,10 +9,6 @@ ContainerName=remnawave-node
 Environment=NODE_PORT=2223
 Secret=remnawave-node-secret-key,type=env,target=SECRET_KEY
 
-Label="glance.parent=remnawave"
-Label="glance.name=Remnawave Node"
-Label="glance.hide=false"
-
 Label="traefik.enable=true"
 Label="traefik.http.routers.remnawave-node.rule=Host(`crypto1.${base_domain}`) && PathPrefix(`/${secrets.remnawave_xhttp_path}`)"
 Label="traefik.http.routers.remnawave-node.service=remnawave-node"

@@ -94,6 +94,7 @@ variable "containers_secret_config" {
     remnawave_database_url                              = "53437e56-c71e-4887-bfd1-b3b800f50ea5"
     remnawave_metrics_pass                              = "1cb78e43-698f-48db-a76d-b3b800fb7524"
     remnawave_node_secret_key                           = "87cadb81-1969-4625-b57e-b3b80105ce9e"
+    remnawave_node_2_secret_key                         = "903369ff-bbc1-42a9-8461-b3b9017a0ab3"
     remnawave_api_token                                 = "a0b134ef-a7ee-4972-bae4-b3b9003e6788"
     remnawave_xhttp_path                                = "23bd5525-ac0c-49db-bbd5-b3b90041b8ed"
   }

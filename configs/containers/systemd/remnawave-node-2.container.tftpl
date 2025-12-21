@@ -1,0 +1,21 @@
+[Unit]
+Description=Remnawave Node 2 Quadlet
+
+[Container]
+Image=docker.io/remnawave/node:latest
+AutoUpdate=registry
+ContainerName=remnawave-node-2
+
+Environment=NODE_PORT=2224
+Secret=remnawave-node-2-secret-key,type=env,target=SECRET_KEY
+
+Network=reverse-proxy.network
+PublishPort=9443:8443/tcp
+PublishPort=9443:8443/udp
+
+[Service]
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target

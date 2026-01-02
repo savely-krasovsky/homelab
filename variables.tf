@@ -30,6 +30,7 @@ variable "containers_secret_config" {
     vmauth_proxmox_bearer_token                         = "bb281df0-e5e8-4348-a92e-b2a300a30117"
     oauth2_proxy_cookie_secret                          = "289c0832-27c2-463b-97b7-b29200a8cebd"
     oauth2_proxy_client_secret                          = "afdb8ef2-a3d4-4a17-b839-b29200ab6f87"
+    pocket_id_encryption_key                            = "60f943d2-0a2a-49da-95f7-b3c60143ecbb"
     pocket_id_maxmind_license_key                       = "08c549a4-bf48-4998-8cb0-b29200ac845d"
     actual_budget_openid_client_secret                  = "5754702b-d9d5-4127-b5ab-b29200abdd6a"
     open_webui_secret_key                               = "aeeb7cdd-d10e-41d4-abb4-b33300dabc1a"

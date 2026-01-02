@@ -189,15 +189,7 @@ resource "proxmox_virtual_environment_vm" "fcos" {
   # Intel Arc Pro B50 video
   hostpci {
     device = "hostpci0"
-    id     = "0000:03:00.0"
-    pcie   = true
-    rombar = true
-  }
-
-  # Intel Arc Pro B50 audio
-  hostpci {
-    device = "hostpci1"
-    id     = "0000:04:00.0"
+    id     = "0000:03:00.1"
     pcie   = true
     rombar = true
   }

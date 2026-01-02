@@ -2,7 +2,7 @@
 Description=Pocket ID Quadlet
 
 [Container]
-Image=ghcr.io/pocket-id/pocket-id:v1.16.0
+Image=ghcr.io/pocket-id/pocket-id:v2
 AutoUpdate=registry
 ContainerName=pocket-id
 
@@ -14,6 +14,7 @@ Environment=METRICS_ENABLED=true
 Environment=OTEL_LOGS_EXPORTER=otlp
 Environment=OTEL_EXPORTER_OTLP_ENDPOINT=http://grafana-alloy:4317
 Environment=OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+Secret=pocket-id-encryption-key,type=env,target=ENCRYPTION_KEY
 Secret=pocket-id-maxmind-license-key,type=env,target=MAXMIND_LICENSE_KEY
 
 Label="glance.name=Pocket ID"

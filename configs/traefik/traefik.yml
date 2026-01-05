@@ -5,6 +5,7 @@ entryPoints:
       redirections:
         entryPoint:
           to: websecure
+          priority: 10
   websecure:
     address: ":443"
     asDefault: true

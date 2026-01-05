@@ -19,6 +19,10 @@ Label="traefik.enable=true"
 Label="traefik.tcp.routers.step-ca.rule=HostSNI(`ca.${base_domain}`)"
 Label="traefik.tcp.routers.step-ca.tls.passthrough=true"
 Label="traefik.tcp.services.step-ca.loadbalancer.server.port=9000"
+Label="traefik.http.routers.step-ca-insecure.rule=Host(`ca.${base_domain}`)"
+Label="traefik.http.routers.step-ca-insecure.entrypoints=web"
+Label="traefik.http.routers.step-ca-insecure.priority=20"
+Label="traefik.http.services.step-ca-insecure.loadbalancer.server.port=9001"
 
 Environment=DOCKER_STEPCA_INIT_NAME=Homelab
 Environment=DOCKER_STEPCA_INIT_DNS_NAMES=ca.${base_domain}

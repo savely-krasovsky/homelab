@@ -1,0 +1,32 @@
+[Unit]
+Description=Static Web Server Quadlet
+
+[Container]
+Image=docker.io/joseluisq/static-web-server:2
+AutoUpdate=registry
+ContainerName=static-web-server
+
+User=1000:1000
+
+Environment=SERVER_PORT=8080
+
+Label="traefik.enable=true"
+Label="traefik.http.services.static-web-server.loadbalancer.server.port=8080"
+Label="traefik.http.routers.static-web-server.rule=Host(`static.${base_domain}`) && ! PathPrefix(`/pmtiles/`)"
+Label="traefik.http.routers.static-web-server.service=static-web-server"
+Label="traefik.http.routers.static-web-server.entrypoints=web,websecure"
+Label="traefik.http.routers.static-web-server.priority=20"
+# Protect map from using by strangers
+Label="traefik.http.routers.immich-static-web-server.rule=Host(`immich.${base_domain}`) && PathPrefix(`/pmtiles/`) && Query(`map_key`, `${secrets.immich_map_key}`)"
+Label="traefik.http.routers.immich-static-web-server.service=static-web-server"
+
+Volume=/var/mnt/media/downloads/static:/public:ro
+
+Network=reverse-proxy.network
+
+[Service]
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target

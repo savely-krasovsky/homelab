@@ -14,6 +14,10 @@ entryPoints:
         - security-headers@file
       tls:
         certResolver: leresolver
+      # Matrix Synapse workarounds, lol
+      encodedCharacters:
+        allowEncodedSlash: true
+        allowEncodedHash: true
     http3:
       advertisedPort: 443
     # Allow long uploads

@@ -4,7 +4,7 @@ Requires=opencloud-collabora.service
 After=opencloud-server.service opencloud-collabora.service
 
 [Container]
-Image=docker.io/opencloudeu/opencloud-rolling:4.1.0
+Image=docker.io/opencloudeu/opencloud-rolling:5.0.0
 AutoUpdate=registry
 ContainerName=opencloud-collaboration
 
@@ -19,6 +19,7 @@ Environment=COLLABORATION_APP_NAME=CollaboraOnline
 Environment=COLLABORATION_APP_PRODUCT=Collabora
 Environment=COLLABORATION_APP_ADDR=https://collabora.${base_domain}
 Environment=COLLABORATION_APP_ICON=https://collabora.${base_domain}/favicon.ico
+Environment=COLLABORATION_LOG_LEVEL=info
 
 Entrypoint=/bin/sh
 Exec=-c "opencloud collaboration server"

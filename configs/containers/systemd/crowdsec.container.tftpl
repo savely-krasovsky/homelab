@@ -1,0 +1,30 @@
+[Unit]
+Description=Crowdsec Quadlet
+
+[Container]
+Image=docker.io/crowdsecurity/crowdsec:latest
+AutoUpdate=registry
+ContainerName=crowdsec
+
+User=1000:1000
+UserNS=keep-id:uid=1000,gid=1000
+
+Environment=COLLECTIONS=crowdsecurity/traefik
+Environment=GID=1000
+
+Label="glance.name=Crowdsec"
+Label="glance.icon=di:crowdsec"
+Label="glance.description=Advanced Fail2ban"
+Label="glance.hide=false"
+
+Volume=/var/mnt/docker/app_data/crowdsec/data:/var/lib/crowdsec/data:Z
+Volume=/var/mnt/docker/app_data/crowdsec/config:/etc/crowdsec:Z
+
+Network=reverse-proxy.network
+
+[Service]
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target

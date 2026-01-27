@@ -59,11 +59,18 @@ data "bitwarden_secret" "matrix_rtc_livekit_key" {
 data "bitwarden_secret" "matrix_rtc_livekit_secret" {
   id = var.containers_secret_config.matrix_rtc_livekit_secret
 }
+
+# Remnawave
 data "bitwarden_secret" "remnawave_metrics_pass" {
   id = var.containers_secret_config.remnawave_metrics_pass
 }
 data "bitwarden_secret" "remnawave_xhttp_path" {
   id = var.containers_secret_config.remnawave_xhttp_path
+}
+
+# Crowdsec
+data "bitwarden_secret" "crowdsec_lapi_key" {
+  id = var.containers_secret_config.crowdsec_lapi_key
 }
 
 locals {
@@ -94,6 +101,7 @@ locals {
       matrix_rtc_livekit_secret : data.bitwarden_secret.matrix_rtc_livekit_secret.value
       remnawave_metrics_pass : data.bitwarden_secret.remnawave_metrics_pass.value
       remnawave_xhttp_path : data.bitwarden_secret.remnawave_xhttp_path.value
+      crowdsec_lapi_key : data.bitwarden_secret.crowdsec_lapi_key.value
     }
   })
 

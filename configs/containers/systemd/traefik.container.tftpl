@@ -33,6 +33,7 @@ Label="traefik.http.routers.dashboard-auth.service=oauth2-proxy"
 Volume=%E/traefik/traefik.yml:/etc/traefik/traefik.yml:Z
 Volume=%E/traefik/file:/etc/traefik/file:Z
 Volume=/var/mnt/docker/app_data/traefik/acme:/etc/traefik/acme:Z
+Volume=/var/mnt/docker/app_data/traefik/plugins:/plugins-storage:Z
 
 Volume=%t/podman/podman.sock:/var/run/docker.sock
 

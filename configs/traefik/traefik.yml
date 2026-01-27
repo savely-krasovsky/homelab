@@ -12,6 +12,7 @@ entryPoints:
     http:
       middlewares:
         - security-headers@file
+        - crowdsec@file
       tls:
         certResolver: leresolver
       # Matrix Synapse workarounds, lol
@@ -69,6 +70,7 @@ tracing:
       insecure: true
 
 accessLog:
+  format: json
   otlp:
     grpc:
       endpoint: grafana-alloy:4317
@@ -76,3 +78,7 @@ accessLog:
 
 experimental:
   otlpLogs: true
+  plugins:
+    bouncer:
+      moduleName: "github.com/maxlerebourg/crowdsec-bouncer-traefik-plugin"
+      version: "v1.5.0"

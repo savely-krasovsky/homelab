@@ -1,0 +1,7 @@
+http:
+  middlewares:
+    crowdsec:
+      plugin:
+        bouncer:
+          enabled: true
+          crowdsecLapiKey: ${secrets.crowdsec_lapi_key}

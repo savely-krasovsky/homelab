@@ -9,7 +9,7 @@ ContainerName=opencloud-collabora
 Environment=aliasgroup1=https://wopiserver.${base_domain}:443
 Environment=username=admin
 Environment=DONT_GEN_SSL_CERT=YES
-Environment=extra_params="--o:ssl.enable=false --o:ssl.ssl_verification=false --o:ssl.termination=true --o:welcome.enable=false --o:net.frame_ancestors=cloud.${base_domain}"
+Environment=extra_params="--o:ssl.enable=false --o:ssl.ssl_verification=false --o:ssl.termination=true --o:hexify_embedded_urls=true --o:welcome.enable=false --o:net.frame_ancestors=cloud.${base_domain}"
 Secret=opencloud-collabora-password,type=env,target=password
 
 Label="glance.parent=opencloud"

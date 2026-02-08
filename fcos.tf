@@ -1,108 +1,9 @@
-data "bitwarden_secret" "vmauth_traefik_bearer_token" {
-  id = var.containers_secret_config.vmauth_traefik_bearer_token
-}
-
-data "bitwarden_secret" "vmauth_proxmox_bearer_token" {
-  id = var.containers_secret_config.vmauth_proxmox_bearer_token
-}
-
-data "bitwarden_secret" "immich_map_key" {
-  id = var.containers_secret_config.immich_map_key
-}
-
-// Matrix secrets
-data "bitwarden_secret" "coturn_turn_shared_secret" {
-  id = var.containers_secret_config.coturn_turn_shared_secret
-}
-data "bitwarden_secret" "synapse_postgres_password" {
-  id = var.containers_secret_config.synapse_postgres_password
-}
-data "bitwarden_secret" "synapse_registration_shared_secret" {
-  id = var.containers_secret_config.synapse_registration_shared_secret
-}
-data "bitwarden_secret" "synapse_macaroon_secret_key" {
-  id = var.containers_secret_config.synapse_macaroon_secret_key
-}
-data "bitwarden_secret" "synapse_form_secret" {
-  id = var.containers_secret_config.synapse_form_secret
-}
-data "bitwarden_secret" "synapse_oidc_client_secret" {
-  id = var.containers_secret_config.synapse_oidc_client_secret
-}
-data "bitwarden_secret" "matrix_authentication_service_postgres_password" {
-  id = var.containers_secret_config.matrix_authentication_service_postgres_password
-}
-data "bitwarden_secret" "matrix_authentication_service_secret" {
-  id = var.containers_secret_config.matrix_authentication_service_secret
-}
-data "bitwarden_secret" "matrix_authentication_service_secrets_encryption" {
-  id = var.containers_secret_config.matrix_authentication_service_secrets_encryption
-}
-data "bitwarden_secret" "matrix_authentication_service_secrets_rsa_key" {
-  id = var.containers_secret_config.matrix_authentication_service_secrets_rsa_key
-}
-data "bitwarden_secret" "matrix_authentication_service_secrets_p256_key" {
-  id = var.containers_secret_config.matrix_authentication_service_secrets_p256_key
-}
-data "bitwarden_secret" "matrix_authentication_service_secrets_p384_key" {
-  id = var.containers_secret_config.matrix_authentication_service_secrets_p384_key
-}
-data "bitwarden_secret" "matrix_authentication_service_secrets_secp256k1_key" {
-  id = var.containers_secret_config.matrix_authentication_service_secrets_secp256k1_key
-}
-data "bitwarden_secret" "matrix_authentication_service_smtp_password" {
-  id = var.containers_secret_config.matrix_authentication_service_smtp_password
-}
-data "bitwarden_secret" "matrix_rtc_livekit_key" {
-  id = var.containers_secret_config.matrix_rtc_livekit_key
-}
-data "bitwarden_secret" "matrix_rtc_livekit_secret" {
-  id = var.containers_secret_config.matrix_rtc_livekit_secret
-}
-
-# Remnawave
-data "bitwarden_secret" "remnawave_metrics_pass" {
-  id = var.containers_secret_config.remnawave_metrics_pass
-}
-data "bitwarden_secret" "remnawave_xhttp_path" {
-  id = var.containers_secret_config.remnawave_xhttp_path
-}
-
-# Crowdsec
-data "bitwarden_secret" "crowdsec_lapi_key" {
-  id = var.containers_secret_config.crowdsec_lapi_key
-}
-
 locals {
   // Add secrets into quadlets config
   containers_config = merge(var.containers_config, {
     proxmox_ip : var.proxmox_config.host,
     truenas_ip : var.fcos_config.truenas_ip,
     fcos_ip : var.fcos_config.ip,
-    secrets : {
-      vmauth_traefik_bearer_token : data.bitwarden_secret.vmauth_traefik_bearer_token.value
-      vmauth_proxmox_bearer_token : data.bitwarden_secret.vmauth_proxmox_bearer_token.value
-      immich_map_key : data.bitwarden_secret.immich_map_key.value
-      coturn_turn_shared_secret : data.bitwarden_secret.coturn_turn_shared_secret.value
-      synapse_postgres_password : data.bitwarden_secret.synapse_postgres_password.value
-      synapse_registration_shared_secret : data.bitwarden_secret.synapse_registration_shared_secret.value
-      synapse_macaroon_secret_key : data.bitwarden_secret.synapse_macaroon_secret_key.value
-      synapse_form_secret : data.bitwarden_secret.synapse_form_secret.value
-      synapse_oidc_client_secret : data.bitwarden_secret.synapse_oidc_client_secret.value
-      matrix_authentication_service_postgres_password : data.bitwarden_secret.matrix_authentication_service_postgres_password.value
-      matrix_authentication_service_secret : data.bitwarden_secret.matrix_authentication_service_secret.value
-      matrix_authentication_service_secrets_encryption : data.bitwarden_secret.matrix_authentication_service_secrets_encryption.value
-      matrix_authentication_service_secrets_rsa_key : data.bitwarden_secret.matrix_authentication_service_secrets_rsa_key.value
-      matrix_authentication_service_secrets_p256_key : data.bitwarden_secret.matrix_authentication_service_secrets_p256_key.value
-      matrix_authentication_service_secrets_p384_key : data.bitwarden_secret.matrix_authentication_service_secrets_p384_key.value
-      matrix_authentication_service_secrets_secp256k1_key : data.bitwarden_secret.matrix_authentication_service_secrets_secp256k1_key.value
-      matrix_authentication_service_smtp_password : data.bitwarden_secret.matrix_authentication_service_smtp_password.value
-      matrix_rtc_livekit_key : data.bitwarden_secret.matrix_rtc_livekit_key.value
-      matrix_rtc_livekit_secret : data.bitwarden_secret.matrix_rtc_livekit_secret.value
-      remnawave_metrics_pass : data.bitwarden_secret.remnawave_metrics_pass.value
-      remnawave_xhttp_path : data.bitwarden_secret.remnawave_xhttp_path.value
-      crowdsec_lapi_key : data.bitwarden_secret.crowdsec_lapi_key.value
-    }
   })
 
   # Get a list of all files in the specified directory
@@ -115,7 +16,7 @@ locals {
   config_dirs = provider::homelab-helpers::dirset("${path.module}/configs", "**")
 
   butane_config = merge(var.fcos_config, {
-    config_files : local.config_files
+    config_files : local.config_files,
     config_dirs : local.config_dirs,
   })
 
@@ -124,7 +25,8 @@ locals {
     path => content
   }
 
-  init_script_path = "${path.module}/scripts/init_fcos.sh.tftpl"
+  init_script_path       = "${path.module}/scripts/init_fcos.sh.tftpl"
+  get_secret_script_path = "${path.module}/scripts/get_secret.sh"
 }
 
 output "directories_to_create" {
@@ -205,7 +107,7 @@ resource "proxmox_virtual_environment_vm" "fcos" {
     enabled = true
   }
 
-  kvm_arguments = "-fw_cfg 'name=opt/com.coreos/config,string=${replace(data.ct_config.fcos_ignition.rendered, ",", ",,")}'"
+  kvm_arguments = "-fw_cfg 'name=opt/com.coreos/config,string=${replace(data.ct_config.fcos_ignition.rendered, ",", ",,")}' -smbios type=11,value=io.systemd.credential:bws-access-token=${var.bws_access_token}"
 }
 
 resource "null_resource" "fcos_provision_secrets" {
@@ -216,23 +118,27 @@ resource "null_resource" "fcos_provision_secrets" {
   }
 
   connection {
-    type  = "ssh"
-    user  = "core"
-    agent = true
-    host  = var.fcos_config.ip
+    type        = "ssh"
+    user        = "core"
+    private_key = file(pathexpand(var.fcos_config.ssh_private_key_path))
+    host        = var.fcos_config.ip
   }
 
   provisioner "file" {
-    destination = "/tmp/init.sh"
+    destination = "/var/tmp/init.sh"
     content = templatefile(local.init_script_path, {
-      bws_access_token : var.bws_access_token
       config_files : local.config_files
-      secrets : var.containers_secret_config
+      secret_uuids : var.containers_secret_config
     })
   }
 
+  provisioner "file" {
+    destination = "/home/core/.local/bin/get_secret.sh"
+    content     = file(local.get_secret_script_path)
+  }
+
   provisioner "remote-exec" {
-    inline     = ["sh /tmp/init.sh"]
+    inline     = ["sh /var/tmp/init.sh"]
     on_failure = fail
   }
 }

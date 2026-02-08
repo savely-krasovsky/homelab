@@ -314,7 +314,11 @@ storage:
           		tcp dport 7881 accept
 
           		# allow plex
+          		udp dport 1900 accept
+          		udp dport 5353 accept
+          		tcp dport 8324 accept
           		udp dport { 32410, 32412, 32413, 32414 } accept
+          		tcp dport 32469 accept
 
           		# allow minecraft bds
           		udp dport 19132 accept

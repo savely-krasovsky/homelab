@@ -1,19 +1,28 @@
 users:
   # Traefik
-  - bearer_token: "${secrets.vmauth_traefik_bearer_token}"
+  - bearer_token: "%%{VMAUTH_TRAEFIK_BEARER_TOKEN}"
     url_map:
       - src_hosts:
-        - "metrics\\.${replace(base_domain, ".", "\\\\.")}"
+          - "metrics\\.${replace(base_domain, ".", "\\\\.")}"
         url_prefix: "http://victoria-metrics:8428/"
       - src_hosts:
-        - "logs\\.${replace(base_domain, ".", "\\\\.")}"
+          - "logs\\.${replace(base_domain, ".", "\\\\.")}"
         url_prefix: "http://victoria-logs:9428/"
       - src_hosts:
-        - "traces\\.${replace(base_domain, ".", "\\\\.")}"
+          - "traces\\.${replace(base_domain, ".", "\\\\.")}"
         url_prefix: "http://victoria-traces:10428/"
   # Proxmox
-  - bearer_token: "${secrets.vmauth_proxmox_bearer_token}"
+  - bearer_token: "%%{VMAUTH_PROXMOX_BEARER_TOKEN}"
     url_map:
       - src_hosts:
-        - "metrics\\.${replace(base_domain, ".", "\\\\.")}:443"
+          - "metrics\\.${replace(base_domain, ".", "\\\\.")}:443"
         url_prefix: "http://victoria-metrics:8428/"
+      - src_hosts:
+          - "logs\\.${replace(base_domain, ".", "\\\\.")}"
+        url_prefix: "http://victoria-logs:9428/"
+  # Fedora CoreOS
+  - bearer_token: "%%{VMAUTH_FEDORA_COREOS_BEARER_TOKEN}"
+    url_map:
+      - src_hosts:
+          - "logs\\.${replace(base_domain, ".", "\\\\.")}"
+        url_prefix: "http://victoria-logs:9428/"

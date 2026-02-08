@@ -31,7 +31,9 @@ http:
   - ::1/128
 
 database:
-  uri: "postgresql://mas:${secrets.matrix_authentication_service_postgres_password}@matrix-postgres/mas"
+  host: matrix-postgres
+  username: mas
+  database: mas
   max_connections: 10
   min_connections: 0
   connect_timeout: 30
@@ -56,19 +58,10 @@ email:
   hostname: smtps-proxy.fastmail.com
   port: 443
   username: savely@${base_domain}
-  password: ${secrets.matrix_authentication_service_smtp_password}
 
 secrets:
-  encryption: ${secrets.matrix_authentication_service_secrets_encryption}
-  keys:
-  - key: |
-      ${indent(6, secrets.matrix_authentication_service_secrets_rsa_key)}
-  - key: |
-      ${indent(6, secrets.matrix_authentication_service_secrets_p256_key)}
-  - key: |
-      ${indent(6, secrets.matrix_authentication_service_secrets_p384_key)}
-  - key: |
-      ${indent(6, secrets.matrix_authentication_service_secrets_secp256k1_key)}
+  encryption_file: /run/secrets/matrix-authentication-service-secrets-encryption
+  keys_dir: /run/secrets/keys
 
 passwords:
   enabled: false
@@ -76,7 +69,7 @@ passwords:
 matrix:
   kind: synapse
   homeserver: ${base_domain}
-  secret: ${secrets.matrix_authentication_service_secret}
+  secret_file: /run/secrets/matrix-authentication-service-secret
   endpoint: https://matrix.${base_domain}/
 
 upstream_oauth2:
@@ -86,7 +79,7 @@ upstream_oauth2:
     issuer: "https://id.${base_domain}"
     human_name: "Pocket ID"
     client_id: "c6e8a96b-647f-47fe-8e75-2b05a6c79242"
-    client_secret: "${secrets.synapse_oidc_client_secret}"
+    client_secret_file: /run/secrets/synapse-oidc-client-secret
     token_endpoint_auth_method: client_secret_basic
     scope: "email openid profile"
     claims_imports:

@@ -112,13 +112,18 @@ prometheus.scrape "scrape_metrics" {
   scrape_interval = "10s"
 }
 
+local.file "remnawave_metrics_pass" {
+  filename = "/run/secrets/remnawave-metrics-pass"
+  is_secret = true
+}
+
 prometheus.scrape "scrape_remnawave_metrics" {
   targets         = [
     { __address__ = "remnawave:3001" },
   ]
   basic_auth {
     username = "admin"
-    password = "${secrets.remnawave_metrics_pass}"
+    password = local.file.remnawave_metrics_pass.content
   }
   forward_to = [prometheus.remote_write.victoria_metrics.receiver]
   scrape_interval = "10s"

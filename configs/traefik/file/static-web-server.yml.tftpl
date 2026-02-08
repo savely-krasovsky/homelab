@@ -1,0 +1,17 @@
+http:
+  routers:
+    static-web-server:
+      rule: Host(`static.${base_domain}`) && !PathPrefix(`/pmtiles/`)
+      service: static-web-server
+      entryPoints:
+        - web
+        - websecure
+      priority: 20
+    immich-static-web-server:
+      rule: Host(`immich.${base_domain}`) && PathPrefix(`/pmtiles/`) && Query(`map_key`, `{{ env "IMMICH_MAP_KEY" }}`)
+      service: static-web-server
+  services:
+    static-web-server:
+      loadBalancer:
+        servers:
+          - url: http://static-web-server:8080

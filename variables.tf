@@ -22,12 +22,13 @@ variable "containers_config" {
 }
 
 variable "containers_secret_config" {
-  description = "Quadlet Ssecret"
+  description = "Quadlet Secret"
   type        = map(string)
   default = {
     traefik_cf_dns_api_token                            = "e9e0f0f0-abc8-4bde-b05f-b292018179bb"
     vmauth_traefik_bearer_token                         = "fba802cf-948f-4ff7-8965-b29f00e2da48"
     vmauth_proxmox_bearer_token                         = "bb281df0-e5e8-4348-a92e-b2a300a30117"
+    vmauth_fedora_coreos_bearer_token                   = "2558d1e5-9e89-48c6-82e1-b3e300bb400b"
     oauth2_proxy_cookie_secret                          = "289c0832-27c2-463b-97b7-b29200a8cebd"
     oauth2_proxy_client_secret                          = "afdb8ef2-a3d4-4a17-b839-b29200ab6f87"
     pocket_id_encryption_key                            = "60f943d2-0a2a-49da-95f7-b3c60143ecbb"
@@ -69,9 +70,6 @@ variable "containers_secret_config" {
     restic_password                                     = "52ce5eb2-98ae-4243-ba08-b2c700e04b7e"
     opencloud_collabora_password                        = "bced1168-9741-4b8e-abf4-b2d4000e2c9e"
     opencloud_smtp_password                             = "5e0889ac-3b11-4fc4-81ca-b2d400170e85"
-    simplex_smp_pass                                    = "ebc8a3cb-4b85-44d6-b61c-b33800e45456"
-    simplex_xftp_pass                                   = "c6feec9d-2622-4322-acbf-b338013f79e9"
-    tuwunel_registration_token                          = "92e470e2-c88e-43d3-ae0c-b3570039c4c9"
     coturn_turn_shared_secret                           = "5b69585c-03e8-454f-94e0-b357000002d4"
     matrix_postgres_password                            = "d2ea9e75-f3bc-4e3d-a07c-b37b0147a20a"
     synapse_postgres_password                           = "2209bd8d-f6a7-43e0-afa8-b37a00bbfd2c"
@@ -79,8 +77,7 @@ variable "containers_secret_config" {
     synapse_macaroon_secret_key                         = "cfa20ae3-8103-46be-a129-b37a014627aa"
     synapse_form_secret                                 = "c11840ef-11f0-40c7-a08e-b37a0146564f"
     synapse_oidc_client_secret                          = "6e0f179f-631c-480c-b9ec-b37a0146e95c"
-    matrix_rtc_livekit_key                              = "5c336187-6139-413b-bbf1-b37a01588b03"
-    matrix_rtc_livekit_secret                           = "a24e0995-d297-4c23-849f-b37a0158a5d4"
+    matrix_rtc_livekit_keys                             = "078916ef-ac5d-432f-a44a-b3eb00026bdf"
     matrix_authentication_service_postgres_password     = "d2ea9e75-f3bc-4e3d-a07c-b37b0147a20a"
     matrix_authentication_service_secret                = "bcaa7f79-c9fc-4448-9c79-b37a016954f5"
     matrix_authentication_service_secrets_encryption    = "012d8da3-3f7c-471a-b9cb-b37b0001dc1b"
@@ -98,7 +95,7 @@ variable "containers_secret_config" {
     remnawave_node_2_secret_key                         = "903369ff-bbc1-42a9-8461-b3b9017a0ab3"
     remnawave_api_token                                 = "a0b134ef-a7ee-4972-bae4-b3b9003e6788"
     remnawave_xhttp_path                                = "23bd5525-ac0c-49db-bbd5-b3b90041b8ed"
-    crowdsec_lapi_key                                   = "20c5ff35-d5c2-47b7-8907-b3dd0130e9cf"
+    traefik_crowdsec_lapi_key                           = "20c5ff35-d5c2-47b7-8907-b3dd0130e9cf"
   }
 }
 

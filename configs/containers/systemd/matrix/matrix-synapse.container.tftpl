@@ -10,6 +10,13 @@ ContainerName=matrix-synapse
 
 User=1000:1000
 
+Secret=matrix-authentication-service-secret,uid=1000,gid=1000,mode=0600
+Secret=synapse-postgres-password,uid=1000,gid=1000,mode=0600
+Secret=coturn-turn-shared-secret,uid=1000,gid=1000,mode=0600
+Secret=synapse-registration-shared-secret,uid=1000,gid=1000,mode=0600
+Secret=synapse-macaroon-secret-key,uid=1000,gid=1000,mode=0600
+Secret=synapse-form-secret,uid=1000,gid=1000,mode=0600
+
 Label="glance.id=matrix"
 Label="glance.name=Matrix"
 Label="glance.icon=di:matrix-light"

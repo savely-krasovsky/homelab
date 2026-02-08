@@ -10,6 +10,16 @@ ContainerName=matrix-authentication-service
 
 User=1000:1000
 
+Secret=matrix-authentication-service-postgres-password,type=env,target=MAS_database.password
+Secret=matrix-authentication-service-smtp-password,type=env,target=MAS_email.password
+Secret=matrix-authentication-service-secrets-encryption,uid=1000,gid=1000,mode=0600
+Secret=matrix-authentication-service-secrets-rsa-key,target=/run/secrets/keys/rsa,uid=1000,gid=1000,mode=0600
+Secret=matrix-authentication-service-secrets-p256-key,target=/run/secrets/keys/p256,uid=1000,gid=1000,mode=0600
+Secret=matrix-authentication-service-secrets-p384-key,target=/run/secrets/keys/p384,uid=1000,gid=1000,mode=0600
+Secret=matrix-authentication-service-secrets-secp256k1-key,target=/run/secrets/keys/secp256k1,uid=1000,gid=1000,mode=0600
+Secret=matrix-authentication-service-secret,uid=1000,gid=1000,mode=0600
+Secret=synapse-oidc-client-secret,uid=1000,gid=1000,mode=0600
+
 Label="glance.parent=matrix"
 Label="glance.name=Matrix Authentication Service"
 Label="glance.hide=false"

@@ -1,0 +1,18 @@
+http:
+  routers:
+    remnawave-node:
+      rule: Host(`crypto1.${base_domain}`) && PathPrefix(`/{{ env "REMNAWAVE_XHTTP_PATH" }}`)
+      service: remnawave-node
+    remnawave-fake-page:
+      rule: Host(`crypto1.${base_domain}`)
+      service: remnawave-fake-page
+  services:
+    remnawave-node:
+      loadBalancer:
+        servers:
+          - url: h2c://remnawave-node:8080
+    remnawave-fake-page:
+      loadBalancer:
+        servers:
+          - url: https://cr.yp.to
+        passHostHeader: false

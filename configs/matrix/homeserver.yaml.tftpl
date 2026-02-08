@@ -16,7 +16,7 @@ listeners:
 matrix_authentication_service:
   enabled: true
   endpoint: http://matrix-authentication-service:8080/
-  secret: ${secrets.matrix_authentication_service_secret}
+  secret_path: "/run/secrets/matrix-authentication-service-secret"
 
 # The maximum allowed duration by which sent events can be delayed, as
 # per MSC4140.
@@ -26,7 +26,7 @@ database:
   name: psycopg2
   args:
     user: synapse
-    password: ${secrets.synapse_postgres_password}
+    passfile: "/run/secrets/synapse-postgres-password"
     dbname: synapse
     host: matrix-postgres
     cp_min: 5
@@ -49,23 +49,24 @@ rc_delayed_event_mgmt:
 media_store_path: /data/media_store
 
 turn_uris: [ "turn:turn.${base_domain}?transport=udp", "turn:turn.${base_domain}?transport=tcp" ]
-turn_shared_secret: "${secrets.coturn_turn_shared_secret}"
+turn_shared_secret_path: "/run/secrets/coturn-turn-shared-secret"
 turn_user_lifetime: 86400000
 turn_allow_guests: false
 
-registration_shared_secret: "${secrets.synapse_registration_shared_secret}"
+registration_shared_secret_path: "/run/secrets/synapse-registration-shared-secret"
 auto_join_rooms:
   - "#news:${base_domain}"
 
 enable_metrics: true
 report_stats: false
 
-macaroon_secret_key: "${secrets.synapse_macaroon_secret_key}"
-form_secret: "${secrets.synapse_form_secret}"
+macaroon_secret_key_path: "/run/secrets/synapse-macaroon-secret-key"
+form_secret_path: "/run/secrets/synapse-form-secret"
 
 signing_key_path: "/data/${base_domain}.signing.key"
 trusted_key_servers:
   - server_name: "matrix.org"
+suppress_key_server_warning: true
 
 password_config:
   enabled: false

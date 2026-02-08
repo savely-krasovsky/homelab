@@ -16,6 +16,10 @@ UserNS=keep-id:uid=1000,gid=1000
 # Lego tries to issue cert for you CNAME host.
 Environment=LEGO_DISABLE_CNAME_SUPPORT=true
 Secret=traefik-cf-dns-api-token,type=env,target=CF_DNS_API_TOKEN
+Secret=traefik-crowdsec-lapi-key,type=env,target=CROWDSEC_LAPI_KEY
+Secret=vmauth-traefik-bearer-token,type=env,target=VMAUTH_TRAEFIK_BEARER_TOKEN
+Secret=remnawave-xhttp-path,type=env,target=REMNAWAVE_XHTTP_PATH
+Secret=immich-map-key,type=env,target=IMMICH_MAP_KEY
 
 Label="glance.name=Traefik"
 Label="glance.icon=di:traefik"

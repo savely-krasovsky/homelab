@@ -4,4 +4,4 @@ http:
       plugin:
         bouncer:
           enabled: true
-          crowdsecLapiKey: ${secrets.crowdsec_lapi_key}
+          crowdsecLapiKey: '{{ env "CROWDSEC_LAPI_KEY" }}'

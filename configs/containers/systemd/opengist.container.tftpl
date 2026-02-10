@@ -1,0 +1,39 @@
+[Unit]
+Description=Opengist Quadlet
+
+[Container]
+Image=ghcr.io/thomiceli/opengist:1
+AutoUpdate=registry
+ContainerName=opengist
+
+Environment=OG_LOG_LEVEL=info
+Environment=OG_LOG_OUTPUT=stdout
+Environment=OG_EXTERNAL_URL=https://gist.${base_domain}
+Environment=OG_OIDC_PROVIDER_NAME="Pocket ID"
+Environment=OG_OIDC_CLIENT_KEY=baef6dc9-da27-4d4b-a911-223f9d47ea30
+Environment=OG_OIDC_DISCOVERY_URL=https://id.${base_domain}/.well-known/openid-configuration
+Environment=OG_OIDC_GROUP_CLAIM_NAME=groups
+Environment=OG_OIDC_ADMIN_GROUP=homelab_admins
+Secret=opengist-oidc-secret,type=env,target=OG_OIDC_SECRET
+
+Label="glance.name=Opengist"
+Label="glance.icon=di:opengist"
+Label="glance.url=https://gist.${base_domain}"
+Label="glance.description=Self-hosted Pastebin powered by Git"
+Label="glance.hide=false"
+
+Label="traefik.enable=true"
+Label="traefik.http.routers.opengist.rule=Host(`gist.${base_domain}`)"
+Label="traefik.http.services.opengist.loadbalancer.server.port=6157"
+
+Volume=/var/mnt/docker/app_data/opengist:/opengist:Z
+
+Network=reverse-proxy.network
+PublishPort=2223:2222/tcp
+
+[Service]
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target

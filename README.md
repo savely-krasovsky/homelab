@@ -41,6 +41,7 @@ I also have some observability:
 | OAuth2 Proxy    | Identity-Aware Proxy                                   |     |
 | OpenCloud       | File Management and Collaboration platform             | ☑️  |
 | Open WebUI      | Chatbot UI                                             | ☑️  |
+| Opengist        | Self-hosted Pastebin powered by Git                    |     |
 | Outline         | Personal Knowledge Base                                | ☑️  |
 | Plex            | Personal Media Server                                  |     |
 | Pocket ID       | Single Sign-on Portal                                  |     |
@@ -48,6 +49,7 @@ I also have some observability:
 | Remnaware Panel | Censorship Circumvent Proxy Management Platform        | ☑️  |
 | Remnaware Node  | Node for accessing my server from totalitarian regimes |     |
 | rmqtt           | MQTT Broker Server                                     |     |
+| Step CA         | Smallstep-based Homelab CA instastructure              |     |
 | qBittorrent     | BitTorrent Client                                      |     |
 | Tangled Knot    | Git Platform based on ATProto                          |     |
 | Telegraf        | Only for MQTT to OpenTelemetry conversion              |     |

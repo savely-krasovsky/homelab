@@ -96,6 +96,7 @@ variable "containers_secret_config" {
     remnawave_api_token                                 = "a0b134ef-a7ee-4972-bae4-b3b9003e6788"
     remnawave_xhttp_path                                = "23bd5525-ac0c-49db-bbd5-b3b90041b8ed"
     traefik_crowdsec_lapi_key                           = "20c5ff35-d5c2-47b7-8907-b3dd0130e9cf"
+    opengist_oidc_secret                                = "56f84185-870a-4377-8c64-b3ec00b2f13f"
   }
 }
 

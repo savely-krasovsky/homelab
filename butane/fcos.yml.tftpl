@@ -121,12 +121,12 @@ storage:
         name: core
 
   files:
-    # http and https sockets for traefik
+    # sockets for traefik
     - path: /var/home/core/.config/systemd/user/http.socket
       contents:
         inline: |
           [Socket]
-          ListenStream=${ip}:8080
+          ListenStream=${ip}:80
           FileDescriptorName=web
           Service=traefik.service
 
@@ -140,8 +140,8 @@ storage:
       contents:
         inline: |
           [Socket]
-          ListenStream=${ip}:8443
-          ListenDatagram=${ip}:8443
+          ListenStream=${ip}:443
+          ListenDatagram=${ip}:443
           FileDescriptorName=websecure
           Service=traefik.service
 
@@ -155,7 +155,7 @@ storage:
       contents:
         inline: |
           [Socket]
-          ListenStream=${ip}:8993
+          ListenStream=${ip}:993
           FileDescriptorName=imaps
           Service=traefik.service
 
@@ -169,7 +169,7 @@ storage:
       contents:
         inline: |
           [Socket]
-          ListenStream=${ip}:8465
+          ListenStream=${ip}:465
           FileDescriptorName=smtps
           Service=traefik.service
 
@@ -183,7 +183,7 @@ storage:
       contents:
         inline: |
           [Socket]
-          ListenStream=${ip}:8636
+          ListenStream=${ip}:636
           FileDescriptorName=ldaps
           Service=traefik.service
 
@@ -241,6 +241,11 @@ storage:
       contents:
         inline: |
           [zram0]
+
+    - path: /etc/sysctl.d/90-traefik.conf
+      contents:
+        inline: |
+          net.ipv4.ip_unprivileged_port_start=80
 
     - path: /etc/sysctl.d/90-bbr.conf
       contents:
@@ -301,16 +306,16 @@ storage:
           		tcp dport 2223 accept
 
           		# allow http and https
-          		tcp dport 8080 accept
+          		tcp dport 80 accept
+          		tcp dport 443 accept
+          		udp dport 443 accept
           		tcp dport 8443 accept
           		udp dport 8443 accept
-          		tcp dport 9443 accept
-          		udp dport 9443 accept
 
           		# allow imaps, smtps and ldaps
-          		tcp dport 8993 accept
-          		tcp dport 8465 accept
-          		tcp dport 8636 accept
+          		tcp dport 993 accept
+          		tcp dport 465 accept
+          		tcp dport 636 accept
 
           		# allow livekit
           		udp dport 59000-60000 accept
@@ -593,9 +598,9 @@ systemd:
         Environment=RESTIC_PASSWORD_FILE=%d/restic-password
         # Create LVM snapshot and do backup
         ExecStart=/bin/bash -c "lvremove -y vg0/restic-backblaze || true"
-        ExecStart=/usr/sbin/lvcreate --size 1G --snapshot --name restic-backblaze vg0/lv0
+        ExecStart=/usr/sbin/lvcreate --size 5G --snapshot --name restic-backblaze vg0/lv0
         ExecStart=/usr/bin/mount -o nouuid /dev/vg0/restic-backblaze /mnt/snapshots/backblaze
-        ExecStart=/bin/bash -c "export B2_ACCOUNT_ID=$(cat $CREDENTIALS_DIRECTORY/restic-b2-account-id); export B2_ACCOUNT_KEY=$(cat $CREDENTIALS_DIRECTORY/restic-b2-account-key); restic -r b2:krasovsky-homelab:app-data --verbose backup /var/mnt/docker/app_data"
+        ExecStart=/bin/bash -c "export B2_ACCOUNT_ID=$(cat $CREDENTIALS_DIRECTORY/restic-b2-account-id); export B2_ACCOUNT_KEY=$(cat $CREDENTIALS_DIRECTORY/restic-b2-account-key); restic -r b2:krasovsky-homelab:app-data --verbose backup /mnt/snapshots/backblaze/app_data"
         ExecStart=/bin/bash -c "umount /mnt/snapshots/backblaze || true"
         ExecStart=/usr/sbin/lvremove -y vg0/restic-backblaze
 
@@ -631,9 +636,9 @@ systemd:
         Environment=RESTIC_PASSWORD_FILE=%d/restic-password
         # Create LVM snapshot and do backup
         ExecStart=/bin/bash -c "lvremove -y vg0/restic-storj || true"
-        ExecStart=/usr/sbin/lvcreate --size 1G --snapshot --name restic-storj vg0/lv0
+        ExecStart=/usr/sbin/lvcreate --size 5G --snapshot --name restic-storj vg0/lv0
         ExecStart=/usr/bin/mount -o nouuid /dev/vg0/restic-storj /mnt/snapshots/storj
-        ExecStart=/bin/bash -c "export AWS_ACCESS_KEY_ID=$(cat $CREDENTIALS_DIRECTORY/restic-aws-access-key-id); export AWS_SECRET_ACCESS_KEY=$(cat $CREDENTIALS_DIRECTORY/restic-aws-secret-access-key); restic -r s3:https://gateway.eu1.storjshare.io/homelab-backup/app-data --verbose backup /var/mnt/docker/app_data"
+        ExecStart=/bin/bash -c "export AWS_ACCESS_KEY_ID=$(cat $CREDENTIALS_DIRECTORY/restic-aws-access-key-id); export AWS_SECRET_ACCESS_KEY=$(cat $CREDENTIALS_DIRECTORY/restic-aws-secret-access-key); restic -r s3:https://gateway.eu1.storjshare.io/homelab-backup/app-data --verbose backup /mnt/snapshots/storj/app_data"
         ExecStart=/bin/bash -c "umount /mnt/snapshots/storj || true"
         ExecStart=/usr/sbin/lvremove -y vg0/restic-storj
 

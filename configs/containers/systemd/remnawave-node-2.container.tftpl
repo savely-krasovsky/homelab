@@ -10,8 +10,8 @@ Environment=NODE_PORT=2224
 Secret=remnawave-node-2-secret-key,type=env,target=SECRET_KEY
 
 Network=reverse-proxy.network
-PublishPort=9443:8443/tcp
-PublishPort=9443:8443/udp
+PublishPort=8443:8443/tcp
+PublishPort=8443:8443/udp
 
 [Service]
 TimeoutStartSec=900

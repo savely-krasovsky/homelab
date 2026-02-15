@@ -1,0 +1,36 @@
+[Unit]
+Description=Crowdsec Web UI Quadlet
+
+[Container]
+Image=ghcr.io/theduffman85/crowdsec-web-ui:latest
+AutoUpdate=registry
+ContainerName=crowdsec-web-ui
+
+User=1000:1000
+
+Environment=CROWDSEC_URL=http://crowdsec-security-engine:8080
+Environment=CROWDSEC_USER=crowdsec-web-ui
+Environment=CROWDSEC_REFRESH_INTERVAL=30s
+Secret=crowdsec-lapi-password,type=env,target=CROWDSEC_PASSWORD
+
+Label="glance.parent=crowdsec"
+Label="glance.name=Web UI"
+Label="glance.hide=false"
+
+Label="traefik.enable=true"
+Label="traefik.http.routers.crowdsec.rule=Host(`crowdsec.${base_domain}`)"
+Label="traefik.http.routers.crowdsec.middlewares=oauth2-proxy@file"
+Label="traefik.http.services.crowdsec.loadbalancer.server.port=3000"
+Label="traefik.http.routers.crowdsec-auth.rule=Host(`crowdsec.${base_domain}`) && PathPrefix(`/oauth2/`)"
+Label="traefik.http.routers.crowdsec-auth.service=oauth2-proxy"
+
+Volume=/var/mnt/docker/app_data/crowdsec/web-ui-data:/app/data:Z
+
+Pod=crowdsec.pod
+
+[Service]
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target

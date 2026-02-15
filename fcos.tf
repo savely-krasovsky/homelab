@@ -53,6 +53,7 @@ resource "proxmox_virtual_environment_vm" "fcos" {
   # Use modern platform
   machine = "q35"
   bios    = "ovmf"
+  scsi_hardware = "virtio-scsi-single"
 
   startup {
     order = 20

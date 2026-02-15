@@ -4,10 +4,9 @@ Description=Crowdsec Quadlet
 [Container]
 Image=docker.io/crowdsecurity/crowdsec:latest
 AutoUpdate=registry
-ContainerName=crowdsec
+ContainerName=crowdsec-security-engine
 
 User=1000:1000
-UserNS=keep-id:uid=1000,gid=1000
 
 Environment=COLLECTIONS=crowdsecurity/traefik
 Environment=GID=1000
@@ -21,7 +20,7 @@ Volume=/var/mnt/docker/app_data/crowdsec/data:/var/lib/crowdsec/data:Z
 Volume=/var/mnt/docker/app_data/crowdsec/config:/etc/crowdsec:Z
 Volume=/var/mnt/docker/app_data/crowdsec/staging:/staging:Z
 
-Network=reverse-proxy.network
+Pod=crowdsec.pod
 
 [Service]
 TimeoutStartSec=900

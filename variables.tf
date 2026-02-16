@@ -63,6 +63,7 @@ variable "containers_secret_config" {
     glance_github_token                                 = "de3353d8-09d9-4063-b513-b2a3008cc2c9"
     tangled_knot_server_secret                          = "a58caac0-1c07-4152-89e6-b2a900c8fe8f"
     forward_info_bot_telegram_token                     = "f8eda775-f945-4eb8-b48a-b2b80092cf54"
+    masked_email_bot_telegram_token                     = "3995096e-2497-4319-adb1-b3f201587265"
     restic_aws_access_key_id                            = "2743cf63-05ae-45b4-997f-b2c700dfabef"
     restic_aws_secret_access_key                        = "134279a9-b3ee-4309-ae9e-b2c700dfe86c"
     restic_b2_account_id                                = "3e058bd3-e13d-4b6a-9d48-b2c700e00d62"

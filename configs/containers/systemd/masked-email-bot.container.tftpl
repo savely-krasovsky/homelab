@@ -1,0 +1,29 @@
+[Unit]
+Description=Masked Email Bot Quadlet
+
+[Container]
+Image=ghcr.io/savely-krasovsky/masked-email-bot:latest
+AutoUpdate=registry
+ContainerName=masked-email-bot
+
+User=1000:1000
+UserNS=keep-id:uid=1000,gid=1000
+
+Environment=FASTMAIL_OAUTH2_CLIENT_ID=354141ae
+Environment=FASTMAIL_OAUTH2_REDIRECT_URL=https://maskedemailbot.${base_domain}/redirect
+Secret=masked-email-bot-telegram-token,type=env,target=TELEGRAM_TOKEN
+
+Label="traefik.enable=true"
+Label="traefik.http.routers.masked-email-bot.rule=Host(`maskedemailbot.${base_domain}`)"
+Label="traefik.http.services.masked-email-bot.loadbalancer.server.port=8080"
+
+Volume=/var/mnt/docker/app_data/masked-email-bot:/data:Z
+
+Network=reverse-proxy.network
+
+[Service]
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target

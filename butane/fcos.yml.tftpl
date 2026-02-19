@@ -365,42 +365,6 @@ storage:
         inline: |
           [Service]
           StateDirectory=vector
-    - path: /etc/vector/vector.yaml
-      contents:
-        inline: |
-          secret
-            bitwarden
-              type: exec
-              command: ["get_secret.sh"]
-          sources:
-            journald:
-              type: journald
-              include_units: ["sshd.service"]
-          transforms:
-            remap:
-              type: "remap"
-              inputs:
-                - journald
-              source: |
-                .level = to_syslog_level!(.PRIORITY)
-          sinks:
-            victorialogs:
-              inputs:
-                - remap
-              type: elasticsearch
-              endpoints:
-                - https://logs.krasovs.ky/insert/elasticsearch/
-              api_version: v8
-              compression: gzip
-              healthcheck:
-                enabled: false
-              query:
-                _msg_field: message
-                _time_field: timestamp
-                _stream_fields: host,container_name
-              request:
-                headers:
-                  - Authorization: "Bearer"
 
     # download systemd_exporter and create systemd user service
     - path: /var/home/core/.local/bin/systemd_exporter.tar.gz

@@ -12,6 +12,7 @@ Secret=remnawave-node-2-secret-key,type=env,target=SECRET_KEY
 Network=reverse-proxy.network
 PublishPort=8443:8443/tcp
 PublishPort=8443:8443/udp
+AddHost=crypto1.${base_domain}:host-gateway
 
 [Service]
 TimeoutStartSec=900

@@ -55,7 +55,7 @@ Label="traefik.http.routers.opencloud.rule=Host(`cloud.${base_domain}`)"
 Label="traefik.http.routers.opencloud.service=opencloud"
 Label="traefik.http.services.opencloud.loadbalancer.server.port=9200"
 
-Label="traefik.http.routers.opencloud-monitoring.rule=Host(`cloud.krasovs.ky`) && PathPrefix(`/debug`)"
+Label="traefik.http.routers.opencloud-monitoring.rule=Host(`cloud.${base_domain}`) && PathPrefix(`/debug`)"
 Label="traefik.http.routers.opencloud-monitoring.service=opencloud-monitoring"
 Label="traefik.http.routers.opencloud-monitoring.middlewares=strip-debug-prefix"
 Label="traefik.http.middlewares.strip-debug-prefix.stripprefix.prefixes=/debug"

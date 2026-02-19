@@ -1,3 +1,6 @@
+# The web and websecure entry points do not listen on 8080/8443.
+# Instead, they use systemd socket activation.
+# To allow requests between Podman networks, I also exposed real 80/443.
 entryPoints:
   web:
     address: ":8080"
@@ -9,7 +12,7 @@ entryPoints:
   websecure:
     address: ":8443"
     asDefault: true
-    http:
+    http: &http_secure
       middlewares:
         - security-headers@file
         - crowdsec@file
@@ -19,38 +22,28 @@ entryPoints:
       encodedCharacters:
         allowEncodedSlash: true
         allowEncodedHash: true
-    http3:
+    http3: &http3
       advertisedPort: 443
     # Allow long uploads
-    transport:
+    transport: &transport
       respondingTimeouts:
         readTimeout: "0s"
-  intraweb:
+  podmanWeb:
     address: ":80"
     http:
       redirections:
         entryPoint:
-          to: intrawebsecure
+          to: podmanWebsecure
           priority: 10
-  intrawebsecure:
+  podmanWebsecure:
     address: ":443"
     asDefault: true
     http:
-      middlewares:
-        - security-headers@file
-        - crowdsec@file
-      tls:
-        certResolver: leresolver
-      # Matrix Synapse workarounds, lol
-      encodedCharacters:
-        allowEncodedSlash: true
-        allowEncodedHash: true
+      <<: *http_secure
     http3:
-      advertisedPort: 443
-    # Allow long uploads
+      <<: *http3
     transport:
-      respondingTimeouts:
-        readTimeout: "0s"
+      <<: *transport
   imaps:
     address: ":993"
   smtps:

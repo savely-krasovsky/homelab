@@ -33,8 +33,6 @@ Volume=/var/mnt/docker/app_data/glance/assets:/app/assets:Z
 Volume=%t/podman/podman.sock:/var/run/docker.sock
 
 Network=reverse-proxy.network
-AddHost=pve.${base_domain}:host-gateway
-AddHost=truenas.${base_domain}:host-gateway
 
 # Disable label security to access Podman socket.
 SecurityLabelDisable=true

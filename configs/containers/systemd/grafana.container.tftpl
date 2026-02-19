@@ -44,7 +44,6 @@ Label="traefik.http.routers.grafana.rule=Host(`grafana.${base_domain}`)"
 Volume=/var/mnt/docker/app_data/grafana/data:/var/lib/grafana:Z
 
 Network=reverse-proxy.network
-AddHost=id.${base_domain}:host-gateway
 
 [Service]
 TimeoutStartSec=900

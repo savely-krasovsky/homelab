@@ -42,11 +42,18 @@ Volume=/var/mnt/docker/app_data/traefik/plugins:/plugins-storage:Z
 Volume=%t/podman/podman.sock:/var/run/docker.sock
 
 Network=reverse-proxy.network
+NetworkAlias=id.${base_domain}
+NetworkAlias=matrix.${base_domain}
+NetworkAlias=matrix-account.${base_domain}
+NetworkAlias=pve.${base_domain}
+NetworkAlias=truenas.${base_domain}
+NetworkAlias=crypto1.${base_domain}
 
 Notify=true
 
 # Disable label security to access Podman socket.
 SecurityLabelDisable=true
+AddCapability=CAP_NET_BIND_SERVICE
 
 [Service]
 TimeoutStartSec=900

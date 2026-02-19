@@ -21,7 +21,6 @@ Label="traefik.http.routers.actual-budget.rule=Host(`actual.${base_domain}`)"
 Volume=/var/mnt/docker/app_data/actual-budget:/data:Z
 
 Network=reverse-proxy.network
-AddHost=id.${base_domain}:host-gateway
 
 [Service]
 TimeoutStartSec=900

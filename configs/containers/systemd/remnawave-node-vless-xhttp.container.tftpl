@@ -1,13 +1,13 @@
 [Unit]
-Description=Remnawave Node Quadlet
+Description=Remnawave Node VLESS XHTTP Quadlet
 
 [Container]
 Image=docker.io/remnawave/node:latest
 AutoUpdate=registry
-ContainerName=remnawave-node
+ContainerName=remnawave-node-vless-xhttp
 
 Environment=NODE_PORT=2223
-Secret=remnawave-node-secret-key,type=env,target=SECRET_KEY
+Secret=remnawave-node-vless-xhttp-secret-key,type=env,target=SECRET_KEY
 Secret=remnawave-xhttp-path,type=env,target=REMNAWAVE_XHTTP_PATH
 
 Network=reverse-proxy.network

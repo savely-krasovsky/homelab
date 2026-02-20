@@ -1,13 +1,13 @@
 [Unit]
-Description=Remnawave Node 2 Quadlet
+Description=Remnawave Node VLESS REALITY Quadlet
 
 [Container]
 Image=docker.io/remnawave/node:latest
 AutoUpdate=registry
-ContainerName=remnawave-node-2
+ContainerName=remnawave-node-vless-reality
 
 Environment=NODE_PORT=2224
-Secret=remnawave-node-2-secret-key,type=env,target=SECRET_KEY
+Secret=remnawave-node-vless-reality-secret-key,type=env,target=SECRET_KEY
 
 Network=reverse-proxy.network
 PublishPort=8443:8443/tcp

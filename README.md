@@ -69,8 +69,8 @@ I also have some observability:
 | qBittorrent (`qbittorrent`)                                     | BitTorrent Client                                 |     |
 | Remnawave Panel (`remnawave-panel`)                             | Censorship Circumvention Management Platform      | ☑️  |
 | Remnawave Subscription Page (`remnawave-subscription-page`)     | Public subscription page                          | ☑️  |
-| Remnawave Node 2 (`remnawave-node-2`)                           | Proxy access node                                 |     |
-| Remnawave Node (`remnawave-node`)                               | Proxy access node                                 |     |
+| Remnawave Node VLESS XHTTP (`remnawave-node-vless-xhttp`)       | Proxy access node                                 |     |
+| Remnawave Node VLESS REALITY (`remnawave-node-vless-reality`)   | Proxy access node                                 |     |
 | RMQTT (`rmqtt`)                                                 | MQTT Broker Server                                |     |
 | Static Web Server (`static-web-server`)                         | Static files host                                 |     |
 | Step CA (`step-ca`)                                             | Smallstep-based Homelab CA infrastructure         |     |

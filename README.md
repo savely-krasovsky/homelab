@@ -1,81 +1,103 @@
 # Experimental Homelab
 
-- Uses immutable, atomic OS provisioned on Proxmox VE node as a base.
+- Uses immutable, atomic Fedora CoreOS provisioned on a Proxmox VE node as a base.
 - Uses rootless Podman instead of rootful Docker.
-- Uses Quadlets systemd-like containers instead of Docker Compose.
-- VM can be fully removed and re-provisioned within 3 minutes, including container autostart.
-- Provisioning of everything is done using Terraform/OpenTofu.
+- Uses Quadlet systemd-like containers instead of Docker Compose.
+- VM can be fully removed and re-provisioned in a few minutes, including container autostart.
+- Provisioning is done with OpenTofu/Terraform.
+- Configs are rendered from templates and synced automatically after changes.
 - Secrets are provided using Bitwarden Secrets Manager.
-- Source IP is preserved
-  using [systemd socket activation](https://github.com/eriksjolund/podman-networking-docs?tab=readme-ov-file#socket-activation-systemd-user-service)
-  mechanism.
+- Bitwarden token is injected into VM credentials and then mapped to Podman/system credentials during bootstrap.
+- Source IP is preserved using
+  [systemd socket activation](https://github.com/eriksjolund/podman-networking-docs?tab=readme-ov-file#socket-activation-systemd-user-service)
+  with Traefik.
 - Native network performance due to the reason above.
-- Stores Podman and application data on dedicated iSCSI disk.
-- Stores media and downloads on NFS share.
-- SELinux support.
+- Podman and application data are stored on a dedicated iSCSI-backed LVM disk.
+- Media, personal files, and observability data are stored on NFS shares.
+- Daily restic backups are done from LVM snapshots to Backblaze B2 and Storj.
+- Uses per-stack Podman networks plus a shared reverse-proxy network.
+- Container-to-container traffic stays on-host inside Podman networks,
+  while shared domain names are still used via Traefik `NetworkAlias`.
+- Uses nftables default-deny firewall policy.
+- SELinux support (including explicit context fixes where needed).
 
 I also have some observability:
 
-- Storage: VictoriaMetrics and VictoriaLogs.
-- Scrapping and writing: Grafana Alloy.
+- Storage: VictoriaMetrics, VictoriaLogs, and VictoriaTraces.
+- Collection and routing: Grafana Alloy (Prometheus/Loki/OTLP) and Telegraf for MQTT -> OTLP.
 - Visualization: Grafana.
-- Traces are not supported for now.
+- Traefik itself exports logs/metrics/traces via OTLP to Alloy.
 
 ## Current services
 
-| Name            | Description                                            | Pod |
-|-----------------|--------------------------------------------------------|-----|
-| Actual Budget   | Budgeting App                                          |     |
-| Bluesky PDS     | ATProto Personal Data Server                           |     |
-| Element Web     | Element Web Client                                     |     |
-| Element Call    | Element Call Client                                    |     |
-| Glance          | Homelab Dashboard                                      |     |
-| Grafana         | Data-visualization Platform                            |     |
-| Grafana Alloy   | OpenTelemetry Collector                                |     |
-| Davmail         | Exchange to IMAP/SMTP Gateway                          |     |
-| Karakeep        | Bookmark App                                           | ☑️  |
-| Immich          | Image & Video Management                               | ☑️  |
-| Matrix          | Matrix Homeserver                                      | ☑️  |
-| MatrixRTC       | Matrix Realtime Stack                                  | ☑️  |
-| Miniflux        | RSS Reader                                             | ☑️  |
-| OAuth2 Proxy    | Identity-Aware Proxy                                   |     |
-| OpenCloud       | File Management and Collaboration platform             | ☑️  |
-| Open WebUI      | Chatbot UI                                             | ☑️  |
-| Opengist        | Self-hosted Pastebin powered by Git                    |     |
-| Outline         | Personal Knowledge Base                                | ☑️  |
-| Plex            | Personal Media Server                                  |     |
-| Pocket ID       | Single Sign-on Portal                                  |     |
-| Podman Exporter | Podman Prometheus Metrics Exporter                     |     |
-| Remnaware Panel | Censorship Circumvent Proxy Management Platform        | ☑️  |
-| Remnaware Node  | Node for accessing my server from totalitarian regimes |     |
-| rmqtt           | MQTT Broker Server                                     |     |
-| Step CA         | Smallstep-based Homelab CA instastructure              |     |
-| qBittorrent     | BitTorrent Client                                      |     |
-| Tangled Knot    | Git Platform based on ATProto                          |     |
-| Telegraf        | Only for MQTT to OpenTelemetry conversion              |     |
-| Traefik         | Application Proxy                                      |     |
-| Gatus           | Uptime Monitoring[^1]                                  |     |
-| vmauth          | Authorization module for VictoriaMetrics products      | ☑️  |
-| VictoriaMetrics | Metrics Storage                                        | ☑️  |
-| VictoriaLogs    | Logs Storage                                           | ☑️  |
-| VictoriaTraces  | Tracing Storage                                        | ☑️  |
-
-[^1]: It lives outside Homeleb.
+| Name                                                            | Description                                       | Pod |
+|-----------------------------------------------------------------|---------------------------------------------------|-----|
+| Actual Budget (`actual-budget`)                                 | Budgeting App                                     |     |
+| Anubis (`anubis`)                                               | Anti-bot ForwardAuth gateway                      |     |
+| Bluesky PDS (`bluesky-pds`)                                     | ATProto Personal Data Server                      |     |
+| CrowdSec (`crowdsec-security-engine`)                           | Advanced Fail2ban                                 | ☑️  |
+| CrowdSec Web UI (`crowdsec-web-ui`)                             | CrowdSec web interface                            | ☑️  |
+| DavMail (`davmail`)                                             | Exchange Gateway                                  |     |
+| Element Admin (`element-admin`)                                 | Element Admin Panel                               |     |
+| Element Call (`element-call`)                                   | Element Call Client                               |     |
+| Element Web (`element-web`)                                     | Matrix Web Client                                 |     |
+| Forward Info Bot (`forward-info-bot`)                           | Telegram utility bot                              |     |
+| Glance (`glance`)                                               | Homelab Dashboard                                 |     |
+| Grafana Alloy (`grafana-alloy`)                                 | OpenTelemetry Collector                           |     |
+| Grafana (`grafana`)                                             | Data-visualization Platform                       |     |
+| Immich ML (`immich-machine-learning`)                           | Immich machine-learning worker                    | ☑️  |
+| Immich (`immich-server`)                                        | Image & Video Management                          | ☑️  |
+| Karakeep Chrome (`karakeep-chrome`)                             | Browser worker for archiving                      | ☑️  |
+| Karakeep Meilisearch (`karakeep-meilisearch`)                   | Search index                                      | ☑️  |
+| Karakeep (`karakeep-server`)                                    | Bookmark App                                      | ☑️  |
+| Masked Email Bot (`masked-email-bot`)                           | Telegram utility bot                              |     |
+| MatrixRTC JWT (`matrix-rtc-jwt`)                                | LiveKit JWT service                               | ☑️  |
+| MatrixRTC SFU (`matrix-rtc-sfu`)                                | Matrix Realtime Stack                             | ☑️  |
+| Matrix Authentication Service (`matrix-authentication-service`) | Matrix auth service                               | ☑️  |
+| Matrix Synapse (`matrix-synapse`)                               | Matrix Homeserver                                 | ☑️  |
+| Miniflux (`miniflux-server`)                                    | RSS Reader                                        | ☑️  |
+| OAuth2 Proxy (`oauth2-proxy-server`)                            | Identity-Aware Proxy                              | ☑️  |
+| Open WebUI (`open-webui`)                                       | Chatbot UI                                        | ☑️  |
+| OpenCloud (`opencloud-server`)                                  | File Management and Collaboration Platform        | ☑️  |
+| OpenCloud Collabora (`opencloud-collabora`)                     | Office editing backend                            | ☑️  |
+| OpenCloud Collaboration (`opencloud-collaboration`)             | Realtime collaboration service                    | ☑️  |
+| Opengist (`opengist`)                                           | Self-hosted Pastebin powered by Git               |     |
+| Outline (`outline-server`)                                      | Personal Knowledge Base                           | ☑️  |
+| Plex (`plex`)                                                   | Personal Media Server                             |     |
+| Pocket ID (`pocket-id`)                                         | Single Sign-on Portal                             |     |
+| Podman Exporter (`prometheus-podman-exporter`)                  | Podman Prometheus Metrics Exporter                |     |
+| qBittorrent (`qbittorrent`)                                     | BitTorrent Client                                 |     |
+| Remnawave Panel (`remnawave-panel`)                             | Censorship Circumvention Management Platform      | ☑️  |
+| Remnawave Subscription Page (`remnawave-subscription-page`)     | Public subscription page                          | ☑️  |
+| Remnawave Node 2 (`remnawave-node-2`)                           | Proxy access node                                 |     |
+| Remnawave Node (`remnawave-node`)                               | Proxy access node                                 |     |
+| RMQTT (`rmqtt`)                                                 | MQTT Broker Server                                |     |
+| Static Web Server (`static-web-server`)                         | Static files host                                 |     |
+| Step CA (`step-ca`)                                             | Smallstep-based Homelab CA infrastructure         |     |
+| Tangled Knot (`tangled`)                                        | Git Platform based on ATProto                     |     |
+| Telegraf (`telegraf`)                                           | MQTT to OpenTelemetry conversion                  |     |
+| Traefik (`traefik`)                                             | Application Proxy                                 |     |
+| VictoriaLogs (`victoria-logs`)                                  | Logs Storage                                      | ☑️  |
+| VictoriaMetrics (`victoria-metrics`)                            | Metrics Storage                                   | ☑️  |
+| VictoriaTraces (`victoria-traces`)                              | Tracing Storage                                   | ☑️  |
+| vmauth (`victoria-vmauth`)                                      | Authorization module for VictoriaMetrics products | ☑️  |
+| Gatus                                                           | Uptime Monitoring[^2]                             |     |
 
 ## Caveats
 
-This is not a ready-to-use configuration that you can just apply. It requires initialized state.
-You can apply it, then go to Pocket ID, generate OAuth2 Client IDs, and paste them into container templates.
-Technically, it's possible to make it as generic as possible, but I don't think anyone wants to copy my setup entirely.
-I see this more as a template for your own setups.
+This is not a ready-to-use configuration that you can just apply.
+It requires initialized state and personal values (DNS, Proxmox, TrueNAS, Bitwarden secret IDs, Pocket ID clients,
+etc.).
+You can adapt it, but copying it as-is is not realistic.
+I see this repository more as a template for your own setup.
 
 ## Future plans
 
 - [x] Move Traefik, Grafana Alloy and other configs to the repository.
-- [ ] Consider switching to Flatcar Linux. Personally I like it more, but in the current version they didn't ship
-  `i915` driver, which is a dealbreaker for me. However,
-  it's [already merged](https://github.com/flatcar/scripts/pull/2349)
-  and will soon be available in the Alpha channel.
-- [x] Monitor uptime and setup alerts with Uptime Kuma.
-- [ ] Harden network setup; for now it's pretty permissive.
+- [ ] Consider switching to Flatcar Linux. I still like it more, but missing pieces were a blocker.
+- [x] Monitor uptime and setup alerts with an external monitor[^1].
+- [ ] Harden network setup; some parts are still permissive.
 - [ ] Integrate `hashicorp/assert` support.
+
+[^1]: It lives outside this repository.
+[^2]: It lives outside this homelab host.

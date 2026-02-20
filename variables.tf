@@ -18,6 +18,7 @@ variable "containers_config" {
     email       = string
     base_domain = string
     ews_domain  = string
+    public_ip   = string
   })
 }
 

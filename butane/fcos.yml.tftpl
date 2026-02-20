@@ -420,6 +420,13 @@ storage:
           [Install]
           WantedBy=default.target
 
+    # Disable Podman access logs
+    - path: /var/home/core/.config/systemd/user/podman.service.d/override.conf
+      contents:
+        inline: |
+          [Service]
+          Environment=LOGGING="--log-level=warn"
+
 systemd:
   units:
     - name: install-additional-software.service

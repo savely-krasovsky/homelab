@@ -4,4 +4,8 @@ Description=MatrixRTC Pod
 [Pod]
 PodName=matrix-rtc
 UserNS=keep-id:uid=1000,gid=1000
-Network=host
+Network=matrix-rtc.network
+Network=reverse-proxy.network
+PublishPort=59000-60000:59000-60000/udp
+PublishPort=3478:3478/udp
+PublishPort=7881:7881/tcp

@@ -42,12 +42,16 @@ Volume=/var/mnt/docker/app_data/traefik/plugins:/plugins-storage:Z
 Volume=%t/podman/podman.sock:/var/run/docker.sock
 
 Network=reverse-proxy.network
+NetworkAlias=cloud.${base_domain}
+NetworkAlias=collabora.${base_domain}
+NetworkAlias=crypto1.${base_domain}
 NetworkAlias=id.${base_domain}
 NetworkAlias=matrix.${base_domain}
 NetworkAlias=matrix-account.${base_domain}
+NetworkAlias=matrix-rtc.${base_domain}
 NetworkAlias=pve.${base_domain}
 NetworkAlias=truenas.${base_domain}
-NetworkAlias=crypto1.${base_domain}
+NetworkAlias=wopiserver.${base_domain}
 
 Notify=true
 

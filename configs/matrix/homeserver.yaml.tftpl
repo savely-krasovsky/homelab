@@ -52,6 +52,10 @@ turn_uris: [ "turn:turn.${base_domain}?transport=udp", "turn:turn.${base_domain}
 turn_shared_secret_path: "/run/secrets/coturn-turn-shared-secret"
 turn_user_lifetime: 86400000
 turn_allow_guests: false
+matrix_rtc:
+  transports:
+    - type: livekit
+      livekit_service_url: "https://matrix-rtc.${base_domain}/livekit/jwt"
 
 registration_shared_secret_path: "/run/secrets/synapse-registration-shared-secret"
 auto_join_rooms:
@@ -85,3 +89,5 @@ experimental_features:
   msc4222_enabled: true
   # QR Login
   msc4108_enabled: true
+  # MatrixRTC
+  msc4143_enabled: true

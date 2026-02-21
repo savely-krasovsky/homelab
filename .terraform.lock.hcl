@@ -5,6 +5,7 @@ provider "registry.opentofu.org/bpg/proxmox" {
   version     = "0.91.0"
   constraints = "0.91.0"
   hashes = [
+    "h1:iU3T+orD8861Tiv5HA4mghqxb1f68a2BuvKi7tt1yjA=",
     "h1:ooV0EeV/R6rAI/lVOdno3brl6qcGQJPGV3dtJ+vfR9g=",
     "zh:001fda547318587c61145e64684fc760810cfa5575167d10d7790092832da21d",
     "zh:02c9b4fddc833de2c37201203333431d0fc952e2297d59ad60d4d868b04571cd",
@@ -29,6 +30,7 @@ provider "registry.opentofu.org/hashicorp/local" {
   constraints = "2.6.1"
   hashes = [
     "h1:Dd5MP04TnE9qaFD8BQkJYkluiJCOsL7fwUTJx26KIP0=",
+    "h1:QH/Ay/SWVoOLgvFacjcvQcrw2WfEktZHxCcIQG0A9/w=",
     "zh:0416d7bf0b459a995cf48f202af7b7ffa252def7d23386fc05b34f67347a22ba",
     "zh:24743d559026b59610eb3d9fa9ec7fbeb06399c0ef01272e46fe5c313eb5c6ff",
     "zh:2561cdfbc90090fee7f844a5cb5cbed8472ce264f5d505acb18326650a5b563f",
@@ -45,6 +47,7 @@ provider "registry.opentofu.org/hashicorp/null" {
   version     = "3.2.4"
   constraints = "3.2.4"
   hashes = [
+    "h1:jsKjBiLb+v3OIC3xuDiY4sR0r1OHUMSWPYKult9MhT0=",
     "h1:wg0cxqzzWFNnEzw0LSlPL9Ovqy1VFW44A7ayHEU/A1I=",
     "zh:1769783386610bed8bb1e861a119fe25058be41895e3996d9216dd6bb8a7aee3",
     "zh:32c62a9387ad0b861b5262b41c5e9ed6e940eda729c2a0e58100e6629af27ddb",
@@ -64,6 +67,7 @@ provider "registry.opentofu.org/maxlaverse/bitwarden" {
   constraints = "0.16.0"
   hashes = [
     "h1:M+YcQ8NzbcBbXq/813VzWlo4K4F6l5DwnXEs1NDBWLU=",
+    "h1:myDU3D1qdmcupXF/WfexYhZ0zqghZqgSVlBd8qlgj10=",
     "zh:49b383ae6edda2b6e0f321b6e7be8866ed26e31bfca6c7dbdf93f97600e25a9d",
     "zh:5e78bae93e270eefedae0109bb049a70e971adc0f7a46fee06249f50419ea4c6",
     "zh:65b492c19462222145ae9b06ae55dadf90247611045223e2ccfe621ca985eb07",
@@ -86,6 +90,7 @@ provider "registry.opentofu.org/poseidon/ct" {
   version     = "0.14.0"
   constraints = "0.14.0"
   hashes = [
+    "h1:2B5G8Y8n7nBHQhquxtyJrKW3vpXZQ1uxdMA1TIH+dik=",
     "h1:F8ap6XKB2h3uQkMEMggoT3I473ikUb5s5c088/c4UWQ=",
     "zh:167f43428cea07a70dc3ee1827c07a8cf86078412abc744d9484e3428b54ff06",
     "zh:57bd3063684aef8739ba1b0af2db10d469b0298788807ba4d52c2b502feccab5",
@@ -99,6 +104,7 @@ provider "registry.terraform.io/savely-krasovsky/homelab-helpers" {
   version     = "0.0.8"
   constraints = "0.0.8"
   hashes = [
+    "h1:YKoTpC0QGVlv5mWq+jU20NECmyhJY7OvgenOSI6qSNU=",
     "h1:ozsaWEiU0lry4hj7pKQneSdpQqH5Ir4XNrqDhxddnMI=",
     "zh:00cefc422a58ceafa02bfa6ae871b6688bbc9d25e7714b4d09e8d00255dbe084",
     "zh:18486ff9d6e95ff948d10c1349208452308fe1a288457d9463dacf634899337a",

@@ -72,6 +72,7 @@ resource "proxmox_virtual_environment_vm" "fcos" {
   efi_disk {
     datastore_id = "local-zfs"
     type         = "4m"
+    pre_enrolled_keys = true
   }
 
   disk {

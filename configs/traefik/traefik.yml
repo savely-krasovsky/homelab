@@ -77,6 +77,7 @@ metrics:
       insecure: true
 
 log:
+  level: INFO
   otlp:
     grpc:
       endpoint: grafana-alloy:4317

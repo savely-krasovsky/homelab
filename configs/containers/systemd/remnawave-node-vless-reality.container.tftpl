@@ -16,6 +16,7 @@ PublishPort=8443:8443/udp
 [Service]
 TimeoutStartSec=900
 Restart=always
+RuntimeMaxSec=1d
 
 [Install]
 WantedBy=multi-user.target default.target

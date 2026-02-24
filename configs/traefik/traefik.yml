@@ -18,9 +18,14 @@ entryPoints:
         - crowdsec@file
       tls:
         certResolver: leresolver
-      # Matrix Synapse workarounds, lol
+      # Exceptions for Matrix Synapse
       encodedCharacters:
         allowEncodedSlash: true
+        allowEncodedBackSlash: false
+        allowEncodedNullCharacter: false
+        allowEncodedSemicolon: false
+        allowEncodedPercent: false
+        allowEncodedQuestionMark: false
         allowEncodedHash: true
     http3: &http3
       advertisedPort: 443
@@ -54,6 +59,7 @@ entryPoints:
 providers:
   docker:
     exposedByDefault: false
+    network: systemd-reverse-proxy
   file:
     directory: /etc/traefik/file
     watch: true

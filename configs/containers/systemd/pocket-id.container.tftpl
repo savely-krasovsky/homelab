@@ -10,6 +10,7 @@ User=1000:1000
 UserNS=keep-id:uid=1000,gid=1000
 
 Environment=APP_URL=https://id.${base_domain}
+Environment=TRUST_PROXY=true
 Environment=METRICS_ENABLED=true
 Environment=OTEL_LOGS_EXPORTER=otlp
 Environment=OTEL_EXPORTER_OTLP_ENDPOINT=http://grafana-alloy:4317

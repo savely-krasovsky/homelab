@@ -2,6 +2,7 @@ server_name: "${base_domain}"
 pid_file: /data/homeserver.pid
 web_client_location: "https://element.${base_domain}"
 public_baseurl: "https://matrix.${base_domain}"
+default_room_version: 12
 listeners:
   - port: 8008
     tls: false
@@ -87,7 +88,15 @@ experimental_features:
   # MSC4222 needed for syncv2 state_after. This allow clients to
   # correctly track the state of the room.
   msc4222_enabled: true
-  # QR Login
+  # Remotely toggle push notifications for another client
+  msc3881_enabled: true
+  # Mechanism to allow OAuth 2.0 API sign in and E2EE set up via QR code
   msc4108_enabled: true
   # MatrixRTC
   msc4143_enabled: true
+  # Invite filtering
+  msc4155_enabled: true
+  # Thread Subscriptions
+  msc4306_enabled: true
+  # Sticky Events
+  msc4354_enabled: true

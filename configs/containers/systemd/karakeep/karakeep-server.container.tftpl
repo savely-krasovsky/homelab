@@ -40,6 +40,9 @@ Label="traefik.http.routers.karakeep.rule=Host(`karakeep.${base_domain}`)"
 Label="traefik.http.services.karakeep.loadbalancer.server.port=3000"
 Label="traefik.docker.network=systemd-karakeep"
 
+Entrypoint=/bin/sh
+Exec=-lc 'export HOSTNAME=0.0.0.0; exec /init'
+
 Volume=/var/mnt/docker/app_data/karakeep:/data:Z
 
 Pod=karakeep.pod

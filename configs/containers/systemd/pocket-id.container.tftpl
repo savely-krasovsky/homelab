@@ -26,6 +26,7 @@ Label="glance.hide=false"
 
 Label="traefik.enable=true"
 Label="traefik.http.routers.pocket-id.rule=Host(`id.${base_domain}`)"
+Label="traefik.http.services.pocket-id.loadbalancer.server.scheme=h2c"
 
 Volume=/var/mnt/docker/app_data/pocket-id:/app/data:Z
 

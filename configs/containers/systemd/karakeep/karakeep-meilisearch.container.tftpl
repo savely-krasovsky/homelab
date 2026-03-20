@@ -2,7 +2,7 @@
 Description=Karakeep Meilisearch Quadlet
 
 [Container]
-Image=docker.io/getmeili/meilisearch:v1
+Image=docker.io/getmeili/meilisearch:v1.39.0
 AutoUpdate=registry
 ContainerName=karakeep-meilisearch
 
@@ -17,7 +17,7 @@ Label="glance.hide=false"
 
 Exec=/bin/sh -c "meilisearch --experimental-dumpless-upgrade --experimental-logs-mode=json"
 
-Volume=/var/mnt/docker/app_data/meilisearch:/meili_data:Z
+Volume=/var/mnt/docker/app_data/karakeep/meilisearch:/meili_data:Z
 
 Pod=karakeep.pod
 

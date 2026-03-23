@@ -1,0 +1,26 @@
+[Unit]
+Description=Remnawave Routing Updater Quadlet
+Wants=remnawave-panel.service
+After=remnawave-panel.service
+
+[Container]
+Image=ghcr.io/savely-krasovsky/remnawave-routing-updater:latest
+AutoUpdate=registry
+ContainerName=remnawave-routing-updater
+
+Environment=REMNA_BASE_URL=http://remnawave-panel:3000/api
+Environment=EXTRA_DIRECT_SITE=domain:${base_domain}
+Secret=remnawave-api-token,type=env,target=REMNA_TOKEN
+
+Label="glance.parent=remnawave"
+Label="glance.name=Remnawave Routing Updater"
+Label="glance.hide=false"
+
+Pod=remnawave.pod
+
+[Service]
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target

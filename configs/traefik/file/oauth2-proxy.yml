@@ -7,3 +7,5 @@ http:
         authResponseHeaders:
           - X-Auth-Request-Access-Token
           - Authorization
+        maxBodySize: 1048576
+        maxResponseBodySize: 1048576

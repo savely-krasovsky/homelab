@@ -2,7 +2,7 @@
 Description=Remnawave Node VLESS REALITY Quadlet
 
 [Container]
-Image=docker.io/remnawave/node:latest
+Image=docker.io/remnawave/node:2.7.0
 AutoUpdate=registry
 ContainerName=remnawave-node-vless-reality
 
@@ -16,7 +16,6 @@ PublishPort=8443:8443/udp
 [Service]
 TimeoutStartSec=900
 Restart=always
-RuntimeMaxSec=1d
 
 [Install]
 WantedBy=multi-user.target default.target

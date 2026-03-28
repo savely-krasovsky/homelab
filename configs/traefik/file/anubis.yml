@@ -3,3 +3,5 @@ http:
     anubis:
       forwardAuth:
         address: http://anubis:8080/.within.website/x/cmd/anubis/api/check
+        maxBodySize: 1048576
+        maxResponseBodySize: 1048576

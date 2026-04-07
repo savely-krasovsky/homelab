@@ -4,7 +4,7 @@ Requires=http.socket https.socket imaps.socket smtps.socket ldaps.socket podman.
 After=http.socket https.socket imaps.socket smtps.socket ldaps.socket podman.socket
 
 [Container]
-Image=docker.io/library/traefik:v3.6.11
+Image=docker.io/library/traefik:v3.6.13
 AutoUpdate=registry
 ContainerName=traefik
 
@@ -44,7 +44,6 @@ Volume=%t/podman/podman.sock:/var/run/docker.sock
 Network=reverse-proxy.network
 NetworkAlias=cloud.${base_domain}
 NetworkAlias=collabora.${base_domain}
-NetworkAlias=crypto1.${base_domain}
 NetworkAlias=id.${base_domain}
 NetworkAlias=matrix.${base_domain}
 NetworkAlias=matrix-account.${base_domain}

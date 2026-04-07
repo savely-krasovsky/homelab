@@ -4,7 +4,7 @@ Wants=immich-valkey.service immich-postgres.service
 After=immich-valkey.service immich-postgres.service
 
 [Container]
-Image=ghcr.io/immich-app/immich-server:v2.6.3
+Image=ghcr.io/immich-app/immich-server:v2.7.2
 AutoUpdate=registry
 ContainerName=immich-server
 
@@ -13,6 +13,7 @@ GroupAdd=keep-groups
 
 Environment=IMMICH_TELEMETRY_INCLUDE=all
 Environment=IMMICH_MEDIA_LOCATION=/usr/src/app/upload
+Environment=IMMICH_HELMET_FILE=true
 Environment=TZ=Europe/Belgrade
 Environment=DB_HOSTNAME=immich-postgres
 Environment=DB_USERNAME=postgres

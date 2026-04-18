@@ -2,14 +2,14 @@
 Description=MatrixRTC Authorization Service Quadlet
 
 [Container]
-Image=ghcr.io/element-hq/lk-jwt-service:0.4.2
+Image=ghcr.io/element-hq/lk-jwt-service:0.4.3
 AutoUpdate=registry
 ContainerName=matrix-rtc-jwt
 
 User=1000:1000
 
 Environment=LIVEKIT_URL=wss://matrix-rtc.${base_domain}/livekit/sfu
-Environment=LIVEKIT_JWT_PORT=9090
+Environment=LIVEKIT_JWT_BIND=:9090
 Environment=LIVEKIT_FULL_ACCESS_HOMESERVERS=${base_domain}
 Secret=matrix-rtc-livekit-key,type=env,target=LIVEKIT_KEY
 Secret=matrix-rtc-livekit-secret,type=env,target=LIVEKIT_SECRET

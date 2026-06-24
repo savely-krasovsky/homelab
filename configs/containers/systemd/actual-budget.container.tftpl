@@ -9,6 +9,10 @@ ContainerName=actual-budget
 User=1000:1000
 UserNS=keep-id:uid=1000,gid=1000
 
+Environment=ACTUAL_OPENID_DISCOVERY_URL=https://id.${base_domain}/.well-known/openid-configuration
+Environment=ACTUAL_OPENID_CLIENT_ID=319ae771-a343-4c6c-bfae-47af30197186
+Secret=actual-openid-client-secret,type=env,target=ACTUAL_OPENID_CLIENT_SECRET
+
 Label="glance.name=Actual Budget"
 Label="glance.icon=di:actual-budget"
 Label="glance.url=https://actual.${base_domain}"

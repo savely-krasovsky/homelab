@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-BWS_ACCESS_TOKEN=$(systemd-creds --system cat bws-access-token)
+BWS_ACCESS_TOKEN=$(sudo systemd-creds --system cat bws-access-token)
 
 echo "Importing Podman and Restic secrets..."
 # Bitwarden Secrets Manager CLI requires to save state in order to work correctly, but

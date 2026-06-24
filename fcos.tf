@@ -27,6 +27,10 @@ locals {
 
   init_script_path       = "${path.module}/scripts/init_fcos.sh.tftpl"
   get_secret_script_path = "${path.module}/scripts/get_secret.sh"
+  init_script_rendered = templatefile(local.init_script_path, {
+    config_files : local.config_files
+    secret_uuids : var.containers_secret_config
+  })
 }
 
 output "directories_to_create" {
@@ -116,7 +120,8 @@ resource "null_resource" "fcos_provision_secrets" {
   depends_on = [proxmox_virtual_environment_vm.fcos]
 
   triggers = {
-    checksum = sha256(file(local.init_script_path))
+    init_script_checksum       = sha256(local.init_script_rendered)
+    get_secret_script_checksum = sha256(file(local.get_secret_script_path))
   }
 
   connection {
@@ -128,10 +133,7 @@ resource "null_resource" "fcos_provision_secrets" {
 
   provisioner "file" {
     destination = "/var/tmp/init.sh"
-    content = templatefile(local.init_script_path, {
-      config_files : local.config_files
-      secret_uuids : var.containers_secret_config
-    })
+    content     = local.init_script_rendered
   }
 
   provisioner "file" {
@@ -149,7 +151,7 @@ resource "null_resource" "sync_configs" {
   depends_on = [proxmox_virtual_environment_vm.fcos]
 
   triggers = {
-    configs_hash = provider::homelab-helpers::dirhash("${path.module}/configs", "**")
+    configs_hash = sha256(jsonencode(local.config_rendered_files))
   }
 
   connection {

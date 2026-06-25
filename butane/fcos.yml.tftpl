@@ -8,6 +8,15 @@ passwd:
 %{ for _, ssh_key in ssh_keys ~}
         - ${ssh_key}
 %{ endfor ~}
+    - name: deploy
+      home_dir: /var/home/deploy
+      shell: /bin/bash
+%{ if length(deploy_ssh_keys) > 0 ~}
+      ssh_authorized_keys:
+%{ for _, ssh_key in deploy_ssh_keys ~}
+        - ${ssh_key}
+%{ endfor ~}
+%{ endif ~}
 
 storage:
   directories:
@@ -43,6 +52,14 @@ storage:
         name: core
       group:
         name: core
+
+    # Static site deploy target
+    - path: /srv/${base_domain}
+      user:
+        name: core
+      group:
+        name: deploy
+      mode: 0775
 
     # Backup snapshot mounting points
     - path: /var/mnt/snapshots/backblaze
@@ -553,6 +570,20 @@ systemd:
 
     - name: nftables.service
       enabled: true
+
+    - name: blog-content-selinux.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Set SELinux context for blog content
+        Before=multi-user.target
+
+        [Service]
+        Type=oneshot
+        ExecStart=/usr/bin/chcon -R -t container_file_t /srv/${base_domain}
+
+        [Install]
+        WantedBy=multi-user.target
 
     - name: restic-backblaze.service
       contents: |

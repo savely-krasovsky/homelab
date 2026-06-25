@@ -18,6 +18,7 @@ locals {
   butane_config = merge(var.fcos_config, {
     config_files : local.config_files,
     config_dirs : local.config_dirs,
+    base_domain : var.containers_config.base_domain,
   })
 
   config_rendered_files = {

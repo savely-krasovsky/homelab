@@ -107,9 +107,10 @@ variable "containers_secret_config" {
 variable "fcos_config" {
   description = "Fedora CoreOS Configuration"
   type = object({
-    hostname = string
-    ssh_keys = list(string)
-    root_ca  = string
+    hostname        = string
+    ssh_keys        = list(string)
+    deploy_ssh_keys = optional(list(string), [])
+    root_ca         = string
 
     mac_address = string
     ip          = string

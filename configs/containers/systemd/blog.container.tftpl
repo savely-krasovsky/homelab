@@ -1,0 +1,33 @@
+[Unit]
+Description=Blog Quadlet
+
+[Container]
+Image=docker.io/joseluisq/static-web-server:2
+AutoUpdate=registry
+ContainerName=blog
+
+User=1000:1000
+UserNS=keep-id:uid=1000,gid=1000
+
+Environment=SERVER_CONFIG_FILE=/etc/sws.toml
+Environment=SERVER_IGNORE_HIDDEN_FILES=false
+
+Label="traefik.enable=true"
+Label="traefik.http.routers.blog.rule=Host(`${base_domain}`)"
+Label="traefik.http.services.blog.loadbalancer.server.port=8080"
+
+Volume=/srv/${base_domain}:/blog:ro
+Volume=%E/sws/blog.toml:/etc/sws.toml:ro,Z
+
+Network=reverse-proxy.network
+
+ReadOnly=true
+NoNewPrivileges=true
+DropCapability=all
+
+[Service]
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target

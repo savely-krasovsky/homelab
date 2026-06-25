@@ -1,0 +1,37 @@
+[general]
+host = "::"
+port = 8080
+root = "/blog"
+log-level = "info"
+compression = true
+compression-static = true
+directory-listing = false
+redirect-trailing-slash = true
+
+[[advanced.headers]]
+source = "/.well-known/webfinger"
+headers = { Content-Type = "application/jrd+json; charset=utf-8", Access-Control-Allow-Origin = "*" }
+
+[[advanced.headers]]
+source = "/.well-known/matrix/*"
+headers = { Content-Type = "application/json; charset=utf-8", Access-Control-Allow-Origin = "*" }
+
+[[advanced.headers]]
+source = "/.well-known/atproto-did"
+headers = { Content-Type = "text/plain; charset=utf-8" }
+
+[[advanced.headers]]
+source = "/.well-known/did.json"
+headers = { Content-Type = "application/did+json; charset=utf-8" }
+
+[[advanced.headers]]
+source = "/.well-known/microsoft-identity-association.json"
+headers = { Content-Type = "application/json; charset=utf-8" }
+
+[[advanced.headers]]
+source = "/.well-known/openpgpkey/policy"
+headers = { Content-Type = "text/plain; charset=utf-8" }
+
+[[advanced.headers]]
+source = "/.well-known/openpgpkey/hu/*"
+headers = { Content-Type = "application/octet-stream" }

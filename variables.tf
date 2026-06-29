@@ -101,6 +101,7 @@ variable "containers_secret_config" {
     traefik_crowdsec_lapi_key                           = "20c5ff35-d5c2-47b7-8907-b3dd0130e9cf"
     opengist_oidc_secret                                = "56f84185-870a-4377-8c64-b3ec00b2f13f"
     crowdsec_lapi_password                              = "bf604d19-bdbc-4beb-80b0-b3f200cc0e8e"
+    crowdsec_auth_oidc_client_secret                    = "0fb63d05-5193-47d9-b753-b47800a3099e"
   }
 }
 

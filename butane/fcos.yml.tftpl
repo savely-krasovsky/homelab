@@ -597,6 +597,7 @@ systemd:
         LoadCredential=restic-b2-account-id
         LoadCredential=restic-b2-account-key
         LoadCredential=restic-password
+        Environment=RESTIC_CACHE_DIR=/var/cache/restic
         Environment=RESTIC_PASSWORD_FILE=%d/restic-password
         # Create LVM snapshot and do backup
         ExecStart=/bin/bash -c "lvremove -y vg0/restic-backblaze || true"
@@ -635,6 +636,7 @@ systemd:
         LoadCredential=restic-aws-access-key-id
         LoadCredential=restic-aws-secret-access-key
         LoadCredential=restic-password
+        Environment=RESTIC_CACHE_DIR=/var/cache/restic
         Environment=RESTIC_PASSWORD_FILE=%d/restic-password
         # Create LVM snapshot and do backup
         ExecStart=/bin/bash -c "lvremove -y vg0/restic-storj || true"

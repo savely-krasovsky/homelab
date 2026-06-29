@@ -11,7 +11,14 @@ User=1000:1000
 Environment=CROWDSEC_URL=http://crowdsec-security-engine:8080
 Environment=CROWDSEC_USER=crowdsec-web-ui
 Environment=CROWDSEC_REFRESH_INTERVAL=30s
+Environment=AUTH_ENABLED=true
+Environment=CROWDSEC_AUTH_OIDC_ISSUER_URL=https://id.${base_domain}
+Environment=CROWDSEC_AUTH_OIDC_CLIENT_ID=3daa0df7-288a-41d9-bfdb-8f0c6f1bd782
+Environment=CROWDSEC_AUTH_OIDC_GROUPS_CLAIM=groups
+Environment=CROWDSEC_AUTH_OIDC_ADMIN_GROUPS=homelab_admins
+Environment=CROWDSEC_AUTH_OIDC_READ_ONLY_GROUPS=homelab_users
 Secret=crowdsec-lapi-password,type=env,target=CROWDSEC_PASSWORD
+Secret=crowdsec-auth-oidc-client-secret,type=env,target=CROWDSEC_AUTH_OIDC_CLIENT_SECRET
 
 Label="glance.parent=crowdsec"
 Label="glance.name=Web UI"
@@ -19,10 +26,7 @@ Label="glance.hide=false"
 
 Label="traefik.enable=true"
 Label="traefik.http.routers.crowdsec.rule=Host(`crowdsec.${base_domain}`)"
-Label="traefik.http.routers.crowdsec.middlewares=oauth2-proxy@file"
 Label="traefik.http.services.crowdsec.loadbalancer.server.port=3000"
-Label="traefik.http.routers.crowdsec-auth.rule=Host(`crowdsec.${base_domain}`) && PathPrefix(`/oauth2/`)"
-Label="traefik.http.routers.crowdsec-auth.service=oauth2-proxy"
 
 Volume=/var/mnt/docker/app_data/crowdsec/web-ui-data:/app/data:Z
 

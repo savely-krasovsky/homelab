@@ -14,6 +14,7 @@ Environment=CROWDSEC_REFRESH_INTERVAL=30s
 Environment=AUTH_ENABLED=true
 Environment=CROWDSEC_AUTH_OIDC_ISSUER_URL=https://id.${base_domain}
 Environment=CROWDSEC_AUTH_OIDC_CLIENT_ID=3daa0df7-288a-41d9-bfdb-8f0c6f1bd782
+Environment=CROWDSEC_AUTH_OIDC_SCOPE="openid profile email groups"
 Environment=CROWDSEC_AUTH_OIDC_GROUPS_CLAIM=groups
 Environment=CROWDSEC_AUTH_OIDC_ADMIN_GROUPS=homelab_admins
 Environment=CROWDSEC_AUTH_OIDC_READ_ONLY_GROUPS=homelab_users

@@ -4,7 +4,7 @@ Wants=remnawave-postgres.service remnawave-valkey.service
 After=remnawave-postgres.service remnawave-valkey.service
 
 [Container]
-Image=docker.io/remnawave/backend:2.8.1
+Image=docker.io/remnawave/backend:3.2.0
 AutoUpdate=registry
 ContainerName=remnawave-panel
 
@@ -19,8 +19,7 @@ Environment=FRONT_END_DOMAIN=rw.${base_domain}
 Environment=SUB_PUBLIC_DOMAIN=sub.${base_domain}
 Environment=METRICS_USER=admin
 Secret=remnawave-database-url,type=env,target=DATABASE_URL
-Secret=remnawave-jwt-auth-secret,type=env,target=JWT_AUTH_SECRET
-Secret=remnawave-jwt-api-tokens-secret,type=env,target=JWT_API_TOKENS_SECRET
+Secret=remnawave-jwt-auth-secret,type=env,target=APP_SECRET
 Secret=remnawave-metrics-pass,type=env,target=METRICS_PASS
 
 Label="glance.id=remnawave"
@@ -32,6 +31,8 @@ Label="glance.hide=false"
 
 Label="traefik.enable=true"
 Label="traefik.http.routers.remnawave-panel.rule=Host(`rw.${base_domain}`)"
+Label="traefik.http.routers.remnawave-panel.middlewares=remnawave-compress"
+Label="traefik.http.middlewares.remnawave-compress.compress=true"
 Label="traefik.http.services.remnawave-panel.loadbalancer.server.port=3000"
 
 HealthCmd=curl -f http://localhost:3001/health

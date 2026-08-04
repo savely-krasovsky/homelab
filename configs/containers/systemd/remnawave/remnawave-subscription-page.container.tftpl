@@ -4,7 +4,7 @@ Wants=remnawave-panel.service
 After=remnawave-panel.service
 
 [Container]
-Image=docker.io/remnawave/subscription-page:7.2.6
+Image=docker.io/remnawave/subscription-page:8.0.0
 AutoUpdate=registry
 ContainerName=remnawave-subscription-page
 
@@ -18,6 +18,8 @@ Label="glance.hide=false"
 
 Label="traefik.enable=true"
 Label="traefik.http.routers.remnawave-subscription-page.rule=Host(`sub.${base_domain}`)"
+Label="traefik.http.routers.remnawave-subscription-page.middlewares=remnawave-subscription-page-compress"
+Label="traefik.http.middlewares.remnawave-subscription-page-compress.compress=true"
 Label="traefik.http.services.remnawave-subscription-page.loadbalancer.server.port=3010"
 
 Pod=remnawave.pod

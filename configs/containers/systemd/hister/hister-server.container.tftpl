@@ -1,0 +1,46 @@
+[Unit]
+Description=Hister Quadlet
+
+[Container]
+Image=ghcr.io/asciimoo/hister:latest
+AutoUpdate=registry
+ContainerName=hister-server
+
+User=1000:1000
+
+Environment=TZ=Europe/Belgrade
+Environment=HISTER__APP__LOG_FORMAT=json
+Environment=HISTER__APP__SEARCH_URL=https://kagi.com/search?q={query}
+Environment=HISTER__APP__USER_HANDLING=true
+Environment=HISTER__SERVER__ADDRESS=0.0.0.0:4433
+Environment=HISTER__SERVER__BASE_URL=https://hister.${base_domain}
+Environment=HISTER__SERVER__OAUTH_ONLY=true
+Environment=HISTER__SERVER__OAUTH__OIDC__CLIENT_ID=5a0131c6-67a0-4cf3-aa0a-c9a64ab0c792
+Environment=HISTER__SERVER__OAUTH__OIDC__CONFIGURATION_URL=https://id.${base_domain}/.well-known/openid-configuration
+Environment=HISTER__SEMANTIC_SEARCH__ENABLE=true
+Environment=HISTER__SEMANTIC_SEARCH__EMBEDDING_ENDPOINT=http://127.0.0.1:8080/v1/embeddings
+Environment=HISTER__SEMANTIC_SEARCH__EMBEDDING_MODEL=Qwen/Qwen3-Embedding-0.6B-GGUF:F16
+Environment=HISTER__SEMANTIC_SEARCH__DIMENSIONS=1024
+Environment="HISTER__SEMANTIC_SEARCH__QUERY_PREFIX=Instruct: Given a web search query, retrieve relevant passages that answer the query\nQuery:"
+Secret=hister-oidc-client-secret,type=env,target=HISTER__SERVER__OAUTH__OIDC__CLIENT_SECRET
+
+Label="glance.id=hister"
+Label="glance.name=Hister"
+Label="glance.icon=di:hister"
+Label="glance.url=https://hister.${base_domain}"
+Label="glance.description=Private full-text search engine"
+
+Label="traefik.enable=true"
+Label="traefik.http.routers.hister.rule=Host(`hister.${base_domain}`)"
+Label="traefik.http.services.hister.loadbalancer.server.port=4433"
+
+Volume=/var/mnt/docker/app_data/hister/server:/hister/data:Z
+
+Pod=hister.pod
+
+[Service]
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target

@@ -1,0 +1,8 @@
+[Unit]
+Description=Hister Pod
+
+[Pod]
+PodName=hister
+UserNS=keep-id:uid=1000,gid=1000
+Network=hister.network
+Network=reverse-proxy.network

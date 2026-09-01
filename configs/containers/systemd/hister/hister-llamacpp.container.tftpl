@@ -1,0 +1,30 @@
+[Unit]
+Description=Hister llama.cpp Embeddings Quadlet
+
+[Container]
+Image=ghcr.io/ggml-org/llama.cpp:server-intel@sha256:de621aad91ff358cb061a1da43c4bf8677261a00e91c9b3ba7ba33b0c783f2dd
+ContainerName=hister-llamacpp
+
+User=1000:1000
+GroupAdd=keep-groups
+
+Environment=LLAMA_CACHE=/models
+
+Label="glance.parent=hister"
+Label="glance.name=Embeddings"
+Label="glance.description=Qwen3 Embedding 0.6B on Intel Arc"
+
+Volume=/var/mnt/docker/app_data/hister/llamacpp:/models:Z
+
+AddDevice=/dev/dri
+
+Pod=hister.pod
+
+Exec=--hf-repo Qwen/Qwen3-Embedding-0.6B-GGUF:F16 --embedding --pooling last --port 8080 --ctx-size 512 --parallel 2
+
+[Service]
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target

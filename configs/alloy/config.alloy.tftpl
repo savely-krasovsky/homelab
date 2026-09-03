@@ -107,6 +107,12 @@ prometheus.scrape "scrape_metrics" {
     { __address__ = "opencloud:9304" },
     { __address__ = "matrix:9000" },
     { __address__ = "rmqtt:6060", __metrics_path__ = "/api/v1/metrics/prometheus" },
+    {
+      __address__         = "prusa-exporter:10009",
+      __metrics_path__    = "/metrics/udp",
+      __scrape_interval__ = "1s",
+      __scrape_timeout__  = "1s",
+    },
   ]
   forward_to      = [prometheus.remote_write.victoria_metrics.receiver]
   scrape_interval = "10s"

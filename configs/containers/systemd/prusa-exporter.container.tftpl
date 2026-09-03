@@ -1,0 +1,24 @@
+[Unit]
+Description=Prusa Exporter Quadlet
+
+[Container]
+Image=docker.io/pubeldev/prusa_exporter:2.0.0
+AutoUpdate=registry
+ContainerName=prusa-exporter
+
+User=1000:1000
+UserNS=keep-id:uid=1000,gid=1000
+
+Exec=--config.file=/app/prusa.yml --log.level=info --udp.listen-address=0.0.0.0:8514 --no-udp.gcode-enabled
+
+Volume=%E/prusa-exporter/prusa.yml:/app/prusa.yml:ro,Z
+
+Network=reverse-proxy.network
+PublishPort=8514:8514/udp
+
+[Service]
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target

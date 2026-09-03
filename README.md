@@ -66,6 +66,7 @@ I also have some observability:
 | Plex (`plex`)                                                   | Personal Media Server                             |     |
 | Pocket ID (`pocket-id`)                                         | Single Sign-on Portal                             |     |
 | Podman Exporter (`prometheus-podman-exporter`)                  | Podman Prometheus Metrics Exporter                |     |
+| Prusa Exporter (`prusa-exporter`)                               | Prusa 3D Printer Prometheus Metrics Exporter      |     |
 | qBittorrent (`qbittorrent`)                                     | BitTorrent Client                                 |     |
 | Remnawave Panel (`remnawave-panel`)                             | Censorship Circumvention Management Platform      | ☑️  |
 | Remnawave Subscription Page (`remnawave-subscription-page`)     | Public subscription page                          | ☑️  |
@@ -82,6 +83,11 @@ I also have some observability:
 | VictoriaTraces (`victoria-traces`)                              | Tracing Storage                                   | ☑️  |
 | vmauth (`victoria-vmauth`)                                      | Authorization module for VictoriaMetrics products | ☑️  |
 | Gatus                                                           | Uptime Monitoring[^2]                             |     |
+
+## Grafana dashboards
+
+[Prusa Core One UDP-only dashboard](dashboards/prusa-core-one-udp.json) is available
+for manual import without Loki or PrusaLink. See [dashboard notes](dashboards/README.md).
 
 ## Caveats
 

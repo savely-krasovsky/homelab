@@ -1,8 +1,8 @@
 [Unit]
 Description=OAuth2 Proxy Server Quadlet
-# OAuth2 Proxy requests OIDC configuration after launch, Pocket-ID should be ready
-Wants=pocket-id.service
-After=pocket-id.service
+# OIDC discovery reaches Pocket ID through Traefik; Redis must be healthy too.
+Wants=pocket-id.service traefik.service oauth2-proxy-redis.service
+After=pocket-id.service traefik.service oauth2-proxy-redis.service
 
 [Container]
 Image=quay.io/oauth2-proxy/oauth2-proxy:v7.15.4

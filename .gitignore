@@ -43,5 +43,8 @@ terraform.rc
 # Bitwarden Secrets Manager
 .bitwarden/
 
+# Locally built deployment tools
+.build/
+
 # Fedora CoreOS image
 fedora-coreos.qcow2.img

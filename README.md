@@ -7,7 +7,7 @@
 - Provisioning is done with OpenTofu/Terraform.
 - Configs are rendered from templates and synced automatically after changes.
 - Secrets are provided using Bitwarden Secrets Manager.
-- Bitwarden token is injected into VM credentials and then mapped to Podman/system credentials during bootstrap.
+- Ephemeral Bitwarden values are passed to the deployment provider and installed as Podman/system credentials.
 - Source IP is preserved using
   [systemd socket activation](https://github.com/eriksjolund/podman-networking-docs?tab=readme-ov-file#socket-activation-systemd-user-service)
   with Traefik.
@@ -27,6 +27,106 @@ I also have some observability:
 - Collection and routing: Grafana Alloy (Prometheus/Loki/OTLP) and Telegraf for MQTT -> OTLP.
 - Visualization: Grafana.
 - Traefik itself exports logs/metrics/traces via OTLP to Alloy.
+
+## Applying configuration changes
+
+Configuration is managed by `homelab-helpers_deployment.fcos` from
+[terraform-provider-homelab-helpers](../terraform-provider-homelab-helpers).
+The provider runs on the apply machine and transfers files over SSH/SFTP.
+FCOS needs no uploaded deployment binary or Go toolchain.
+
+The resource receives secret values through `secret_values_wo`, validates Quadlet generation
+and nftables rules, atomically updates configuration, then restarts affected
+systemd user units. A pod and its containers form one restart group. Mounted
+configuration and shared Quadlet definitions participate in group hashes.
+Existing Podman networks and volumes still need an explicit migration when their
+creation options change; applying a definition does not recreate persistent data.
+
+The host manifest and pending journal in `~/.local/state/homelab` remain
+compatible with the earlier Bash and Go CLI implementation. Retry failed applies
+without deleting them. Refresh detects changed/missing configuration, missing
+secrets and incomplete applies. It does not poll application health or compare
+the live kernel firewall ruleset. Only recorded files and units are cleaned up;
+application data, credentials and the host firewall survive resource destruction.
+
+For rotated Bitwarden values, bump `deployment_secrets_revision` in your
+variables and run `tofu apply`. Secret IDs are stored in Terraform state;
+ephemeral secret values are excluded from plan, state and deployment fingerprints.
+The Proxmox password also uses an ephemeral Bitwarden resource. The access token
+is an ephemeral input used by the local Bitwarden provider, with no token injected
+into newly created VMs. Existing state history is not rewritten. Existing VMs keep
+their old SMBIOS settings because `kvm_arguments` is ignored by the VM lifecycle.
+
+The firewall source is [butane/nftables.nft](butane/nftables.nft), shared with
+Ignition. Provisioning repairs ownership of the named .local parent and state
+directories from older Ignition configs without recursive ownership changes.
+SSH verifies known_hosts by default; `fcos_config.ssh_host_key` can instead
+pin a trusted public host key. Verify a newly created VM through a trusted console
+before accepting its SSH key.
+
+Requires OpenTofu/Terraform 1.11+. Both providers temporarily use local builds.
+Build them after updating their source:
+
+```sh
+make -C ../terraform-provider-homelab-helpers build
+(cd ../terraform-provider-bitwarden && CGO_ENABLED=0 go build -o bin/terraform-provider-bitwarden .)
+```
+
+Create the ignored `.terraformrc` with absolute paths to the two build directories:
+
+```hcl
+provider_installation {
+  dev_overrides {
+    "registry.terraform.io/savely-krasovsky/homelab-helpers" = "/absolute/path/terraform-provider-homelab-helpers/bin"
+    "registry.opentofu.org/maxlaverse/bitwarden"            = "/absolute/path/terraform-provider-bitwarden/bin"
+    "registry.terraform.io/maxlaverse/bitwarden"            = "/absolute/path/terraform-provider-bitwarden/bin"
+  }
+  direct {}
+}
+```
+
+The Bitwarden clone adds `ephemeral "bitwarden_secret"`; the helpers clone adds
+`homelab-helpers_deployment`. The registry versions pinned in `main.tf` and the
+lock file remain installable baselines for `tofu init`. The
+[development overrides](https://opentofu.org/docs/cli/config/config-file/#development-overrides-for-provider-developers)
+select the local binaries for validate, plan and apply. Keep the overrides until
+releases containing both changes are published, then update the version
+constraints, remove the overrides and run `tofu init -upgrade`.
+Builds require Go 1.27, with no C compiler, musl or SDK binaries.
+
+From the homelab directory:
+
+```sh
+export TF_CLI_CONFIG_FILE="$PWD/.terraformrc"
+tofu init
+tofu validate
+tofu plan
+tofu apply
+```
+
+Exporting `TF_CLI_CONFIG_FILE` once keeps the same provider builds selected for
+all commands. Supply `bws_access_token` through your existing variables or
+`TF_VAR_bws_access_token`.
+
+The first migration plan should remove `null_resource.fcos_provision_secrets`
+and `null_resource.sync_configs` and create `homelab-helpers_deployment.fcos`.
+The old resources have no destroy provisioners; their removal only discards
+bookkeeping. The new resource adopts the host manifest and pending journal.
+No `state mv`, import or manual journal deletion is needed.
+The old `data.bitwarden_secret.proxmox_password` entry is also replaced by the
+ephemeral lookup; historical state snapshots still contain the old data.
+The image download resource `null_resource.fcos_qcow2` remains in use.
+Uploaded CLI/payload leftovers are no longer executed. Review any unexpected VM
+replacement before applying. Provider migration details are in
+[MIGRATION.md](../terraform-provider-homelab-helpers/MIGRATION.md#homelab-provisioners).
+
+OpenCloud extensions are oneshot installers with a daily update timer. Alloy
+persists its WAL and positions in `/var/mnt/docker/app_data/alloy` and uses
+`alloy.grafana.<base_domain>` for its dashboard and OAuth routes.
+
+Verification lives in the provider's Go tests (`make test vet lint`).
+Homelab-specific template and Quadlet checks remain in `tests/` and run with
+`go -C tests test ./...`; they use fake values and never apply to FCOS.
 
 ## Current services
 

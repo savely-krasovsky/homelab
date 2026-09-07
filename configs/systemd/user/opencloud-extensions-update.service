@@ -1,0 +1,9 @@
+[Unit]
+Description=Refresh OpenCloud extension images and assets
+
+[Service]
+Type=oneshot
+# Leave an intentionally stopped stack stopped.
+ExecCondition=/usr/bin/systemctl --user is-active --quiet opencloud-pod.service
+ExecStart=/usr/bin/systemctl --user restart opencloud-drawio.service opencloud-jsonviewer.service opencloud-maps.service opencloud-unzip.service
+TimeoutStartSec=1h

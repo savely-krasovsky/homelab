@@ -3,7 +3,8 @@ Description=OpenCloud Maps Extension Quadlet
 
 [Container]
 Image=docker.io/opencloudeu/web-extensions:maps-latest
-AutoUpdate=registry
+# The daily timer reruns this oneshot; keep cached assets usable when offline.
+Pull=newer
 ContainerName=opencloud-maps
 
 User=1000:1000
@@ -11,7 +12,7 @@ User=1000:1000
 Entrypoint=/bin/sh
 Exec=-c "cp -R /usr/share/nginx/html/apps/maps/ /apps"
 
-Volume=opencloud-apps:/apps
+Volume=opencloud-apps.volume:/apps
 
 Pod=opencloud.pod
 

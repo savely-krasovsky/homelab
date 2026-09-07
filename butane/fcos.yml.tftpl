@@ -27,11 +27,13 @@ storage:
       group:
         name: core
 %{ for _, path in config_dirs ~}
+%{ if path != "systemd" && path != "systemd/user" ~}
     - path: /var/home/core/.config/${path}
       user:
         name: core
       group:
         name: core
+%{ endif ~}
 %{ endfor ~}
 
     # Systemd user dir
@@ -46,13 +48,31 @@ storage:
       group:
         name: core
 
-    # For local binaries
-    - path: /var/home/core/.local/bin
+    # Ignition creates implicit parents as root; declare the whole local tree.
+    - path: /var/home/core/.local
+      mode: 0755
       user:
         name: core
       group:
         name: core
-
+    - path: /var/home/core/.local/bin
+      mode: 0755
+      user:
+        name: core
+      group:
+        name: core
+    - path: /var/home/core/.local/state
+      mode: 0700
+      user:
+        name: core
+      group:
+        name: core
+    - path: /var/home/core/.local/state/homelab
+      mode: 0700
+      user:
+        name: core
+      group:
+        name: core
     # Static site deploy target
     - path: /srv/${base_domain}
       user:
@@ -112,6 +132,14 @@ storage:
     # Enable Podman auto updates
     - path: /var/home/core/.config/systemd/user/timers.target.wants/podman-auto-update.timer
       target: /usr/lib/systemd/user/podman-auto-update.timer
+      user:
+        name: core
+      group:
+        name: core
+
+    # Refresh oneshot OpenCloud extensions
+    - path: /var/home/core/.config/systemd/user/timers.target.wants/opencloud-extensions-update.timer
+      target: /var/home/core/.config/systemd/user/opencloud-extensions-update.timer
       user:
         name: core
       group:
@@ -296,83 +324,7 @@ storage:
       mode: 0644
       contents:
         inline: |
-          #!/usr/sbin/nft -f
-
-          flush ruleset
-
-          table inet filter {
-          	chain input {
-          		type filter hook input priority filter; policy drop;
-
-          		# allow established/related connections
-          		ct state {established, related} accept
-
-          		# early drop of invalid connections
-          		ct state invalid drop
-
-          		# allow from loopback
-          		iifname lo accept
-
-          		# allow icmp
-          		ip protocol icmp accept
-          		ip6 nexthdr icmpv6 counter accept
-
-          		# allow ssh
-          		tcp dport ssh accept
-          		tcp dport 2222 accept
-          		tcp dport 2223 accept
-
-          		# allow http and https
-          		tcp dport 80 accept
-          		tcp dport 443 accept
-          		udp dport 443 accept
-          		tcp dport 8443 accept
-          		udp dport 8443 accept
-
-          		# allow imaps, smtps and ldaps
-          		tcp dport 993 accept
-          		tcp dport 465 accept
-          		tcp dport 636 accept
-
-          		# allow livekit
-          		udp dport 59000-60000 accept
-          		udp dport 3478 accept
-          		tcp dport 7881 accept
-
-          		# allow plex
-          		udp dport 1900 accept
-          		udp dport 5353 accept
-          		tcp dport 8324 accept
-          		udp dport { 32410, 32412, 32413, 32414 } accept
-          		tcp dport 32469 accept
-
-          		# allow minecraft bds
-          		udp dport 19132 accept
-
-          		# allow Prusa printers to report metrics
-          		udp dport 8514 accept
-
-          		# allow truenas to report metrics using graphite
-          		ip saddr 192.168.100.3 tcp dport 2003 accept
-          		ip saddr 192.168.100.3 udp dport 2003 accept
-
-          		# allow plugs to access mqtt broker
-          		ip saddr 192.168.100.1 tcp dport 1883 accept
-          	}
-
-          	chain forward {
-          		type filter hook forward priority filter; policy drop;
-
-          		ct state {established, related} accept
-          		ct state invalid drop
-
-          		ct status dnat accept
-          	}
-
-          	chain output {
-          		type filter hook output priority 0; policy accept;
-          	}
-          }
+          ${indent(10, firewall_config)}
 
     # download vector
     - path: /var/tmp/vector.rpm

@@ -1,5 +1,5 @@
 locals {
-  // Add secrets into quadlets config
+  # Shared template values. Secret contents are passed only through secret_values_wo.
   containers_config = merge(var.containers_config, {
     proxmox_ip : var.proxmox_config.host,
     truenas_ip : var.fcos_config.truenas_ip,
@@ -10,7 +10,7 @@ locals {
   config_paths = fileset("${path.module}/configs", "**")
   config_files = {
     for cfgpath in local.config_paths :
-    replace(cfgpath, ".tftpl", "") => templatefile("${path.module}/configs/${cfgpath}", local.containers_config)
+    trimsuffix(cfgpath, ".tftpl") => templatefile("${path.module}/configs/${cfgpath}", local.containers_config)
   }
   # Terraform hasn't directory alternative for fileset method
   config_dirs = provider::homelab-helpers::dirset("${path.module}/configs", "**")
@@ -19,18 +19,7 @@ locals {
     config_files : local.config_files,
     config_dirs : local.config_dirs,
     base_domain : var.containers_config.base_domain,
-  })
-
-  config_rendered_files = {
-    for path, content in local.config_files :
-    path => content
-  }
-
-  init_script_path       = "${path.module}/scripts/init_fcos.sh.tftpl"
-  get_secret_script_path = "${path.module}/scripts/get_secret.sh"
-  init_script_rendered = templatefile(local.init_script_path, {
-    config_files : local.config_files
-    secret_uuids : var.containers_secret_config
+    firewall_config : local.firewall_config,
   })
 }
 
@@ -56,8 +45,8 @@ resource "proxmox_virtual_environment_vm" "fcos" {
   }
 
   # Use modern platform
-  machine = "q35"
-  bios    = "ovmf"
+  machine       = "q35"
+  bios          = "ovmf"
   scsi_hardware = "virtio-scsi-single"
 
   startup {
@@ -75,8 +64,8 @@ resource "proxmox_virtual_environment_vm" "fcos" {
   }
 
   efi_disk {
-    datastore_id = "local-zfs"
-    type         = "4m"
+    datastore_id      = "local-zfs"
+    type              = "4m"
     pre_enrolled_keys = true
   }
 
@@ -114,76 +103,29 @@ resource "proxmox_virtual_environment_vm" "fcos" {
     enabled = true
   }
 
-  kvm_arguments = "-fw_cfg 'name=opt/com.coreos/config,string=${replace(data.ct_config.fcos_ignition.rendered, ",", ",,")}' -smbios type=11,value=io.systemd.credential:bws-access-token=${var.bws_access_token}"
+  kvm_arguments = "-fw_cfg 'name=opt/com.coreos/config,string=${replace(data.ct_config.fcos_ignition.rendered, ",", ",,")}'"
 }
 
-resource "null_resource" "fcos_provision_secrets" {
+resource "homelab-helpers_deployment" "fcos" {
   depends_on = [proxmox_virtual_environment_vm.fcos]
 
-  triggers = {
-    init_script_checksum       = sha256(local.init_script_rendered)
-    get_secret_script_checksum = sha256(file(local.get_secret_script_path))
+  host             = var.fcos_config.ip
+  user             = "core"
+  private_key_file = pathexpand(var.fcos_config.ssh_private_key_path)
+  host_key         = var.fcos_config.ssh_host_key
+
+  files            = local.config_files
+  units            = local.managed_units
+  groups           = local.deployment_groups
+  firewall         = local.firewall_config
+  secrets          = var.containers_secret_config
+  secrets_revision = var.deployment_secrets_revision
+
+  secret_values_wo = {
+    for name, secret in ephemeral.bitwarden_secret.containers : name => secret.value
   }
 
-  connection {
-    type        = "ssh"
-    user        = "core"
-    private_key = file(pathexpand(var.fcos_config.ssh_private_key_path))
-    host        = var.fcos_config.ip
-  }
-
-  provisioner "file" {
-    destination = "/var/tmp/init.sh"
-    content     = local.init_script_rendered
-  }
-
-  provisioner "file" {
-    destination = "/home/core/.local/bin/get_secret.sh"
-    content     = file(local.get_secret_script_path)
-  }
-
-  provisioner "remote-exec" {
-    inline     = ["sh /var/tmp/init.sh"]
-    on_failure = fail
-  }
-}
-
-resource "null_resource" "sync_configs" {
-  depends_on = [proxmox_virtual_environment_vm.fcos]
-
-  triggers = {
-    configs_hash = sha256(jsonencode(local.config_rendered_files))
-  }
-
-  connection {
-    type        = "ssh"
-    user        = "core"
-    private_key = file(pathexpand(var.fcos_config.ssh_private_key_path))
-    host        = var.fcos_config.ip
-  }
-
-  // Create directories if not exist
-  provisioner "remote-exec" {
-    inline = distinct([
-      for path, _ in local.config_rendered_files :
-      "mkdir -p /var/home/core/.config/${replace(dirname(path), "\\", "/")}"
-    ])
-  }
-
-  // Copy files, but remove the last byte to avoid double newline
-  provisioner "remote-exec" {
-    inline = [
-      for path, content in local.config_rendered_files : <<-EOT
-        cat <<'EOF' | head -c -1 > "/var/home/core/.config/${path}"
-        ${content}
-        EOF
-      EOT
-    ]
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "systemctl --user daemon-reload"
-    ]
+  lifecycle {
+    replace_triggered_by = [proxmox_virtual_environment_vm.fcos]
   }
 }

@@ -1,4 +1,6 @@
 terraform {
+  required_version = ">= 1.11.0"
+
   required_providers {
     proxmox = {
       source  = "bpg/proxmox"
@@ -6,6 +8,7 @@ terraform {
     }
     bitwarden = {
       source = "maxlaverse/bitwarden"
+      # Ephemeral secrets currently require the local .terraformrc override.
       version = "0.16.0"
     }
     ct = {
@@ -16,26 +19,26 @@ terraform {
       source  = "hashicorp/null"
       version = "3.2.4"
     }
-    local = {
-      source  = "hashicorp/local"
-      version = "2.6.1"
-    }
     homelab-helpers = {
       source = "registry.terraform.io/savely-krasovsky/homelab-helpers"
+      # Keep the published selection for init; .terraformrc supplies the local deployment resource.
       version = "0.0.8"
     }
   }
 }
 
 provider "bitwarden" {
-  access_token = var.bws_access_token
-  experimental {
-    embedded_client = true
-  }
+  access_token          = var.bws_access_token
+  client_implementation = "embedded"
 }
 
-data "bitwarden_secret" "proxmox_password" {
+ephemeral "bitwarden_secret" "proxmox_password" {
   id = var.proxmox_config.password_secret_id
+}
+
+ephemeral "bitwarden_secret" "containers" {
+  for_each = var.containers_secret_config
+  id       = each.value
 }
 
 provider "proxmox" {
@@ -44,7 +47,7 @@ provider "proxmox" {
 
   // Unfortunately Proxmox can execute a lot of actions only under root user...
   username = "root@pam"
-  password = data.bitwarden_secret.proxmox_password.value
+  password = ephemeral.bitwarden_secret.proxmox_password.value
 
   ssh {
     agent = true

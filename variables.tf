@@ -1,7 +1,8 @@
 variable "bws_access_token" {
-  description = "Bitwarden Secrets CLI access token"
+  description = "Bitwarden Secrets Manager access token for the local provider."
   type        = string
   sensitive   = true
+  ephemeral   = true
 }
 
 variable "proxmox_config" {
@@ -125,5 +126,12 @@ variable "fcos_config" {
 
     # To sync configs afterwards
     ssh_private_key_path = string
+    ssh_host_key         = optional(string)
   })
+}
+
+variable "deployment_secrets_revision" {
+  description = "Bump after rotating Bitwarden values without changing their IDs."
+  type        = string
+  default     = "1"
 }

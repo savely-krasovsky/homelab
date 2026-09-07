@@ -55,17 +55,11 @@ Label="traefik.http.routers.opencloud.rule=Host(`cloud.${base_domain}`)"
 Label="traefik.http.routers.opencloud.service=opencloud"
 Label="traefik.http.services.opencloud.loadbalancer.server.port=9200"
 
-Label="traefik.http.routers.opencloud-monitoring.rule=Host(`cloud.${base_domain}`) && PathPrefix(`/debug`)"
-Label="traefik.http.routers.opencloud-monitoring.service=opencloud-monitoring"
-Label="traefik.http.routers.opencloud-monitoring.middlewares=strip-debug-prefix"
-Label="traefik.http.middlewares.strip-debug-prefix.stripprefix.prefixes=/debug"
-Label="traefik.http.services.opencloud-monitoring.loadbalancer.server.port=9205"
-
 Volume=%E/opencloud/app-registry.yaml:/etc/opencloud/app-registry.yaml:Z
 Volume=%E/opencloud/csp.yaml:/etc/opencloud/csp.yaml:Z
 Volume=/var/mnt/docker/app_data/opencloud:/etc/opencloud:z
 Volume=/var/mnt/personal/opencloud:/var/lib/opencloud:Z
-Volume=opencloud-apps:/var/lib/opencloud/web/assets/apps
+Volume=opencloud-apps.volume:/var/lib/opencloud/web/assets/apps
 
 Pod=opencloud.pod
 

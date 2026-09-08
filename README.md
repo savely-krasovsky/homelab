@@ -1,5 +1,7 @@
 # Experimental Homelab
 
+Configuration and deployment scripts for my personal homelab.
+
 - Uses immutable, atomic Fedora CoreOS provisioned on a Proxmox VE node as a base.
 - Uses rootless Podman instead of rootful Docker.
 - Uses Quadlet systemd-like containers instead of Docker Compose.
@@ -39,13 +41,12 @@ The resource receives secret values through `secret_values_wo`, validates Quadle
 and nftables rules, atomically updates configuration, then restarts affected
 systemd user units. A pod and its containers form one restart group. Mounted
 configuration and shared Quadlet definitions participate in group hashes.
-Existing Podman networks and volumes still need an explicit migration when their
-creation options change; applying a definition does not recreate persistent data.
+Podman network and volume creation options are applied when those resources are
+first created.
 
-The host manifest and pending journal in `~/.local/state/homelab` remain
-compatible with the earlier Bash and Go CLI implementation. Retry failed applies
-without deleting them. Refresh detects changed/missing configuration, missing
-secrets and incomplete applies. It does not poll application health or compare
+The host manifest and pending journal are stored in `~/.local/state/homelab`.
+Retry failed applies without deleting them. Refresh detects changed/missing
+configuration, missing secrets and incomplete applies. It does not poll application health or compare
 the live kernel firewall ruleset. Only recorded files and units are cleaned up;
 application data, credentials and the host firewall survive resource destruction.
 
@@ -53,13 +54,10 @@ For rotated Bitwarden values, bump `deployment_secrets_revision` in your
 variables and run `tofu apply`. Secret IDs are stored in Terraform state;
 ephemeral secret values are excluded from plan, state and deployment fingerprints.
 The Proxmox password also uses an ephemeral Bitwarden resource. The access token
-is an ephemeral input used by the local Bitwarden provider, with no token injected
-into newly created VMs. Existing state history is not rewritten. Existing VMs keep
-their old SMBIOS settings because `kvm_arguments` is ignored by the VM lifecycle.
+is an ephemeral input used by the local Bitwarden provider.
 
 The firewall source is [butane/nftables.nft](butane/nftables.nft), shared with
-Ignition. Provisioning repairs ownership of the named .local parent and state
-directories from older Ignition configs without recursive ownership changes.
+Ignition.
 SSH verifies known_hosts by default; `fcos_config.ssh_host_key` can instead
 pin a trusted public host key. Verify a newly created VM through a trusted console
 before accepting its SSH key.
@@ -89,9 +87,7 @@ The Bitwarden clone adds `ephemeral "bitwarden_secret"`; the helpers clone adds
 `homelab-helpers_deployment`. The registry versions pinned in `main.tf` and the
 lock file remain installable baselines for `tofu init`. The
 [development overrides](https://opentofu.org/docs/cli/config/config-file/#development-overrides-for-provider-developers)
-select the local binaries for validate, plan and apply. Keep the overrides until
-releases containing both changes are published, then update the version
-constraints, remove the overrides and run `tofu init -upgrade`.
+select the local binaries for validate, plan and apply.
 Builds require Go 1.27, with no C compiler, musl or SDK binaries.
 
 From the homelab directory:
@@ -107,18 +103,6 @@ tofu apply
 Exporting `TF_CLI_CONFIG_FILE` once keeps the same provider builds selected for
 all commands. Supply `bws_access_token` through your existing variables or
 `TF_VAR_bws_access_token`.
-
-The first migration plan should remove `null_resource.fcos_provision_secrets`
-and `null_resource.sync_configs` and create `homelab-helpers_deployment.fcos`.
-The old resources have no destroy provisioners; their removal only discards
-bookkeeping. The new resource adopts the host manifest and pending journal.
-No `state mv`, import or manual journal deletion is needed.
-The old `data.bitwarden_secret.proxmox_password` entry is also replaced by the
-ephemeral lookup; historical state snapshots still contain the old data.
-The image download resource `null_resource.fcos_qcow2` remains in use.
-Uploaded CLI/payload leftovers are no longer executed. Review any unexpected VM
-replacement before applying. Provider migration details are in
-[MIGRATION.md](../terraform-provider-homelab-helpers/MIGRATION.md#homelab-provisioners).
 
 OpenCloud extensions are oneshot installers with a daily update timer. Alloy
 persists its WAL and positions in `/var/mnt/docker/app_data/alloy` and uses

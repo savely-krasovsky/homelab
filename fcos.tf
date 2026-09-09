@@ -13,7 +13,7 @@ locals {
     trimsuffix(cfgpath, ".tftpl") => templatefile("${path.module}/configs/${cfgpath}", local.containers_config)
   }
   # Terraform hasn't directory alternative for fileset method
-  config_dirs = provider::homelab-helpers::dirset("${path.module}/configs", "**")
+  config_dirs = provider::homelab::dirset("${path.module}/configs", "**")
 
   butane_config = merge(var.fcos_config, {
     config_files : local.config_files,
@@ -106,7 +106,7 @@ resource "proxmox_virtual_environment_vm" "fcos" {
   kvm_arguments = "-fw_cfg 'name=opt/com.coreos/config,string=${replace(data.ct_config.fcos_ignition.rendered, ",", ",,")}'"
 }
 
-resource "homelab-helpers_deployment" "fcos" {
+resource "homelab_config" "fcos" {
   depends_on = [proxmox_virtual_environment_vm.fcos]
 
   host             = var.fcos_config.ip
@@ -122,7 +122,8 @@ resource "homelab-helpers_deployment" "fcos" {
   secrets_revision = var.deployment_secrets_revision
 
   secret_values_wo = {
-    for name, secret in ephemeral.bitwarden_secret.containers : name => secret.value
+    for name, id in var.containers_secret_config :
+    name => ephemeral.bitwarden_secrets.containers.values[lower(id)]
   }
 
   lifecycle {

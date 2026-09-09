@@ -4,7 +4,7 @@ terraform {
   required_providers {
     proxmox = {
       source  = "bpg/proxmox"
-      version = "0.91.0"
+      version = "0.112.0"
     }
     bitwarden = {
       source = "maxlaverse/bitwarden"
@@ -17,12 +17,11 @@ terraform {
     }
     null = {
       source  = "hashicorp/null"
-      version = "3.2.4"
+      version = "3.3.1"
     }
-    homelab-helpers = {
-      source = "registry.terraform.io/savely-krasovsky/homelab-helpers"
-      # Keep the published selection for init; .terraformrc supplies the local deployment resource.
-      version = "0.0.8"
+    homelab = {
+      source  = "registry.terraform.io/savely-krasovsky/homelab-helpers"
+      version = "0.2.1"
     }
   }
 }
@@ -36,9 +35,8 @@ ephemeral "bitwarden_secret" "proxmox_password" {
   id = var.proxmox_config.password_secret_id
 }
 
-ephemeral "bitwarden_secret" "containers" {
-  for_each = var.containers_secret_config
-  id       = each.value
+ephemeral "bitwarden_secrets" "containers" {
+  ids = toset(values(var.containers_secret_config))
 }
 
 provider "proxmox" {

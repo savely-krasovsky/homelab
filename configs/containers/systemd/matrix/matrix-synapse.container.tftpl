@@ -27,6 +27,9 @@ Label="traefik.enable=true"
 Label="traefik.http.routers.matrix-synapse.rule=Host(`matrix.${base_domain}`)"
 Label="traefik.http.services.matrix-synapse.loadbalancer.server.port=8008"
 
+Label="alloy.metrics.enable=true"
+Label="alloy.metrics.port=9000"
+
 Volume=%E/matrix/homeserver.yaml:/data/homeserver.yaml:Z
 Volume=%E/matrix/log.config:/data/${base_domain}.log.config:Z
 Volume=/var/mnt/docker/app_data/matrix/synapse:/data:Z

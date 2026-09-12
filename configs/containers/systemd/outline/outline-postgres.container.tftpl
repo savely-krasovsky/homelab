@@ -17,7 +17,6 @@ Label="glance.parent=outline"
 Label="glance.name=Postgres"
 Label="glance.hide=false"
 
-# Every cluster runs with data checksums: fail the health check on any checksum failure, not only on connection errors.
 HealthCmd=pg_isready --host=127.0.0.1 --dbname="$$${POSTGRES_DB}" --username="$$${POSTGRES_USER}" || exit 1; \
         Chksum="$(psql --dbname="$$${POSTGRES_DB}" --username="$$${POSTGRES_USER}" --tuples-only --no-align \
         --command='SELECT COALESCE(SUM(checksum_failures), 0) FROM pg_stat_database')"; \

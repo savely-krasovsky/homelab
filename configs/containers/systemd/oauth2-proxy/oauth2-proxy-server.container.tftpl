@@ -42,6 +42,9 @@ Label="traefik.enable=true"
 Label="traefik.http.routers.oauth2-proxy.rule=Host(`oauth2-proxy.${base_domain}`)"
 Label="traefik.http.services.oauth2-proxy.loadbalancer.server.port=4180"
 
+Label="alloy.metrics.enable=true"
+Label="alloy.metrics.port=8080"
+
 Pod=oauth2-proxy.pod
 
 [Service]

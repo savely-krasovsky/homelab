@@ -55,6 +55,9 @@ Label="traefik.http.routers.opencloud.rule=Host(`cloud.${base_domain}`)"
 Label="traefik.http.routers.opencloud.service=opencloud"
 Label="traefik.http.services.opencloud.loadbalancer.server.port=9200"
 
+Label="alloy.metrics.enable=true"
+Label="alloy.metrics.port=9205"
+
 Volume=%E/opencloud/app-registry.yaml:/etc/opencloud/app-registry.yaml:Z
 Volume=%E/opencloud/csp.yaml:/etc/opencloud/csp.yaml:Z
 Volume=/var/mnt/docker/app_data/opencloud:/etc/opencloud:z

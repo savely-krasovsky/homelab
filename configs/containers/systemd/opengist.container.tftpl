@@ -27,6 +27,9 @@ Label="traefik.enable=true"
 Label="traefik.http.routers.opengist.rule=Host(`gist.${base_domain}`)"
 Label="traefik.http.services.opengist.loadbalancer.server.port=6157"
 
+Label="alloy.metrics.enable=true"
+Label="alloy.metrics.port=6158"
+
 Volume=/var/mnt/docker/app_data/opengist:/opengist:Z
 
 Network=reverse-proxy.network

@@ -17,7 +17,6 @@ Label="glance.parent=immich"
 Label="glance.name=Postgres"
 Label="glance.hide=false"
 
-# Every cluster runs with data checksums: fail the health check on any checksum failure, not only on connection errors.
 HealthCmd=pg_isready --host=127.0.0.1 --dbname="$$${POSTGRES_DB}" --username="$$${POSTGRES_USER}" || exit 1; \
         Chksum="$(psql --dbname="$$${POSTGRES_DB}" --username="$$${POSTGRES_USER}" --tuples-only --no-align \
         --command='SELECT COALESCE(SUM(checksum_failures), 0) FROM pg_stat_database')"; \
@@ -25,7 +24,7 @@ HealthCmd=pg_isready --host=127.0.0.1 --dbname="$$${POSTGRES_DB}" --username="$$
         [ "$Chksum" = '0' ] || exit 1
 HealthInterval=5s
 
-# The Immich image is still PostgreSQL 17, whose data directory lives one level deeper than in 18.
+# PostgreSQL 17 image: data directory is one level deeper.
 Volume=/var/mnt/docker/app_data/immich/postgres:/var/lib/postgresql/data:Z
 
 Pod=immich.pod

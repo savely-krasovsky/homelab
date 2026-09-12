@@ -30,6 +30,10 @@ Label="traefik.tcp.routers.matrix-rtc-turn.tls.certresolver=leresolver"
 Label="traefik.tcp.routers.matrix-rtc-turn.service=matrix-rtc-turn"
 Label="traefik.tcp.services.matrix-rtc-turn.loadbalancer.server.port=5349"
 
+Label="alloy.metrics.enable=true"
+Label="alloy.metrics.port=9091"
+Label="alloy.metrics.host=host.containers.internal"
+
 Exec=--config /etc/livekit.yaml
 
 Volume=%E/matrix-rtc/livekit.yaml:/etc/livekit.yaml:Z

@@ -11,7 +11,7 @@ User=1000:1000
 Environment=POSTGRES_USER=mas
 Environment=POSTGRES_DB=mas
 Environment=POSTGRES_INITDB_ARGS="--data-checksums --encoding=UTF-8 --lc-collate=C --lc-ctype=C"
-# Shares the pod network namespace with synapse-postgres, so it needs its own port.
+# Second Postgres in the pod.
 Environment=PGPORT=5433
 Secret=mas-postgres-password,type=env,target=POSTGRES_PASSWORD
 
@@ -19,7 +19,6 @@ Label="glance.parent=matrix"
 Label="glance.name=Postgres (MAS)"
 Label="glance.hide=false"
 
-# Every cluster runs with data checksums: fail the health check on any checksum failure, not only on connection errors.
 HealthCmd=pg_isready --host=127.0.0.1 --dbname="$$${POSTGRES_DB}" --username="$$${POSTGRES_USER}" || exit 1; \
         Chksum="$(psql --dbname="$$${POSTGRES_DB}" --username="$$${POSTGRES_USER}" --tuples-only --no-align \
         --command='SELECT COALESCE(SUM(checksum_failures), 0) FROM pg_stat_database')"; \

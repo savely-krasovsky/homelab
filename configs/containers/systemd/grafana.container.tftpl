@@ -41,6 +41,9 @@ Label="glance.hide=false"
 Label="traefik.enable=true"
 Label="traefik.http.routers.grafana.rule=Host(`grafana.${base_domain}`) || Host(`ch-vps01.krasovs.ky`) || Host(`nl-vps01.krasovs.ky`)"
 
+Label="alloy.metrics.enable=true"
+Label="alloy.metrics.port=3000"
+
 Volume=/var/mnt/docker/app_data/grafana/data:/var/lib/grafana:Z
 
 Network=reverse-proxy.network

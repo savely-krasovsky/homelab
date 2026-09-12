@@ -13,6 +13,9 @@ Label="glance.parent=immich"
 Label="glance.name=Machine Learning"
 Label="glance.hide=false"
 
+Label="alloy.metrics.enable=true"
+Label="alloy.metrics.port=8082"
+
 Volume=/var/mnt/media/downloads/immich/model-cache:/cache:Z
 Volume=immich-machine-learning.volume:/usr/src/.config
 Volume=immich-machine-learning.volume:/usr/src/.cache

@@ -18,7 +18,6 @@ Secret=synapse-postgres-password
 Secret=mas-postgres-password
 Secret=outline-postgres-password
 Secret=remnawave-postgres-password
-# Miniflux password has URL-unsafe characters and cannot be embedded into a DSN; lib/pq falls back to PGPASSWORD.
 Secret=miniflux-postgres-password,type=env,target=PGPASSWORD
 
 Label="glance.name=Grafana Alloy"
@@ -35,6 +34,9 @@ Label="traefik.http.routers.grafana-alloy.middlewares=oauth2-proxy@file"
 Label="traefik.http.services.grafana-alloy.loadbalancer.server.port=12345"
 Label="traefik.http.routers.grafana-alloy-auth.rule=Host(`alloy.grafana.${base_domain}`) && PathPrefix(`/oauth2/`)"
 Label="traefik.http.routers.grafana-alloy-auth.service=oauth2-proxy"
+
+Label="alloy.metrics.enable=true"
+Label="alloy.metrics.port=12345"
 
 Volume=%E/alloy/config.alloy:/etc/alloy/config.alloy:Z
 Volume=%t/podman/podman.sock:/var/run/docker.sock

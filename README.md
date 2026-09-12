@@ -28,6 +28,7 @@ I also have some observability:
 
 - Storage: VictoriaMetrics, VictoriaLogs, and VictoriaTraces.
 - Collection and routing: Grafana Alloy (Prometheus/Loki/OTLP) and Telegraf for MQTT -> OTLP.
+- Containers opt into metrics scraping with `alloy.metrics.*` Quadlet labels, discovered by Alloy over the Podman socket.
 - Visualization: Grafana.
 - Traefik itself exports logs/metrics/traces via OTLP to Alloy.
 
@@ -89,8 +90,8 @@ I also have some observability:
 
 ## Grafana dashboards
 
-[Prusa Core One UDP-only dashboard](dashboards/prusa-core-one-udp.json) is available
-for manual import without Loki or PrusaLink. See [dashboard notes](dashboards/README.md).
+[Homelab overview](dashboards/homelab-overview.json) is a schema v2 dashboard for manual import.
+See [dashboard notes](dashboards/README.md).
 
 ## Caveats
 

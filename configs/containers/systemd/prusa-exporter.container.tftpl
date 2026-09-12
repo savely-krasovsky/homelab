@@ -9,6 +9,12 @@ ContainerName=prusa-exporter
 User=1000:1000
 UserNS=keep-id:uid=1000,gid=1000
 
+Label="alloy.metrics.enable=true"
+Label="alloy.metrics.port=10009"
+Label="alloy.metrics.path=/metrics/udp"
+Label="alloy.metrics.interval=1s"
+Label="alloy.metrics.timeout=1s"
+
 Exec=--config.file=/app/prusa.yml --log.level=info --udp.listen-address=0.0.0.0:8514 --no-udp.gcode-enabled
 
 Volume=%E/prusa-exporter/prusa.yml:/app/prusa.yml:ro,Z

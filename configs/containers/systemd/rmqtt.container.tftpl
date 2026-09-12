@@ -13,6 +13,10 @@ Label="glance.parent=victoria-metrics"
 Label="glance.name=MQTT Broker"
 Label="glance.hide=false"
 
+Label="alloy.metrics.enable=true"
+Label="alloy.metrics.port=6060"
+Label="alloy.metrics.path=/api/v1/metrics/prometheus"
+
 Volume=/var/mnt/docker/app_data/rmqtt/logs:/var/log/rmqtt:Z
 Volume=/dev/null:/var/log/rmqtt/hook.log
 

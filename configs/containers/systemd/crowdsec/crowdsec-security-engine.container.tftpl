@@ -17,6 +17,9 @@ Label="glance.url=https://crowdsec.${base_domain}"
 Label="glance.description=Advanced Fail2ban"
 Label="glance.hide=false"
 
+Label="alloy.metrics.enable=true"
+Label="alloy.metrics.port=6060"
+
 Volume=/var/mnt/docker/app_data/crowdsec/data:/var/lib/crowdsec/data:Z
 Volume=/var/mnt/docker/app_data/crowdsec/config:/etc/crowdsec:Z
 Volume=/var/mnt/docker/app_data/crowdsec/staging:/staging:Z

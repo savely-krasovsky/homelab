@@ -12,6 +12,9 @@ UserNS=keep-id:uid=65534
 
 Environment=CONTAINER_HOST=unix:///run/podman/podman.sock
 
+Label="alloy.metrics.enable=true"
+Label="alloy.metrics.port=9882"
+
 Exec=--collector.enable-all
 
 Volume=%t/podman/podman.sock:/run/podman/podman.sock

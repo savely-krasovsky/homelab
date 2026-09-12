@@ -37,6 +37,9 @@ Label="traefik.enable=true"
 Label="traefik.http.routers.miniflux.rule=Host(`miniflux.${base_domain}`)"
 Label="traefik.http.services.miniflux.loadbalancer.server.port=8080"
 
+Label="alloy.metrics.enable=true"
+Label="alloy.metrics.port=8080"
+
 Pod=miniflux.pod
 
 [Service]

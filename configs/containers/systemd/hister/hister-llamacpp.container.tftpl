@@ -20,11 +20,13 @@ AddDevice=/dev/dri
 
 Pod=hister.pod
 
-Exec=--hf-repo Qwen/Qwen3-Embedding-0.6B-GGUF:F16 --embedding --pooling last --port 8080 --ctx-size 512 --parallel 2
+Exec=--hf-repo Qwen/Qwen3-Embedding-0.6B-GGUF:F16 --embedding --pooling last --port 8080 --ctx-size 512 --parallel 2 --cache-ram 0
 
 [Service]
 TimeoutStartSec=900
 Restart=always
+MemoryHigh=3G
+MemoryMax=4G
 
 [Install]
 WantedBy=multi-user.target default.target

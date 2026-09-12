@@ -2,7 +2,7 @@
 Description=Immich Machine Learning Quadlet
 
 [Container]
-Image=ghcr.io/immich-app/immich-machine-learning:v3.1.0-openvino
+Image=ghcr.io/immich-app/immich-machine-learning:v3.2.0-openvino
 AutoUpdate=registry
 ContainerName=immich-machine-learning
 
@@ -24,6 +24,8 @@ Pod=immich.pod
 [Service]
 TimeoutStartSec=900
 Restart=always
+MemoryHigh=3G
+MemoryMax=4G
 
 [Install]
 WantedBy=multi-user.target default.target

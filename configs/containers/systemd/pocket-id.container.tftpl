@@ -13,6 +13,7 @@ Environment=APP_URL=https://id.${base_domain}
 Environment=TRUST_PROXY=true
 Environment=METRICS_ENABLED=true
 Environment=OTEL_LOGS_EXPORTER=otlp
+Environment=OTEL_METRICS_EXPORTER=otlp
 Environment=OTEL_EXPORTER_OTLP_ENDPOINT=http://grafana-alloy:4317
 Environment=OTEL_EXPORTER_OTLP_PROTOCOL=grpc
 Secret=pocket-id-encryption-key,type=env,target=ENCRYPTION_KEY

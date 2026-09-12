@@ -12,6 +12,7 @@ ContainerName=oauth2-proxy-server
 User=1000:1000
 
 Environment=OAUTH2_PROXY_HTTP_ADDRESS=0.0.0.0:4180
+Environment=OAUTH2_PROXY_METRICS_ADDRESS=0.0.0.0:8080
 Environment=OAUTH2_PROXY_PROVIDER=oidc
 Environment=OAUTH2_PROXY_OIDC_ISSUER_URL=https://id.${base_domain}
 Environment=OAUTH2_PROXY_EMAIL_DOMAINS=*

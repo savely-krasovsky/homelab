@@ -31,7 +31,8 @@ http:
   - ::1/128
 
 database:
-  host: matrix-postgres
+  host: mas-postgres
+  port: 5433
   username: mas
   database: mas
   max_connections: 10
@@ -60,7 +61,7 @@ email:
   username: savely@${base_domain}
 
 secrets:
-  encryption_file: /run/secrets/matrix-authentication-service-secrets-encryption
+  encryption_file: /run/secrets/mas-secrets-encryption
   keys_dir: /run/secrets/keys
 
 passwords:
@@ -69,7 +70,7 @@ passwords:
 matrix:
   kind: synapse
   homeserver: ${base_domain}
-  secret_file: /run/secrets/matrix-authentication-service-secret
+  secret_file: /run/secrets/mas-secret
   endpoint: https://matrix.${base_domain}/
 
 upstream_oauth2:
@@ -79,7 +80,7 @@ upstream_oauth2:
     issuer: "https://id.${base_domain}"
     human_name: "Pocket ID"
     client_id: "c6e8a96b-647f-47fe-8e75-2b05a6c79242"
-    client_secret_file: /run/secrets/synapse-oidc-client-secret
+    client_secret_file: /run/secrets/mas-oidc-client-secret
     token_endpoint_auth_method: client_secret_basic
     scope: "email openid profile"
     claims_imports:

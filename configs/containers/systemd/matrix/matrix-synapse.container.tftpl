@@ -1,7 +1,7 @@
 [Unit]
 Description=Matrix Synapse Quadlet
-Wants=matrix-valkey.service matrix-postgres.service
-After=matrix-valkey.service matrix-postgres.service
+Wants=matrix-valkey.service synapse-postgres.service
+After=matrix-valkey.service synapse-postgres.service
 
 [Container]
 Image=docker.io/matrixdotorg/synapse:v1.160.0
@@ -10,7 +10,7 @@ ContainerName=matrix-synapse
 
 User=1000:1000
 
-Secret=matrix-authentication-service-secret,uid=1000,gid=1000,mode=0600
+Secret=mas-secret,uid=1000,gid=1000,mode=0600
 Secret=synapse-postgres-password,uid=1000,gid=1000,mode=0600
 Secret=coturn-turn-shared-secret,uid=1000,gid=1000,mode=0600
 Secret=synapse-registration-shared-secret,uid=1000,gid=1000,mode=0600
@@ -36,6 +36,8 @@ Pod=matrix.pod
 [Service]
 TimeoutStartSec=900
 Restart=always
+MemoryHigh=1G
+MemoryMax=1.5G
 
 [Install]
 WantedBy=multi-user.target default.target

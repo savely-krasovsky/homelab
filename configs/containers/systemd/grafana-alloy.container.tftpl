@@ -11,6 +11,15 @@ ContainerName=grafana-alloy
 # Grafana Alloy doesn't work under non-root user
 
 Secret=remnawave-metrics-pass
+Secret=meili-master-key
+Secret=opencloud-collabora-password
+Secret=immich-postgres-password
+Secret=synapse-postgres-password
+Secret=mas-postgres-password
+Secret=outline-postgres-password
+Secret=remnawave-postgres-password
+# Miniflux password has URL-unsafe characters and cannot be embedded into a DSN; lib/pq falls back to PGPASSWORD.
+Secret=miniflux-postgres-password,type=env,target=PGPASSWORD
 
 Label="glance.name=Grafana Alloy"
 Label="glance.icon=di:alloy"
@@ -40,6 +49,8 @@ SecurityLabelDisable=true
 ExecStartPre=/usr/bin/mkdir -p /var/mnt/docker/app_data/alloy
 TimeoutStartSec=900
 Restart=always
+MemoryHigh=1.5G
+MemoryMax=2G
 
 [Install]
 WantedBy=multi-user.target default.target

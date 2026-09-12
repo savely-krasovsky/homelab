@@ -113,6 +113,14 @@ prometheus.scrape "scrape_metrics" {
       __scrape_interval__ = "1s",
       __scrape_timeout__  = "1s",
     },
+    { __address__ = "victoria:8427" }, // vmauth
+    { __address__ = "grafana:3000" },
+    { __address__ = "grafana-alloy:12345" },
+    { __address__ = "crowdsec:6060" },
+    { __address__ = "oauth2-proxy:8080" },
+    { __address__ = "miniflux:8080" },
+    { __address__ = "opengist:6158" },
+    { __address__ = "hister:8080" }, // llama.cpp
   ]
   forward_to      = [prometheus.remote_write.victoria_metrics.receiver]
   scrape_interval = "10s"
@@ -132,6 +140,168 @@ prometheus.scrape "scrape_remnawave_metrics" {
     password = local.file.remnawave_metrics_pass.content
   }
   forward_to = [prometheus.remote_write.victoria_metrics.receiver]
+  scrape_interval = "10s"
+}
+
+local.file "meili_master_key" {
+  filename  = "/run/secrets/meili-master-key"
+  is_secret = true
+}
+
+prometheus.scrape "scrape_meilisearch_metrics" {
+  targets = [
+    { __address__ = "karakeep:7700" },
+  ]
+  authorization {
+    type        = "Bearer"
+    credentials = local.file.meili_master_key.content
+  }
+  forward_to      = [prometheus.remote_write.victoria_metrics.receiver]
+  scrape_interval = "10s"
+}
+
+local.file "opencloud_collabora_password" {
+  filename  = "/run/secrets/opencloud-collabora-password"
+  is_secret = true
+}
+
+prometheus.scrape "scrape_collabora_metrics" {
+  targets = [
+    { __address__ = "opencloud:9980", __metrics_path__ = "/cool/getMetrics" },
+  ]
+  basic_auth {
+    username = "admin"
+    password = local.file.opencloud_collabora_password.content
+  }
+  forward_to      = [prometheus.remote_write.victoria_metrics.receiver]
+  scrape_interval = "10s"
+}
+
+// Valkey/Redis instances have no exporter of their own; every pod is also attached
+// to the reverse-proxy network, so they are reachable by pod name.
+prometheus.exporter.redis "immich" {
+  redis_addr = "immich:6379"
+}
+
+prometheus.exporter.redis "matrix" {
+  redis_addr = "matrix:6379"
+}
+
+prometheus.exporter.redis "matrix_rtc" {
+  redis_addr = "host.containers.internal:6379" // matrix-rtc pod runs on the host network
+}
+
+prometheus.exporter.redis "oauth2_proxy" {
+  redis_addr = "oauth2-proxy:6379"
+}
+
+prometheus.exporter.redis "outline" {
+  redis_addr = "outline:6379"
+}
+
+prometheus.exporter.redis "remnawave" {
+  redis_addr = "remnawave:6379"
+}
+
+prometheus.scrape "scrape_redis_metrics" {
+  targets = array.concat(
+    prometheus.exporter.redis.immich.targets,
+    prometheus.exporter.redis.matrix.targets,
+    prometheus.exporter.redis.matrix_rtc.targets,
+    prometheus.exporter.redis.oauth2_proxy.targets,
+    prometheus.exporter.redis.outline.targets,
+    prometheus.exporter.redis.remnawave.targets,
+  )
+  forward_to      = [prometheus.remote_write.victoria_metrics.receiver]
+  scrape_interval = "10s"
+}
+
+local.file "immich_postgres_password" {
+  filename  = "/run/secrets/immich-postgres-password"
+  is_secret = true
+}
+
+local.file "synapse_postgres_password" {
+  filename  = "/run/secrets/synapse-postgres-password"
+  is_secret = true
+}
+
+local.file "mas_postgres_password" {
+  filename  = "/run/secrets/mas-postgres-password"
+  is_secret = true
+}
+
+local.file "outline_postgres_password" {
+  filename  = "/run/secrets/outline-postgres-password"
+  is_secret = true
+}
+
+local.file "remnawave_postgres_password" {
+  filename  = "/run/secrets/remnawave-postgres-password"
+  is_secret = true
+}
+
+// postgres_exporter only feeds the first DSN into its collector package, so every server
+// gets its own component. Autodiscovery adds per-database stats (matrix hosts synapse and mas).
+prometheus.exporter.postgres "immich" {
+  data_source_names = ["postgresql://immich:" + local.file.immich_postgres_password.content + "@immich:5432/immich?sslmode=disable"]
+
+  autodiscovery {
+    enabled = true
+  }
+}
+
+prometheus.exporter.postgres "synapse" {
+  data_source_names = ["postgresql://synapse:" + local.file.synapse_postgres_password.content + "@matrix:5432/synapse?sslmode=disable"]
+
+  autodiscovery {
+    enabled = true
+  }
+}
+
+prometheus.exporter.postgres "mas" {
+  data_source_names = ["postgresql://mas:" + local.file.mas_postgres_password.content + "@matrix:5433/mas?sslmode=disable"]
+
+  autodiscovery {
+    enabled = true
+  }
+}
+
+// The Miniflux password contains URL-unsafe characters, so lib/pq takes it from PGPASSWORD instead.
+prometheus.exporter.postgres "miniflux" {
+  data_source_names = ["postgresql://miniflux@miniflux:5432/miniflux?sslmode=disable"]
+
+  autodiscovery {
+    enabled = true
+  }
+}
+
+prometheus.exporter.postgres "outline" {
+  data_source_names = ["postgresql://outline:" + local.file.outline_postgres_password.content + "@outline:5432/outline?sslmode=disable"]
+
+  autodiscovery {
+    enabled = true
+  }
+}
+
+prometheus.exporter.postgres "remnawave" {
+  data_source_names = ["postgresql://remnawave:" + local.file.remnawave_postgres_password.content + "@remnawave:5432/remnawave?sslmode=disable"]
+
+  autodiscovery {
+    enabled = true
+  }
+}
+
+prometheus.scrape "scrape_postgres_metrics" {
+  targets = array.concat(
+    prometheus.exporter.postgres.immich.targets,
+    prometheus.exporter.postgres.synapse.targets,
+    prometheus.exporter.postgres.mas.targets,
+    prometheus.exporter.postgres.miniflux.targets,
+    prometheus.exporter.postgres.outline.targets,
+    prometheus.exporter.postgres.remnawave.targets,
+  )
+  forward_to      = [prometheus.remote_write.victoria_metrics.receiver]
   scrape_interval = "10s"
 }
 

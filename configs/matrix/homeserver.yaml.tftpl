@@ -17,7 +17,7 @@ listeners:
 matrix_authentication_service:
   enabled: true
   endpoint: http://matrix-authentication-service:8080/
-  secret_path: "/run/secrets/matrix-authentication-service-secret"
+  secret_path: "/run/secrets/mas-secret"
 
 # The maximum allowed duration by which sent events can be delayed, as
 # per MSC4140.
@@ -29,7 +29,7 @@ database:
     user: synapse
     passfile: "/run/secrets/synapse-postgres-password"
     dbname: synapse
-    host: matrix-postgres
+    host: synapse-postgres
     cp_min: 5
     cp_max: 10
 

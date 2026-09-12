@@ -1,20 +1,22 @@
 [Unit]
-Description=Outline Postgres Quadlet
+Description=Matrix Authentication Service Postgres Quadlet
 
 [Container]
 Image=docker.io/postgres:18-trixie
 AutoUpdate=registry
-ContainerName=outline-postgres
+ContainerName=mas-postgres
 
 User=1000:1000
 
-Environment=POSTGRES_USER=outline
-Environment=POSTGRES_DB=outline
-Environment=POSTGRES_INITDB_ARGS="--data-checksums"
-Secret=outline-postgres-password,type=env,target=POSTGRES_PASSWORD
+Environment=POSTGRES_USER=mas
+Environment=POSTGRES_DB=mas
+Environment=POSTGRES_INITDB_ARGS="--data-checksums --encoding=UTF-8 --lc-collate=C --lc-ctype=C"
+# Shares the pod network namespace with synapse-postgres, so it needs its own port.
+Environment=PGPORT=5433
+Secret=mas-postgres-password,type=env,target=POSTGRES_PASSWORD
 
-Label="glance.parent=outline"
-Label="glance.name=Postgres"
+Label="glance.parent=matrix"
+Label="glance.name=Postgres (MAS)"
 Label="glance.hide=false"
 
 # Every cluster runs with data checksums: fail the health check on any checksum failure, not only on connection errors.
@@ -25,9 +27,9 @@ HealthCmd=pg_isready --host=127.0.0.1 --dbname="$$${POSTGRES_DB}" --username="$$
         [ "$Chksum" = '0' ] || exit 1
 HealthInterval=5s
 
-Volume=/var/mnt/docker/app_data/outline/postgres:/var/lib/postgresql:Z
+Volume=/var/mnt/docker/app_data/matrix/mas-postgres:/var/lib/postgresql:Z
 
-Pod=outline.pod
+Pod=matrix.pod
 Notify=healthy
 
 [Service]

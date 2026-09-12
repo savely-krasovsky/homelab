@@ -9,6 +9,7 @@ ContainerName=karakeep-meilisearch
 User=1000:1000
 
 Environment=MEILI_NO_ANALYTICS=true
+Environment=MEILI_EXPERIMENTAL_ENABLE_METRICS=true
 Secret=meili-master-key,type=env,target=MEILI_MASTER_KEY
 
 Label="glance.parent=karakeep"

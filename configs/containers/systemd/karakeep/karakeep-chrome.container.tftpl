@@ -22,6 +22,8 @@ AddDevice=/dev/dri
 [Service]
 TimeoutStartSec=900
 Restart=always
+MemoryHigh=1G
+MemoryMax=2G
 
 [Install]
 WantedBy=multi-user.target default.target

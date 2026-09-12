@@ -41,6 +41,8 @@ Pod=hister.pod
 [Service]
 TimeoutStartSec=900
 Restart=always
+MemoryHigh=2G
+MemoryMax=3G
 
 [Install]
 WantedBy=multi-user.target default.target

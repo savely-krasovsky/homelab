@@ -10,13 +10,19 @@ User=1000:1000
 
 Environment=POSTGRES_USER=remnawave
 Environment=POSTGRES_DB=remnawave
+Environment=POSTGRES_INITDB_ARGS="--data-checksums"
 Secret=remnawave-postgres-password,type=env,target=POSTGRES_PASSWORD
 
 Label="glance.parent=remnawave"
 Label="glance.name=Postgres"
 Label="glance.hide=false"
 
-HealthCmd=pg_isready --host=127.0.0.1 --dbname="$$${POSTGRES_DB}" --username="$$${POSTGRES_USER}" || exit 1;
+# Every cluster runs with data checksums: fail the health check on any checksum failure, not only on connection errors.
+HealthCmd=pg_isready --host=127.0.0.1 --dbname="$$${POSTGRES_DB}" --username="$$${POSTGRES_USER}" || exit 1; \
+        Chksum="$(psql --dbname="$$${POSTGRES_DB}" --username="$$${POSTGRES_USER}" --tuples-only --no-align \
+        --command='SELECT COALESCE(SUM(checksum_failures), 0) FROM pg_stat_database')"; \
+        echo "checksum failure count is $Chksum"; \
+        [ "$Chksum" = '0' ] || exit 1
 HealthInterval=5s
 
 Volume=/var/mnt/docker/app_data/remnawave/postgres:/var/lib/postgresql:Z

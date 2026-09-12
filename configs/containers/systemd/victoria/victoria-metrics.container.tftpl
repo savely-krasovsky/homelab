@@ -23,6 +23,8 @@ Pod=victoria.pod
 [Service]
 TimeoutStartSec=900
 Restart=always
+MemoryHigh=1.5G
+MemoryMax=2G
 
 [Install]
 WantedBy=multi-user.target default.target

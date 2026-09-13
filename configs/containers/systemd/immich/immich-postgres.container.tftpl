@@ -2,7 +2,7 @@
 Description=Immich Postgres Quadlet
 
 [Container]
-Image=ghcr.io/immich-app/postgres:17-vectorchord0.5.3
+Image=ghcr.io/immich-app/postgres:18-vectorchord1.1.1
 AutoUpdate=registry
 ContainerName=immich-postgres
 
@@ -24,8 +24,7 @@ HealthCmd=pg_isready --host=127.0.0.1 --dbname="$$${POSTGRES_DB}" --username="$$
         [ "$Chksum" = '0' ] || exit 1
 HealthInterval=5s
 
-# PostgreSQL 17 image: data directory is one level deeper.
-Volume=/var/mnt/docker/app_data/immich/postgres:/var/lib/postgresql/data:Z
+Volume=/var/mnt/docker/app_data/immich/postgres:/var/lib/postgresql:Z
 
 Pod=immich.pod
 Notify=healthy

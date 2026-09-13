@@ -5,7 +5,6 @@ After=opencloud-server.service opencloud-collabora.service
 
 [Container]
 Image=docker.io/opencloudeu/opencloud-rolling:7.5.0
-AutoUpdate=registry
 ContainerName=opencloud-collaboration
 
 User=1000:1000
@@ -41,6 +40,9 @@ Volume=/var/mnt/docker/app_data/opencloud:/etc/opencloud:z
 Pod=opencloud.pod
 
 [Service]
+# App URLs are read once at startup and never retried, so wait for Traefik to
+# route collabora — it must go through Traefik to advertise public urlsrc.
+ExecStartPre=/usr/bin/bash -c 'until curl -sfo /dev/null https://collabora.${base_domain}/hosting/discovery; do sleep 2; done'
 TimeoutStartSec=900
 Restart=always
 

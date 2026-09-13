@@ -1,18 +1,17 @@
 [Unit]
 Description=Outline Server Quadlet
-Wants=outline-postgres.service outline-redis.service
-After=outline-postgres.service outline-redis.service
+Wants=outline-postgres.service outline-valkey.service
+After=outline-postgres.service outline-valkey.service
 
 [Container]
 Image=docker.io/outlinewiki/outline:1.10.1
-AutoUpdate=registry
 ContainerName=outline-server
 
 User=1000:1000
 
 Environment=NODE_ENV=production
 Environment=PGSSLMODE=disable
-Environment=REDIS_URL=redis://outline-redis:6379
+Environment=REDIS_URL=redis://outline-valkey:6379
 Environment=URL=https://outline.${base_domain}
 Environment=FILE_STORAGE=local
 Environment=FILE_STORAGE_LOCAL_ROOT_DIR=/var/lib/outline/data

@@ -121,6 +121,10 @@ resource "homelab_config" "fcos" {
   secrets          = var.containers_secret_config
   secrets_revision = var.deployment_secrets_revision
 
+  # Volume sources below this root are created before the units start; the root
+  # itself must be mounted. The NFS shares stay outside it on purpose.
+  data_root = "/var/mnt/docker/app_data"
+
   secret_values_wo = {
     for name, id in var.containers_secret_config :
     name => ephemeral.bitwarden_secrets.containers.values[lower(id)]

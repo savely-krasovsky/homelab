@@ -31,6 +31,7 @@ provider "registry.opentofu.org/bpg/proxmox" {
     "zh:87f8e413717010959b0a7bbb2258f9586e7b6119db52bc56d2192c03fad41a89",
     "zh:b0f938d5b5e615a1357083215ff16b6c8e43b156f3029ea7918965550d4d54d1",
     "zh:c296d4bb96dfc9549062906ff5be052cbaeb7fc25c4b41e176224c89031e5bed",
+    "zh:f26e0763dbe6a6b2195c94b44696f2110f7f55433dc142839be16b9697fa5597",
   ]
 }
 
@@ -100,6 +101,7 @@ provider "registry.opentofu.org/maxlaverse/bitwarden" {
     "zh:84c028274de3676cfe38cfe54ba9caab1249a6fa9a18b60d42455ee21073a0b9",
     "zh:b6c803139a82fc2f0e3a9a845c7a9210bf97037e2d1f99dbb016d373676a56b9",
     "zh:cf1424eba886052d6833014dc0247ba7ddcbac2eac030226aff97ac5b215a615",
+    "zh:f809ab383cca0a5f83072981c64208cbd7fa67e986a86ee02dd2c82333221e32",
     "zh:ff785f45caf25680d14eec4c81b684353d82d8344e922f7a0d203b6200fea1ca",
   ]
 }
@@ -119,17 +121,16 @@ provider "registry.opentofu.org/poseidon/ct" {
 }
 
 provider "registry.terraform.io/savely-krasovsky/homelab-helpers" {
-  version     = "0.2.1"
-  constraints = "0.2.1"
+  version     = "0.2.2"
+  constraints = "0.2.2"
   hashes = [
-    "h1:T0z1ZXXoJ3I4RPeLh2AF1zy2o2UhFY6Xq9FqBmdsmmg=",
-    "h1:ZYCUm2j1c5rZ255xKy2AY7gtMhbqcVnSbmm+sIf7iao=",
-    "zh:223bea49253bdb482a2886b5c9148618105fc3ff9d3479136480ee680b5b0d23",
-    "zh:8b6880395010ad2a3c2a8da7237b927a7101b9e9338cbed21aad45abd5a40793",
-    "zh:b0d2cd1731b77b72f1cebc7adcdea66b01cd1a198e32b3e5dd6353aa5baf6fe4",
-    "zh:bac3ed5255ea40a1385721908bce0829bedc13d4ceb949ef09e29fee9912fbfa",
-    "zh:cc73f2f040abbaa7ac634562608c23c4fe2d566e3f32124fa7147829219aebe4",
-    "zh:efd4bab46dd2df7dc19a2c778ca0a4afb3de1edc672b1f39b0dbba6b21e2e931",
+    "h1:d8oOZ2Gk0BBxJiKSxtneMsmvZFna2UfzTxPMyUc8BQ8=",
+    "zh:4e9626ac96fc3943842a9efed8061b30db04d61498da04503ad804b8e664c28a",
+    "zh:5d4407700683699ff16acb41676f57e9913641fde4d6d6b66085faf99ff6b3c1",
+    "zh:73f54bb9c141a2c181c2573f21050a28a69ae587941c2dad6edc6c80cce1aab4",
+    "zh:98b1a0d120b5d481625a177cd80b2571a52a680379dede0784bd957ce85e8984",
+    "zh:b6115dcbacd8a776963f32308266b3c220c3184dd7e54b9e8d3871184b3b845e",
+    "zh:e6bc81f403512bcfce4a0ed62f9d7d8275e04e8255d82f9b2f0ead4e020e60cd",
     "zh:f809ab383cca0a5f83072981c64208cbd7fa67e986a86ee02dd2c82333221e32",
   ]
 }

@@ -9,6 +9,8 @@ Configuration and deployment scripts for my personal homelab.
 - Provisioning is done with OpenTofu/Terraform.
 - Configs are rendered from templates and deployed over SSH by my
   [homelab provider](https://github.com/savely-krasovsky/terraform-provider-homelab-helpers).
+- Image bumps arrive as Renovate PRs; `AutoUpdate=registry` is kept only on rolling tags,
+  whose patch releases Renovate cannot see.
 - Secrets are provided using Bitwarden Secrets Manager.
 - Ephemeral Bitwarden values are passed to the deployment provider and installed as Podman/system credentials.
 - Source IP is preserved using

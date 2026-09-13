@@ -1,20 +1,20 @@
 [Unit]
-Description=Outline Redis Quadlet
+Description=Outline Valkey Quadlet
 
 [Container]
-Image=docker.io/redis:8-alpine
+Image=docker.io/valkey/valkey:9-alpine
 AutoUpdate=registry
-ContainerName=outline-redis
+ContainerName=outline-valkey
 
 User=1000:1000
 
 Label="glance.parent=outline"
-Label="glance.name=Redis"
+Label="glance.name=Valkey"
 Label="glance.hide=false"
 
-HealthCmd=redis-cli ping || exit 1
+HealthCmd=valkey-cli ping || exit 1
 
-Volume=/var/mnt/docker/app_data/outline/redis:/data:Z
+Volume=/var/mnt/docker/app_data/outline/valkey:/data:Z
 
 Pod=outline.pod
 Notify=healthy

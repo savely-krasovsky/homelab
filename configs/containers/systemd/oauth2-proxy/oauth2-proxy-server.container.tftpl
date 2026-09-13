@@ -1,12 +1,11 @@
 [Unit]
 Description=OAuth2 Proxy Server Quadlet
-# OIDC discovery reaches Pocket ID through Traefik; Redis must be healthy too.
-Wants=pocket-id.service traefik.service oauth2-proxy-redis.service
-After=pocket-id.service traefik.service oauth2-proxy-redis.service
+# OIDC discovery reaches Pocket ID through Traefik; Valkey must be healthy too.
+Wants=pocket-id.service traefik.service oauth2-proxy-valkey.service
+After=pocket-id.service traefik.service oauth2-proxy-valkey.service
 
 [Container]
 Image=quay.io/oauth2-proxy/oauth2-proxy:v7.15.4
-AutoUpdate=registry
 ContainerName=oauth2-proxy-server
 
 User=1000:1000
@@ -26,7 +25,7 @@ Environment=OAUTH2_PROXY_COOKIE_EXPIRE=720h
 Environment=OAUTH2_PROXY_REVERSE_PROXY=true
 Environment=OAUTH2_PROXY_UPSTREAMS=static://202
 Environment=OAUTH2_PROXY_SESSION_STORE_TYPE=redis
-Environment=OAUTH2_PROXY_REDIS_CONNECTION_URL=redis://oauth2-proxy-redis
+Environment=OAUTH2_PROXY_REDIS_CONNECTION_URL=redis://oauth2-proxy-valkey
 Environment=OAUTH2_PROXY_SKIP_JWT_BEARER_TOKENS=true
 Environment=OAUTH2_PROXY_EXTRA_JWT_ISSUERS=https://id.${base_domain}=6ab0d4e0-db54-4404-ad25-003aa4c9d208
 Secret=oauth2-proxy-cookie-secret,type=env,target=OAUTH2_PROXY_COOKIE_SECRET

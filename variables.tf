@@ -71,6 +71,7 @@ variable "containers_secret_config" {
     restic_b2_account_key                     = "ddc2f07b-47ca-49b2-ae41-b2c700e02f01"
     restic_password                           = "52ce5eb2-98ae-4243-ba08-b2c700e04b7e"
     opencloud_collabora_password              = "bced1168-9741-4b8e-abf4-b2d4000e2c9e"
+    opencloud_collabora_proof_key             = "88d40ec2-b73c-439a-9efe-b4c400aa419c"
     opencloud_smtp_password                   = "5e0889ac-3b11-4fc4-81ca-b2d400170e85"
     coturn_turn_shared_secret                 = "5b69585c-03e8-454f-94e0-b357000002d4"
     synapse_postgres_password                 = "2209bd8d-f6a7-43e0-afa8-b37a00bbfd2c"

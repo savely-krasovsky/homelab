@@ -21,7 +21,6 @@
         "quadlet"
       ],
       "matchPackageNames": [
-        "gcr.io/zenika-hub/alpine-chrome",
         "ghcr.io/open-webui/pipelines",
         "ghcr.io/savely-krasovsky/forward-info-bot",
         "ghcr.io/savely-krasovsky/masked-email-bot"
@@ -58,11 +57,11 @@
       "matchPackageNames": [
         "/postgres/",
         "/valkey/",
-        "/redis/",
         "/meilisearch/"
       ],
       "matchUpdateTypes": [
-        "major"
+        "major",
+        "minor"
       ],
       "dependencyDashboardApproval": true
     },
@@ -79,6 +78,13 @@
         "atcr.io/tangled.org/knot"
       ],
       "enabled": false
+    },
+    {
+      "description": "Collabora restructures the image inside version-looking bumps; read the release notes before merging.",
+      "matchPackageNames": [
+        "docker.io/collabora/code"
+      ],
+      "dependencyDashboardApproval": true
     }
   ]
 }

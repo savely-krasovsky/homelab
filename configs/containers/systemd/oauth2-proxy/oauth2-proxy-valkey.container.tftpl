@@ -1,20 +1,20 @@
 [Unit]
-Description=OAuth2 Proxy Redis Quadlet
+Description=OAuth2 Proxy Valkey Quadlet
 
 [Container]
-Image=docker.io/redis:8-alpine
+Image=docker.io/valkey/valkey:9-alpine
 AutoUpdate=registry
-ContainerName=oauth2-proxy-redis
+ContainerName=oauth2-proxy-valkey
 
 User=1000:1000
 
 Label="glance.parent=oauth2-proxy"
-Label="glance.name=Redis"
+Label="glance.name=Valkey"
 Label="glance.hide=false"
 
-HealthCmd=redis-cli ping || exit 1
+HealthCmd=valkey-cli ping || exit 1
 
-Volume=/var/mnt/docker/app_data/oauth2-proxy/redis:/data:Z
+Volume=/var/mnt/docker/app_data/oauth2-proxy/valkey:/data:Z
 
 Pod=oauth2-proxy.pod
 Notify=healthy

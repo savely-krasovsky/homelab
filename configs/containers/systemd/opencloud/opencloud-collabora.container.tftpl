@@ -3,7 +3,6 @@ Description=OpenCloud Collabora Quadlet
 
 [Container]
 Image=docker.io/collabora/code:26.04.3.2.1
-AutoUpdate=registry
 ContainerName=opencloud-collabora
 
 Environment=aliasgroup1=https://wopiserver.${base_domain}:443
@@ -11,6 +10,7 @@ Environment=username=admin
 Environment=DONT_GEN_SSL_CERT=YES
 Environment=extra_params="--o:ssl.enable=false --o:ssl.ssl_verification=false --o:ssl.termination=true --o:hexify_embedded_urls=true --o:welcome.enable=false --o:net.frame_ancestors=cloud.${base_domain}"
 Secret=opencloud-collabora-password,type=env,target=password
+Secret=opencloud-collabora-proof-key,type=mount,target=/etc/coolwsd/proof_key,uid=1001,gid=1001,mode=0600
 
 Label="glance.parent=opencloud"
 Label="glance.name=Collabora"
@@ -21,11 +21,7 @@ Label="traefik.http.routers.collabora.rule=Host(`collabora.${base_domain}`)"
 Label="traefik.http.routers.collabora.service=collabora"
 Label="traefik.http.services.collabora.loadbalancer.server.port=9980"
 
-Entrypoint=/bin/bash
-Exec=-c "coolconfig generate-proof-key && /start-collabora-online.sh"
-
 # This allows to implement depends_on alternative
-HealthCmd=["/bin/bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/9980 && echo -e 'GET /hosting/discovery HTTP/1.1\\r\\nHost: localhost:9980\\r\\n\\r\\n' >&3 && head -n 1 <&3 | grep '200 OK'"]
 HealthInterval=30s
 HealthStartPeriod=1m
 Notify=healthy

@@ -3,7 +3,6 @@ Description=Karakeep Meilisearch Quadlet
 
 [Container]
 Image=docker.io/getmeili/meilisearch:v1.53.2
-AutoUpdate=registry
 ContainerName=karakeep-meilisearch
 
 User=1000:1000
@@ -16,7 +15,7 @@ Label="glance.parent=karakeep"
 Label="glance.name=Meilisearch"
 Label="glance.hide=false"
 
-Exec=/bin/sh -c "meilisearch --experimental-dumpless-upgrade --experimental-logs-mode=json"
+Exec=/bin/sh -c "meilisearch --upgrade-db --experimental-logs-mode=json"
 
 Volume=/var/mnt/docker/app_data/karakeep/meilisearch:/meili_data:Z
 

@@ -40,7 +40,9 @@ ephemeral "bitwarden_secrets" "containers" {
 }
 
 provider "proxmox" {
-  endpoint = "https://pve.${var.containers_config.base_domain}"
+  # Straight to the node: routing through Traefik cannot survive replacing the VM that
+  # Traefik itself runs on.
+  endpoint = "https://pve.lan.${var.containers_config.base_domain}:8006"
 
   // Unfortunately Proxmox can execute a lot of actions only under root user...
   username = "root@pam"

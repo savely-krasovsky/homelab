@@ -26,8 +26,13 @@ resource "proxmox_acme_certificate" "pve" {
   node_name = "pve"
   force     = true
 
-  domains = [{
-    domain = "pve.${var.containers_config.base_domain}"
-    plugin = proxmox_acme_dns_plugin.cloudflare.plugin
-  }]
+  # pve.<domain> is what every service CNAMEs to and is reached through Traefik; the
+  # second name is a leaf that resolves straight to the node, so overriding it locally
+  # cannot drag the rest of the zone onto the hypervisor.
+  domains = [
+    for name in ["pve", "pve.lan"] : {
+      domain = "${name}.${var.containers_config.base_domain}"
+      plugin = proxmox_acme_dns_plugin.cloudflare.plugin
+    }
+  ]
 }

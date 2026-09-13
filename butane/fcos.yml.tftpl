@@ -47,6 +47,23 @@ storage:
         name: core
       group:
         name: core
+    # Ignition would create these as root while linking units into them, and then
+    # `systemctl --user enable/disable` cannot write to them.
+    - path: /var/home/core/.config/systemd/user/default.target.wants
+      user:
+        name: core
+      group:
+        name: core
+    - path: /var/home/core/.config/systemd/user/timers.target.wants
+      user:
+        name: core
+      group:
+        name: core
+    - path: /var/home/core/.config/systemd/user/podman.service.d
+      user:
+        name: core
+      group:
+        name: core
 
     # Ignition creates implicit parents as root; declare the whole local tree.
     - path: /var/home/core/.local
@@ -73,14 +90,6 @@ storage:
         name: core
       group:
         name: core
-    # Static site deploy target
-    - path: /srv/${base_domain}
-      user:
-        name: core
-      group:
-        name: deploy
-      mode: 0775
-
     # Backup snapshot mounting points
     - path: /var/mnt/snapshots/backblaze
     - path: /var/mnt/snapshots/storj
@@ -539,16 +548,23 @@ systemd:
     - name: nftables.service
       enabled: true
 
-    - name: blog-content-selinux.service
+    - name: blog-deploy-target.service
       enabled: true
       contents: |
         [Unit]
-        Description=Set SELinux context for blog content
+        Description=Prepare the blog deploy target
+        RequiresMountsFor=/var/mnt/docker
         Before=multi-user.target
 
         [Service]
         Type=oneshot
-        ExecStart=/usr/bin/chcon -R -t container_file_t /srv/${base_domain}
+        RemainAfterExit=yes
+        ExecStart=/usr/bin/mkdir -p /var/mnt/docker/blog
+        # rsync -a sets perms and times on the target itself, which needs ownership.
+        ExecStart=/usr/bin/chown deploy:deploy /var/mnt/docker/blog
+        ExecStart=/usr/bin/chmod 0755 /var/mnt/docker/blog
+        # New files inherit this from the directory, so rsync output stays readable to the container.
+        ExecStart=/usr/bin/chcon -R -t container_file_t /var/mnt/docker/blog
 
         [Install]
         WantedBy=multi-user.target

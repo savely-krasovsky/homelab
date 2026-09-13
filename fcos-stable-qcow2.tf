@@ -34,3 +34,14 @@ resource "proxmox_download_file" "fcos_qcow2" {
 
   upload_timeout = 1800
 }
+
+resource "proxmox_virtual_environment_file" "fcos_ignition" {
+  node_name    = "pve"
+  datastore_id = "local"
+  content_type = "snippets"
+
+  source_raw {
+    data      = data.ct_config.fcos_ignition.rendered
+    file_name = "fcos.ign"
+  }
+}

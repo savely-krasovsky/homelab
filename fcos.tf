@@ -39,8 +39,7 @@ resource "proxmox_virtual_environment_vm" "fcos" {
 
   lifecycle {
     ignore_changes = [
-      disk["file_id"],
-      kvm_arguments
+      disk["file_id"]
     ]
   }
 
@@ -103,7 +102,8 @@ resource "proxmox_virtual_environment_vm" "fcos" {
     enabled = true
   }
 
-  kvm_arguments = "-fw_cfg 'name=opt/com.coreos/config,string=${replace(data.ct_config.fcos_ignition.rendered, ",", ",,")}'"
+  # An inlined config outgrew what PVE passes to QEMU and was dropped without an error.
+  kvm_arguments = "-fw_cfg name=opt/com.coreos/config,file=/var/lib/vz/snippets/${proxmox_virtual_environment_file.fcos_ignition.source_raw[0].file_name}"
 }
 
 resource "homelab_config" "fcos" {

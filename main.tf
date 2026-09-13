@@ -21,7 +21,7 @@ terraform {
     }
     homelab = {
       source  = "registry.terraform.io/savely-krasovsky/homelab-helpers"
-      version = "0.2.2"
+      version = "0.2.3"
     }
   }
 }
@@ -40,7 +40,7 @@ ephemeral "bitwarden_secrets" "containers" {
 }
 
 provider "proxmox" {
-  endpoint = "https://pve.${var.containers_config.base_domain}:8006"
+  endpoint = "https://pve.${var.containers_config.base_domain}"
 
   // Unfortunately Proxmox can execute a lot of actions only under root user...
   username = "root@pam"

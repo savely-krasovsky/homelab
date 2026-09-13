@@ -16,7 +16,7 @@ Label="traefik.enable=true"
 Label="traefik.http.routers.blog.rule=Host(`${base_domain}`)"
 Label="traefik.http.services.blog.loadbalancer.server.port=8080"
 
-Volume=/srv/${base_domain}:/blog:ro
+Volume=/var/mnt/docker/blog:/blog:ro
 Volume=%E/sws/blog.toml:/etc/sws.toml:ro,Z
 
 Network=reverse-proxy.network

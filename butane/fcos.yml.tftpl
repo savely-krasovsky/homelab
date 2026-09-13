@@ -20,21 +20,13 @@ passwd:
 
 storage:
   directories:
-    # Config dir
+    # Config dir. The subtree below it is created by the deployment provider as
+    # it installs files, so only the roots that must predate it are listed here.
     - path: /var/home/core/.config
       user:
         name: core
       group:
         name: core
-%{ for _, path in config_dirs ~}
-%{ if path != "systemd" && path != "systemd/user" ~}
-    - path: /var/home/core/.config/${path}
-      user:
-        name: core
-      group:
-        name: core
-%{ endif ~}
-%{ endfor ~}
 
     # Systemd user dir
     - path: /var/home/core/.config/systemd

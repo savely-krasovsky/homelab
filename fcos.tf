@@ -12,19 +12,13 @@ locals {
     for cfgpath in local.config_paths :
     trimsuffix(cfgpath, ".tftpl") => templatefile("${path.module}/configs/${cfgpath}", local.containers_config)
   }
-  # Terraform hasn't directory alternative for fileset method
-  config_dirs = provider::homelab::dirset("${path.module}/configs", "**")
+
+  firewall_config = file("${path.module}/butane/nftables.nft")
 
   butane_config = merge(var.fcos_config, {
-    config_files : local.config_files,
-    config_dirs : local.config_dirs,
     base_domain : var.containers_config.base_domain,
     firewall_config : local.firewall_config,
   })
-}
-
-output "directories_to_create" {
-  value = local.config_dirs
 }
 
 data "ct_config" "fcos_ignition" {
@@ -115,8 +109,6 @@ resource "homelab_config" "fcos" {
   host_key         = var.fcos_config.ssh_host_key
 
   files            = local.config_files
-  units            = local.managed_units
-  groups           = local.deployment_groups
   firewall         = local.firewall_config
   secrets          = var.containers_secret_config
   secrets_revision = var.deployment_secrets_revision

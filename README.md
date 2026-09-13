@@ -8,7 +8,8 @@ Configuration and deployment scripts for my personal homelab.
 - VM can be fully removed and re-provisioned in a few minutes, including container autostart.
 - Provisioning is done with OpenTofu/Terraform.
 - Configs are rendered from templates and deployed over SSH by my
-  [homelab provider](https://github.com/savely-krasovsky/terraform-provider-homelab-helpers).
+  [homelab provider](https://github.com/savely-krasovsky/terraform-provider-homelab-helpers),
+  which also derives from them which units it owns and which ones restart together.
 - Image bumps arrive as Renovate PRs; `AutoUpdate=registry` is kept only on rolling tags,
   whose patch releases Renovate cannot see.
 - Secrets are provided using Bitwarden Secrets Manager.

@@ -14,19 +14,6 @@ import (
 	"testing"
 )
 
-type group struct {
-	Units       []string `json:"units"`
-	Enable      []string `json:"enable"`
-	Hash        string   `json:"hash"`
-	UsesSecrets bool     `json:"uses_secrets"`
-}
-
-type payload struct {
-	Files  map[string]string `json:"files"`
-	Units  []string          `json:"units"`
-	Groups map[string]group  `json:"groups"`
-}
-
 func noError(t *testing.T, err error) {
 	t.Helper()
 	if err != nil {
@@ -60,7 +47,9 @@ func console(t *testing.T, dir, expression string, result any) {
 	noError(t, json.Unmarshal([]byte(encoded), result))
 }
 
-func render(t *testing.T) payload {
+// render fills every template variable with a placeholder, so the test needs no
+// secrets and no Bitwarden session to reach the real Quadlet definitions.
+func render(t *testing.T) map[string]string {
 	t.Helper()
 	repo, err := filepath.Abs("..")
 	noError(t, err)
@@ -98,24 +87,13 @@ func render(t *testing.T) payload {
 	var files map[string]string
 	console(t, t.TempDir(), expression, &files)
 
-	dir := t.TempDir()
-	data, err := json.Marshal(files)
-	noError(t, err)
-	noError(t, os.WriteFile(filepath.Join(dir, "files.json"), data, 0600))
-	noError(t, os.WriteFile(filepath.Join(dir, "inputs.tf"), []byte(`locals { config_files = jsondecode(file("files.json")) }`), 0600))
-	deployment := strings.ReplaceAll(read(t, filepath.Join(repo, "deployment.tf")), "${path.module}", repo)
-	noError(t, os.WriteFile(filepath.Join(dir, "deployment.tf"), []byte(deployment), 0600))
-
-	var result payload
-	console(t, dir, `jsonencode({files=local.config_files,groups=local.deployment_groups,units=local.managed_units})`, &result)
-
-	return result
+	return files
 }
 
-func TestRenderedQuadletsAndRestartGroups(t *testing.T) {
-	config := render(t)
+func generate(t *testing.T, files map[string]string) map[string]string {
+	t.Helper()
 	stage := t.TempDir()
-	for name, content := range config.Files {
+	for name, content := range files {
 		destination := filepath.Join(stage, "files", name)
 		noError(t, os.MkdirAll(filepath.Dir(destination), 0755))
 		noError(t, os.WriteFile(destination, []byte(content), 0644))
@@ -144,39 +122,121 @@ func TestRenderedQuadletsAndRestartGroups(t *testing.T) {
 		t.Fatalf("Quadlet generation: %v\n%s", err, output)
 	}
 
-	for _, unit := range config.Units {
-		if _, err := os.Stat(filepath.Join(generated, unit)); err == nil {
+	units := map[string]string{}
+	entries, err := os.ReadDir(generated)
+	noError(t, err)
+	for _, entry := range entries {
+		if entry.IsDir() {
 			continue
 		}
-		if _, err := os.Stat(filepath.Join(stage, "files/systemd/user", unit)); err == nil {
-			continue
-		}
-		t.Errorf("unit was not generated: %s", unit)
+		units[entry.Name()] = read(t, filepath.Join(generated, entry.Name()))
 	}
 
-	for name, group := range config.Groups {
-		if group.Hash == "" || len(group.Units) == 0 {
-			t.Errorf("empty restart group %s", name)
+	return units
+}
+
+// unitName applies the generator's naming rules, which the deployment provider
+// reimplements to decide which units it owns. Checking them against the real
+// generator is what this repository can do and the provider's own tests cannot.
+func unitName(file string) string {
+	base := filepath.Base(file)
+	stem := strings.TrimSuffix(base, filepath.Ext(base))
+
+	switch filepath.Ext(base) {
+	case ".container":
+		return stem + ".service"
+	case ".pod":
+		return stem + "-pod.service"
+	case ".network":
+		return stem + "-network.service"
+	case ".volume":
+		return stem + "-volume.service"
+	}
+
+	return ""
+}
+
+func TestGeneratedUnitsMatchDeclaredQuadlets(t *testing.T) {
+	files := render(t)
+	generated := generate(t, files)
+
+	expected := map[string]string{}
+	for name := range files {
+		if !strings.HasPrefix(name, "containers/systemd/") {
+			continue
 		}
-		for _, unit := range append(slices.Clone(group.Units), group.Enable...) {
-			if !slices.Contains(config.Units, unit) {
-				t.Errorf("group %s refers to unowned unit %s", name, unit)
-			}
+		if unit := unitName(name); unit != "" {
+			expected[unit] = name
+		}
+	}
+	if len(expected) == 0 {
+		t.Fatal("no Quadlet definitions were rendered")
+	}
+
+	for unit, source := range expected {
+		if _, found := generated[unit]; !found {
+			t.Errorf("%s declares %s, which the generator did not produce", source, unit)
 		}
 	}
 
-	for name, content := range config.Files {
-		if !strings.HasSuffix(name, ".container") {
+	// The other direction catches a Quadlet type the deployment does not know
+	// about yet: it would run on the host without ever being owned, restarted
+	// or removed.
+	for unit := range generated {
+		if _, found := expected[unit]; !found {
+			t.Errorf("the generator produced %s, which the deployment would not own", unit)
+		}
+	}
+}
+
+func TestPodMembersBindToTheirPod(t *testing.T) {
+	files := render(t)
+	generated := generate(t, files)
+	member := regexp.MustCompile(`(?m)^Pod=([^\r\n]+)`)
+
+	for name, content := range files {
+		matches := member.FindStringSubmatch(content)
+		if !strings.HasSuffix(name, ".container") || len(matches) == 0 {
 			continue
 		}
-		matches := regexp.MustCompile(`(?m)^Pod=([^\r\n]+)`).FindStringSubmatch(content)
-		if len(matches) == 0 {
-			continue
-		}
+
 		pod := strings.TrimSuffix(matches[1], ".pod") + "-pod.service"
-		member := strings.TrimSuffix(filepath.Base(name), ".container") + ".service"
-		if !slices.Contains(config.Groups[pod].Units, member) {
-			t.Errorf("%s is missing from pod restart group %s", member, pod)
+		if _, found := generated[pod]; !found {
+			t.Errorf("%s joins %s, which is not declared", name, matches[1])
+
+			continue
+		}
+
+		// The restart group exists because systemd couples the two; if that
+		// coupling ever disappears, grouping them is no longer justified.
+		unit := unitName(name)
+		if !strings.Contains(generated[unit], pod) {
+			t.Errorf("%s no longer references %s, so the pod restart group is unfounded", unit, pod)
+		}
+	}
+}
+
+func TestNativeUnitsAreSelfContained(t *testing.T) {
+	files := render(t)
+
+	for name := range files {
+		if !strings.HasPrefix(name, "systemd/user/") || !strings.HasSuffix(name, ".timer") {
+			continue
+		}
+
+		service := strings.TrimSuffix(name, ".timer") + ".service"
+		if _, found := files[service]; !found {
+			t.Errorf("%s has no %s to start", name, filepath.Base(service))
+		}
+	}
+
+	owned := []string{".service", ".timer", ".socket", ".conf"}
+	for name := range files {
+		if !strings.HasPrefix(name, "systemd/user/") {
+			continue
+		}
+		if !slices.Contains(owned, filepath.Ext(name)) {
+			t.Errorf("%s is not a unit the deployment can own", name)
 		}
 	}
 }

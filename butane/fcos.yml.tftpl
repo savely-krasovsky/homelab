@@ -243,18 +243,6 @@ storage:
           driver = "overlay"
           rootless_storage_path = "/var/mnt/docker/$USER"
 
-    # Configs block
-%{ for name, content in config_files ~}
-    - path: /var/home/core/.config/${name}
-      contents:
-        inline: |
-          ${indent(10, content)}
-      user:
-        name: core
-      group:
-        name: core
-%{ endfor ~}
-
     # Enable linger so containers can continue to run even after core user logouts
     - path: /var/lib/systemd/linger/core
 
@@ -451,17 +439,18 @@ systemd:
       contents: |
         [Unit]
         Description=Attach iSCSI disk
-        ConditionFirstBoot=yes
         Wants=network-online.target
         After=network-online.target iscsi.service
+        Before=var-mnt-docker.mount
 
         [Service]
         Type=oneshot
         RemainAfterExit=yes
-        ExecStart=/usr/sbin/iscsiadm -m discovery -t sendtargets -p ${truenas_ip}
-        ExecStart=/usr/sbin/iscsiadm -m node -T ${truenas_iqn} -p ${truenas_ip} --login
-        ExecStart=/usr/bin/udevadm settle
-        ExecStart=/usr/sbin/lvmdevices --adddev /dev/disk/by-path/ip-${truenas_ip}:3260-iscsi-${truenas_iqn}-lun-0
+        ExecStart=-/usr/sbin/iscsiadm -m discovery -t sendtargets -p ${truenas_ip}
+        ExecStart=-/usr/sbin/iscsiadm -m node -T ${truenas_iqn} -p ${truenas_ip} --login
+        # iscsiadm returns before udev has queued the new device, so settle can pass on an empty queue.
+        ExecStart=/usr/bin/udevadm wait --timeout=120 /dev/disk/by-path/ip-${truenas_ip}:3260-iscsi-${truenas_iqn}-lun-0
+        ExecStart=-/usr/sbin/lvmdevices --adddev /dev/disk/by-path/ip-${truenas_ip}:3260-iscsi-${truenas_iqn}-lun-0
         ExecStart=/usr/sbin/vgchange -ay
 
         [Install]

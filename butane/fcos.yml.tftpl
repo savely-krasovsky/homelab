@@ -460,7 +460,8 @@ systemd:
         RemainAfterExit=yes
         ExecStart=/usr/sbin/iscsiadm -m discovery -t sendtargets -p ${truenas_ip}
         ExecStart=/usr/sbin/iscsiadm -m node -T ${truenas_iqn} -p ${truenas_ip} --login
-        ExecStart=/usr/sbin/lvmdevices --adddev /dev/sda
+        ExecStart=/usr/bin/udevadm settle
+        ExecStart=/usr/sbin/lvmdevices --adddev /dev/disk/by-path/ip-${truenas_ip}:3260-iscsi-${truenas_iqn}-lun-0
         ExecStart=/usr/sbin/vgchange -ay
 
         [Install]

@@ -4,12 +4,12 @@ terraform {
   required_providers {
     proxmox = {
       source  = "bpg/proxmox"
-      version = "0.112.0"
+      version = "0.113.1"
     }
     bitwarden = {
       source = "maxlaverse/bitwarden"
       # Ephemeral secrets currently require the local .terraformrc override.
-      version = "0.16.0"
+      version = "0.18.0"
     }
     ct = {
       source  = "poseidon/ct"
@@ -17,7 +17,7 @@ terraform {
     }
     null = {
       source  = "hashicorp/null"
-      version = "3.3.1"
+      version = "3.3.2"
     }
     homelab = {
       source  = "registry.terraform.io/savely-krasovsky/homelab-helpers"

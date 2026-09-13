@@ -85,6 +85,13 @@
         "docker.io/collabora/code"
       ],
       "dependencyDashboardApproval": true
+    },
+    {
+      "description": "qBittorrent also ships libtorrent 2.x builds as 5.2.3-lt2-1. Semver ranks that suffix above 5.2.3-1, so Renovate would read a different build line as an upgrade.",
+      "matchPackageNames": [
+        "docker.io/qbittorrentofficial/qbittorrent-nox"
+      ],
+      "allowedVersions": "!/lt2/"
     }
   ]
 }

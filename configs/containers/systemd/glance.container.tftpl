@@ -4,8 +4,7 @@ Requires=podman.socket
 After=podman.socket
 
 [Container]
-Image=docker.io/glanceapp/glance
-AutoUpdate=registry
+Image=docker.io/glanceapp/glance:v0.8.6
 ContainerName=glance
 
 User=1000:1000

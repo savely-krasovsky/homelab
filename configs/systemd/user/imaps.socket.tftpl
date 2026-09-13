@@ -1,0 +1,7 @@
+[Socket]
+ListenStream=${fcos_ip}:993
+FileDescriptorName=imaps
+Service=traefik.service
+
+[Install]
+WantedBy=sockets.target

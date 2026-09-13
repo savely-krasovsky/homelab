@@ -96,36 +96,6 @@ storage:
         name: core
 
     # Enable http and https sockets for traefik
-    - path: /var/home/core/.config/systemd/user/timers.target.wants/http.socket
-      target: /var/home/core/.config/systemd/user/http.socket
-      user:
-        name: core
-      group:
-        name: core
-    - path: /var/home/core/.config/systemd/user/timers.target.wants/https.socket
-      target: /var/home/core/.config/systemd/user/https.socket
-      user:
-        name: core
-      group:
-        name: core
-    - path: /var/home/core/.config/systemd/user/timers.target.wants/imaps.socket
-      target: /var/home/core/.config/systemd/user/imaps.socket
-      user:
-        name: core
-      group:
-        name: core
-    - path: /var/home/core/.config/systemd/user/timers.target.wants/smtps.socket
-      target: /var/home/core/.config/systemd/user/smtps.socket
-      user:
-        name: core
-      group:
-        name: core
-    - path: /var/home/core/.config/systemd/user/timers.target.wants/ldaps.socket
-      target: /var/home/core/.config/systemd/user/ldaps.socket
-      user:
-        name: core
-      group:
-        name: core
 
     # Enable Podman auto updates
     - path: /var/home/core/.config/systemd/user/timers.target.wants/podman-auto-update.timer
@@ -136,12 +106,6 @@ storage:
         name: core
 
     # Refresh oneshot OpenCloud extensions
-    - path: /var/home/core/.config/systemd/user/timers.target.wants/opencloud-extensions-update.timer
-      target: /var/home/core/.config/systemd/user/opencloud-extensions-update.timer
-      user:
-        name: core
-      group:
-        name: core
 
     # Hometown timezone
     - path: /etc/localtime
@@ -165,77 +129,6 @@ storage:
 
   files:
     # sockets for traefik
-    - path: /var/home/core/.config/systemd/user/http.socket
-      contents:
-        inline: |
-          [Socket]
-          ListenStream=${ip}:80
-          FileDescriptorName=web
-          Service=traefik.service
-
-          [Install]
-          WantedBy=sockets.target
-      user:
-        name: core
-      group:
-        name: core
-    - path: /var/home/core/.config/systemd/user/https.socket
-      contents:
-        inline: |
-          [Socket]
-          ListenStream=${ip}:443
-          ListenDatagram=${ip}:443
-          FileDescriptorName=websecure
-          Service=traefik.service
-
-          [Install]
-          WantedBy=sockets.target
-      user:
-        name: core
-      group:
-        name: core
-    - path: /var/home/core/.config/systemd/user/imaps.socket
-      contents:
-        inline: |
-          [Socket]
-          ListenStream=${ip}:993
-          FileDescriptorName=imaps
-          Service=traefik.service
-
-          [Install]
-          WantedBy=sockets.target
-      user:
-        name: core
-      group:
-        name: core
-    - path: /var/home/core/.config/systemd/user/smtps.socket
-      contents:
-        inline: |
-          [Socket]
-          ListenStream=${ip}:465
-          FileDescriptorName=smtps
-          Service=traefik.service
-
-          [Install]
-          WantedBy=sockets.target
-      user:
-        name: core
-      group:
-        name: core
-    - path: /var/home/core/.config/systemd/user/ldaps.socket
-      contents:
-        inline: |
-          [Socket]
-          ListenStream=${ip}:636
-          FileDescriptorName=ldaps
-          Service=traefik.service
-
-          [Install]
-          WantedBy=sockets.target
-      user:
-        name: core
-      group:
-        name: core
 
     - path: /etc/containers/storage.conf
       contents:

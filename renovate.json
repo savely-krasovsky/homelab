@@ -92,6 +92,44 @@
         "docker.io/qbittorrentofficial/qbittorrent-nox"
       ],
       "allowedVersions": "!/lt2/"
+    },
+    {
+      "description": "Ignition verifies these tarballs by sha256 and Renovate cannot recompute it, so the hash has to be updated by hand in the same PR.",
+      "matchManagers": [
+        "custom.regex"
+      ],
+      "prBodyNotes": [
+        "Update the `sha256-` hash next to this URL in `butane/fcos.yml.tftpl` before merging.",
+        "`curl -sL <url> | sha256sum` gives the value; a stale hash fails ignition on the next rebuild, not on apply."
+      ]
+    }
+  ],
+  "customManagers": [
+    {
+      "description": "systemd_exporter tarball fetched by ignition; the version appears twice in the URL.",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^butane/fcos\\.yml\\.tftpl$/"
+      ],
+      "matchStrings": [
+        "https://github\\.com/(?<depName>prometheus\\-community/systemd_exporter)/releases/download/v(?<currentValue>[\\d.]+)/systemd_exporter-[\\d.]+\\.linux-amd64\\.tar\\.gz"
+      ],
+      "autoReplaceStringTemplate": "https://github.com/{{{depName}}}/releases/download/v{{{newValue}}}/systemd_exporter-{{{newValue}}}.linux-amd64.tar.gz",
+      "datasourceTemplate": "github-releases",
+      "extractVersionTemplate": "^v?(?<version>.+)$"
+    },
+    {
+      "description": "node_exporter tarball fetched by ignition; the version appears twice in the URL.",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^butane/fcos\\.yml\\.tftpl$/"
+      ],
+      "matchStrings": [
+        "https://github\\.com/(?<depName>prometheus/node_exporter)/releases/download/v(?<currentValue>[\\d.]+)/node_exporter-[\\d.]+\\.linux-amd64\\.tar\\.gz"
+      ],
+      "autoReplaceStringTemplate": "https://github.com/{{{depName}}}/releases/download/v{{{newValue}}}/node_exporter-{{{newValue}}}.linux-amd64.tar.gz",
+      "datasourceTemplate": "github-releases",
+      "extractVersionTemplate": "^v?(?<version>.+)$"
     }
   ]
 }

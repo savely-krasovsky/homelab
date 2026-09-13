@@ -1,0 +1,7 @@
+[Socket]
+ListenStream=${fcos_ip}:636
+FileDescriptorName=ldaps
+Service=traefik.service
+
+[Install]
+WantedBy=sockets.target

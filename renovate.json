@@ -1,0 +1,80 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended"
+  ],
+  "timezone": "Europe/Belgrade",
+  "schedule": [
+    "after 2am and before 7am on monday"
+  ],
+  "prHourlyLimit": 0,
+  "prConcurrentLimit": 10,
+  "quadlet": {
+    "managerFilePatterns": [
+      "/.+\\.container$/",
+      "/.+\\.container\\.tftpl$/",
+      "/.+\\.image$/",
+      "/.+\\.volume$/"
+    ]
+  },
+  "packageRules": [
+    {
+      "description": "Rolling tags with no upstream releases: track by digest instead.",
+      "matchManagers": [
+        "quadlet"
+      ],
+      "matchPackageNames": [
+        "gcr.io/zenika-hub/alpine-chrome",
+        "ghcr.io/open-webui/pipelines",
+        "ghcr.io/savely-krasovsky/forward-info-bot",
+        "ghcr.io/savely-krasovsky/masked-email-bot"
+      ],
+      "pinDigests": true,
+      "groupName": "rolling container digests"
+    },
+    {
+      "description": "Batch routine container bumps into one reviewable PR.",
+      "matchManagers": [
+        "quadlet"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
+      "groupName": "container images (minor & patch)"
+    },
+    {
+      "description": "Majors get their own PR — they need release notes read.",
+      "matchManagers": [
+        "quadlet"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "groupName": null
+    },
+    {
+      "description": "Databases never move on their own.",
+      "matchManagers": [
+        "quadlet"
+      ],
+      "matchPackageNames": [
+        "/postgres/",
+        "/valkey/",
+        "/redis/",
+        "/meilisearch/"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "dependencyDashboardApproval": true
+    },
+    {
+      "description": "OpenTofu providers from main.tf.",
+      "matchManagers": [
+        "terraform"
+      ],
+      "groupName": "opentofu providers"
+    }
+  ]
+}

@@ -85,9 +85,6 @@ storage:
     - path: /var/mnt/snapshots/backblaze
     - path: /var/mnt/snapshots/storj
 
-    # Vector systemd additional configuration dir
-    - path: /etc/systemd/system/vector.service.d
-
   links:
     # Enable Podman socket for Traefik
     - path: /var/home/core/.config/systemd/user/timers.target.wants/podman.socket
@@ -326,18 +323,6 @@ storage:
         inline: |
           ${indent(10, firewall_config)}
 
-    # download vector
-    - path: /var/tmp/vector.rpm
-      contents:
-        source: https://github.com/vectordotdev/vector/releases/download/v0.53.0/vector-0.53.0-1.x86_64.rpm
-        verification:
-          hash: sha256-92beb3a08ad848667b78281454326363e9ad72e6ef58228bea265fa099d6ec6f
-    - path: /etc/systemd/system/vector.service.d/override.conf
-      contents:
-        inline: |
-          [Service]
-          StateDirectory=vector
-
     # download systemd_exporter and create systemd user service
     - path: /var/home/core/.local/bin/systemd_exporter.tar.gz
       contents:
@@ -414,7 +399,7 @@ systemd:
         [Service]
         Type=oneshot
         RemainAfterExit=yes
-        ExecStart=/usr/bin/rpm-ostree install --allow-inactive --assumeyes --reboot qemu-guest-agent restic btop nvtop /var/tmp/vector.rpm
+        ExecStart=/usr/bin/rpm-ostree install --allow-inactive --assumeyes --reboot qemu-guest-agent restic btop nvtop
         ExecStart=/bin/touch /var/lib/%N.stamp
 
         [Install]
@@ -617,9 +602,6 @@ systemd:
 
         [Install]
         WantedBy=timers.target
-
-    - name: vector.service
-      enabled: true
 
 kernel_arguments:
   should_exist:

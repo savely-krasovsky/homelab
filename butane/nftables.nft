@@ -53,9 +53,6 @@ table inet filter {
 		udp dport { 32410, 32412, 32413, 32414 } accept
 		tcp dport 32469 accept
 
-		# allow minecraft bds
-		udp dport 19132 accept
-
 		# allow Prusa printers to report metrics
 		udp dport 8514 accept
 

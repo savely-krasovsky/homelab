@@ -24,70 +24,15 @@ loki.source.docker "podman" {
   host          = "unix:///var/run/docker.sock"
   targets       = discovery.docker.fcos.targets
   labels        = { "source_name" = "podman" }
-  forward_to    = [loki.process.copy_msg.receiver]
+  forward_to    = [loki.write.victoria_logs.receiver]
   relabel_rules = discovery.relabel.docker.rules
-}
-
-loki.process "copy_msg" {
-  forward_to = [loki.write.victoria_logs.receiver]
-
-  // Some services require to manually remap message field to _msg.
-  stage.match {
-    selector = "{_msg=\"\"}"
-
-    stage.match {
-      selector = "{container_name=\"/matrix-synapse\"}"
-
-      stage.json {
-        expressions = { "log" = "" }
-      }
-
-      stage.labels {
-        values = { "_msg" = "log" }
-      }
-    }
-
-    stage.match {
-      selector = "{container_name=\"/grafana\"}"
-
-      stage.json {
-        expressions = { "msg" = "" }
-      }
-
-      stage.labels {
-        values = { "_msg" = "msg" }
-      }
-    }
-
-    stage.match {
-      selector = "{container_name=\"/grafana-alloy\"}"
-
-      stage.json {
-        expressions = { "msg" = "" }
-      }
-
-      stage.labels {
-        values = { "_msg" = "msg" }
-      }
-    }
-
-    stage.match {
-      selector = "{container_name=\"/bluesky-pds\"}"
-
-      stage.json {
-        expressions = { "msg" = "" }
-      }
-
-      stage.labels {
-        values = { "_msg" = "msg" }
-      }
-    }
-  }
 }
 
 loki.write "victoria_logs" {
   endpoint {
-    url = "http://victoria:9428/insert/loki/api/v1/push?_stream_fields=source_name,container_name"
+    // Services name their message field differently; VictoriaLogs picks the first one present.
+    // Traefik logs some errors with no message field at all, hence the trailing error.
+    url = "http://victoria:9428/insert/loki/api/v1/push?_stream_fields=source_name,container_name&_msg_field=_msg,msg,message,log,fields.message,error"
   }
 }
 

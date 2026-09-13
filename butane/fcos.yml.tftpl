@@ -384,6 +384,44 @@ storage:
           [Service]
           Environment=LOGGING="--log-level=warn"
 
+    # Paths restic must not upload. The wildcard covers both snapshot mount
+    # points (/mnt/snapshots/backblaze and /mnt/snapshots/storj).
+    - path: /etc/restic/excludes.txt
+      overwrite: true
+      mode: 0644
+      contents:
+        inline: |
+          # Caches and indexes that the application rebuilds on its own
+          /mnt/snapshots/*/app_data/alloy
+          /mnt/snapshots/*/app_data/crowdsec/data
+          /mnt/snapshots/*/app_data/crowdsec/staging
+          /mnt/snapshots/*/app_data/grafana/data/plugins
+          /mnt/snapshots/*/app_data/hister/llamacpp
+          /mnt/snapshots/*/app_data/karakeep/meilisearch
+          /mnt/snapshots/*/app_data/open-webui/cache
+          /mnt/snapshots/*/app_data/traefik/plugins
+
+          # Media Synapse re-fetches from the originating homeserver
+          /mnt/snapshots/*/app_data/matrix/synapse/media_store/remote_content
+          /mnt/snapshots/*/app_data/matrix/synapse/media_store/remote_thumbnail
+          /mnt/snapshots/*/app_data/matrix/synapse/media_store/local_thumbnails
+
+          # Plex rebuilds everything here from the library on disk
+          /mnt/snapshots/*/app_data/plex/Library/Application Support/Plex Media Server/Cache
+          /mnt/snapshots/*/app_data/plex/Library/Application Support/Plex Media Server/Codecs
+          /mnt/snapshots/*/app_data/plex/Library/Application Support/Plex Media Server/Crash Reports
+          /mnt/snapshots/*/app_data/plex/Library/Application Support/Plex Media Server/Drivers
+          /mnt/snapshots/*/app_data/plex/Library/Application Support/Plex Media Server/Logs
+          /mnt/snapshots/*/app_data/plex/Library/Application Support/Plex Media Server/Media
+          /mnt/snapshots/*/app_data/plex/Library/Application Support/Plex Media Server/Metadata
+          /mnt/snapshots/*/app_data/plex/Library/Application Support/Plex Media Server/Scanners
+
+          # Volatile stores: sessions and queues, worthless once restored
+          /mnt/snapshots/*/app_data/*/valkey
+          /mnt/snapshots/*/app_data/immich/redis
+          /mnt/snapshots/*/app_data/rmqtt/logs
+          /mnt/snapshots/*/app_data/*/*.log
+
 systemd:
   units:
     - name: install-additional-software.service
@@ -541,9 +579,9 @@ systemd:
         Environment=RESTIC_PASSWORD_FILE=%d/restic-password
         # Create LVM snapshot and do backup
         ExecStart=/bin/bash -c "lvremove -y vg0/restic-backblaze || true"
-        ExecStart=/usr/sbin/lvcreate --size 5G --snapshot --name restic-backblaze vg0/lv0
+        ExecStart=/usr/sbin/lvcreate --size 15G --snapshot --name restic-backblaze vg0/lv0
         ExecStart=/usr/bin/mount -o nouuid /dev/vg0/restic-backblaze /mnt/snapshots/backblaze
-        ExecStart=/bin/bash -c "export B2_ACCOUNT_ID=$(cat $CREDENTIALS_DIRECTORY/restic-b2-account-id); export B2_ACCOUNT_KEY=$(cat $CREDENTIALS_DIRECTORY/restic-b2-account-key); restic -r b2:krasovsky-homelab:app-data --verbose backup /mnt/snapshots/backblaze/app_data"
+        ExecStart=/bin/bash -c "export B2_ACCOUNT_ID=$(cat $CREDENTIALS_DIRECTORY/restic-b2-account-id); export B2_ACCOUNT_KEY=$(cat $CREDENTIALS_DIRECTORY/restic-b2-account-key); restic -r b2:krasovsky-homelab:app-data --verbose --exclude-file=/etc/restic/excludes.txt backup /mnt/snapshots/backblaze/app_data"
         ExecStart=/bin/bash -c "umount /mnt/snapshots/backblaze || true"
         ExecStart=/usr/sbin/lvremove -y vg0/restic-backblaze
 
@@ -580,9 +618,9 @@ systemd:
         Environment=RESTIC_PASSWORD_FILE=%d/restic-password
         # Create LVM snapshot and do backup
         ExecStart=/bin/bash -c "lvremove -y vg0/restic-storj || true"
-        ExecStart=/usr/sbin/lvcreate --size 5G --snapshot --name restic-storj vg0/lv0
+        ExecStart=/usr/sbin/lvcreate --size 15G --snapshot --name restic-storj vg0/lv0
         ExecStart=/usr/bin/mount -o nouuid /dev/vg0/restic-storj /mnt/snapshots/storj
-        ExecStart=/bin/bash -c "export AWS_ACCESS_KEY_ID=$(cat $CREDENTIALS_DIRECTORY/restic-aws-access-key-id); export AWS_SECRET_ACCESS_KEY=$(cat $CREDENTIALS_DIRECTORY/restic-aws-secret-access-key); restic -r s3:https://gateway.eu1.storjshare.io/homelab-backup/app-data --verbose backup /mnt/snapshots/storj/app_data"
+        ExecStart=/bin/bash -c "export AWS_ACCESS_KEY_ID=$(cat $CREDENTIALS_DIRECTORY/restic-aws-access-key-id); export AWS_SECRET_ACCESS_KEY=$(cat $CREDENTIALS_DIRECTORY/restic-aws-secret-access-key); restic -r s3:https://gateway.eu1.storjshare.io/homelab-backup/app-data --verbose --exclude-file=/etc/restic/excludes.txt backup /mnt/snapshots/storj/app_data"
         ExecStart=/bin/bash -c "umount /mnt/snapshots/storj || true"
         ExecStart=/usr/sbin/lvremove -y vg0/restic-storj
 
@@ -599,6 +637,72 @@ systemd:
         OnCalendar=daily
         RandomizedDelaySec=3600
         Unit=restic-storj.service
+
+        [Install]
+        WantedBy=timers.target
+
+    - name: restic-backblaze-prune.service
+      contents: |
+        [Unit]
+        Description=Apply retention policy to the Backblaze repository
+        Wants=network-online.target
+        After=network-online.target restic-backblaze.service
+
+        [Service]
+        Type=oneshot
+        LoadCredential=restic-b2-account-id
+        LoadCredential=restic-b2-account-key
+        LoadCredential=restic-password
+        Environment=RESTIC_CACHE_DIR=/var/cache/restic
+        Environment=RESTIC_PASSWORD_FILE=%d/restic-password
+        ExecStart=/bin/bash -c "export B2_ACCOUNT_ID=$(cat $CREDENTIALS_DIRECTORY/restic-b2-account-id); export B2_ACCOUNT_KEY=$(cat $CREDENTIALS_DIRECTORY/restic-b2-account-key); restic -r b2:krasovsky-homelab:app-data --verbose forget --keep-daily 14 --keep-weekly 8 --keep-monthly 12 --prune"
+
+        [Install]
+        WantedBy=multi-user.target
+
+    - name: restic-backblaze-prune.timer
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Weekly retention pass on Backblaze
+
+        [Timer]
+        OnCalendar=Sun *-*-* 03:00:00
+        RandomizedDelaySec=900
+        Unit=restic-backblaze-prune.service
+
+        [Install]
+        WantedBy=timers.target
+
+    - name: restic-storj-prune.service
+      contents: |
+        [Unit]
+        Description=Apply retention policy to the Storj repository
+        Wants=network-online.target
+        After=network-online.target restic-storj.service
+
+        [Service]
+        Type=oneshot
+        LoadCredential=restic-aws-access-key-id
+        LoadCredential=restic-aws-secret-access-key
+        LoadCredential=restic-password
+        Environment=RESTIC_CACHE_DIR=/var/cache/restic
+        Environment=RESTIC_PASSWORD_FILE=%d/restic-password
+        ExecStart=/bin/bash -c "export AWS_ACCESS_KEY_ID=$(cat $CREDENTIALS_DIRECTORY/restic-aws-access-key-id); export AWS_SECRET_ACCESS_KEY=$(cat $CREDENTIALS_DIRECTORY/restic-aws-secret-access-key); restic -r s3:https://gateway.eu1.storjshare.io/homelab-backup/app-data --verbose forget --keep-daily 14 --keep-weekly 8 --keep-monthly 12 --prune"
+
+        [Install]
+        WantedBy=multi-user.target
+
+    - name: restic-storj-prune.timer
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Weekly retention pass on Storj
+
+        [Timer]
+        OnCalendar=Sun *-*-* 05:00:00
+        RandomizedDelaySec=900
+        Unit=restic-storj-prune.service
 
         [Install]
         WantedBy=timers.target

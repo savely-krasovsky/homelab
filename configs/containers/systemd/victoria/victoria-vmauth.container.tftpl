@@ -29,7 +29,7 @@ Label="traefik.http.routers.vm-api.priority=2"
 Label="alloy.metrics.enable=true"
 Label="alloy.metrics.port=8427"
 
-Exec="--auth.config=/etc/auth.yml"
+Exec=--loggerFormat=json "--auth.config=/etc/auth.yml"
 
 Volume=%E/vmauth/auth.yml:/etc/auth.yml:Z
 

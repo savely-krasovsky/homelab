@@ -84,6 +84,7 @@ metrics:
 
 log:
   level: INFO
+  format: json
   otlp:
     grpc:
       endpoint: grafana-alloy:4317

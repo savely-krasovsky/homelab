@@ -19,7 +19,9 @@ Configuration and deployment scripts for my personal homelab.
 - Native network performance due to the reason above.
 - Podman and application data are stored on a dedicated iSCSI-backed LVM disk.
 - Media, personal files, and observability data are stored on NFS shares.
-- Daily restic backups are done from LVM snapshots to Backblaze B2 and Storj.
+- Daily restic backups are done from LVM snapshots to Backblaze B2 and Storj,
+  skipping the paths listed in `/etc/restic/excludes.txt` and pruned weekly
+  down to 14 daily, 8 weekly and 12 monthly snapshots.
 - Uses per-stack Podman networks plus a shared reverse-proxy network.
 - Container-to-container traffic stays on-host inside Podman networks,
   while shared domain names are still used via Traefik `NetworkAlias`.

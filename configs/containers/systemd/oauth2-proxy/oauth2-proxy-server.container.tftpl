@@ -28,6 +28,12 @@ Environment=OAUTH2_PROXY_SESSION_STORE_TYPE=redis
 Environment=OAUTH2_PROXY_REDIS_CONNECTION_URL=redis://oauth2-proxy-valkey
 Environment=OAUTH2_PROXY_SKIP_JWT_BEARER_TOKENS=true
 Environment=OAUTH2_PROXY_EXTRA_JWT_ISSUERS=https://id.${base_domain}=6ab0d4e0-db54-4404-ad25-003aa4c9d208
+# oauth2-proxy has no JSON logger, only Go templates. RequestURI and UserAgent
+# arrive already quoted; the rest go through printf %q, whose percent is doubled
+# so that systemd specifier expansion leaves it alone.
+Environment='OAUTH2_PROXY_STANDARD_LOGGING_FORMAT={"level":"info","logger":"standard","ts":{{ printf "%%q" .Timestamp }},"file":{{ printf "%%q" .File }},"msg":{{ printf "%%q" .Message }}}'
+Environment='OAUTH2_PROXY_AUTH_LOGGING_FORMAT={"level":"info","logger":"auth","ts":{{ printf "%%q" .Timestamp }},"client":{{ printf "%%q" .Client }},"request_id":{{ printf "%%q" .RequestID }},"username":{{ printf "%%q" .Username }},"status":{{ printf "%%q" .Status }},"msg":{{ printf "%%q" .Message }}}'
+Environment='OAUTH2_PROXY_REQUEST_LOGGING_FORMAT={"level":"info","logger":"request","ts":{{ printf "%%q" .Timestamp }},"client":{{ printf "%%q" .Client }},"request_id":{{ printf "%%q" .RequestID }},"username":{{ printf "%%q" .Username }},"host":{{ printf "%%q" .Host }},"method":{{ printf "%%q" .RequestMethod }},"uri":{{ .RequestURI }},"protocol":{{ printf "%%q" .Protocol }},"user_agent":{{ .UserAgent }},"upstream":{{ printf "%%q" .Upstream }},"status":{{ .StatusCode }},"response_size":{{ .ResponseSize }},"duration":{{ .RequestDuration }},"msg":"request completed"}'
 Secret=oauth2-proxy-cookie-secret,type=env,target=OAUTH2_PROXY_COOKIE_SECRET
 Secret=oauth2-proxy-client-secret,type=env,target=OAUTH2_PROXY_CLIENT_SECRET
 

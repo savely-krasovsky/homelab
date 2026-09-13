@@ -40,8 +40,7 @@ ephemeral "bitwarden_secrets" "containers" {
 }
 
 provider "proxmox" {
-  endpoint = "https://${var.proxmox_config.host}:8006"
-  insecure = true
+  endpoint = "https://pve.${var.containers_config.base_domain}:8006"
 
   // Unfortunately Proxmox can execute a lot of actions only under root user...
   username = "root@pam"

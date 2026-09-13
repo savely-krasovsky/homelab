@@ -105,6 +105,12 @@ etc.).
 You can adapt it, but copying it as-is is not realistic.
 I see this repository more as a template for your own setup.
 
+Applying also needs a patched Bitwarden provider: the released `maxlaverse/bitwarden` 0.18.0 has no
+ephemeral resources at all, so both `ephemeral "bitwarden_secret"` and `ephemeral "bitwarden_secrets"`
+come from [my fork](https://github.com/savely-krasovsky/terraform-provider-bitwarden) — `v0.18.0` plus
+commits `aa47a52` and `042ae61`, upstream as [PR #406](https://github.com/maxlaverse/terraform-provider-bitwarden/pull/406).
+Build it with `go build -o bin/ .` and point `.terraformrc` at that `bin/` directory.
+
 ## Future plans
 
 - [x] Move Traefik, Grafana Alloy and other configs to the repository.

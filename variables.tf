@@ -10,7 +10,15 @@ variable "proxmox_config" {
   type = object({
     host               = string
     password_secret_id = string
+
+    acme_cf_token_secret_id = optional(string, "85834ead-fb0c-4774-b748-b4c400e98a41")
   })
+}
+
+variable "proxmox_acme_token_revision" {
+  description = "Bump after rotating the Cloudflare token without changing its Bitwarden ID."
+  type        = number
+  default     = 1
 }
 
 variable "containers_config" {

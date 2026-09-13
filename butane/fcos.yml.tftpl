@@ -569,13 +569,14 @@ systemd:
         Description=Backup Docker data to Backblaze
         Wants=network-online.target
         After=network-online.target iscsi.service
+        RequiresMountsFor=/var/mnt/docker
 
         [Service]
         Type=oneshot
         LoadCredential=restic-b2-account-id
         LoadCredential=restic-b2-account-key
         LoadCredential=restic-password
-        Environment=RESTIC_CACHE_DIR=/var/cache/restic
+        Environment=RESTIC_CACHE_DIR=/var/mnt/docker/restic-cache
         Environment=RESTIC_PASSWORD_FILE=%d/restic-password
         # Create LVM snapshot and do backup
         ExecStart=/bin/bash -c "lvremove -y vg0/restic-backblaze || true"
@@ -608,13 +609,14 @@ systemd:
         Description=Backup Docker data to Storj
         Wants=network-online.target
         After=network-online.target iscsi.service
+        RequiresMountsFor=/var/mnt/docker
 
         [Service]
         Type=oneshot
         LoadCredential=restic-aws-access-key-id
         LoadCredential=restic-aws-secret-access-key
         LoadCredential=restic-password
-        Environment=RESTIC_CACHE_DIR=/var/cache/restic
+        Environment=RESTIC_CACHE_DIR=/var/mnt/docker/restic-cache
         Environment=RESTIC_PASSWORD_FILE=%d/restic-password
         # Create LVM snapshot and do backup
         ExecStart=/bin/bash -c "lvremove -y vg0/restic-storj || true"
@@ -647,13 +649,14 @@ systemd:
         Description=Apply retention policy to the Backblaze repository
         Wants=network-online.target
         After=network-online.target restic-backblaze.service
+        RequiresMountsFor=/var/mnt/docker
 
         [Service]
         Type=oneshot
         LoadCredential=restic-b2-account-id
         LoadCredential=restic-b2-account-key
         LoadCredential=restic-password
-        Environment=RESTIC_CACHE_DIR=/var/cache/restic
+        Environment=RESTIC_CACHE_DIR=/var/mnt/docker/restic-cache
         Environment=RESTIC_PASSWORD_FILE=%d/restic-password
         ExecStart=/bin/bash -c "export B2_ACCOUNT_ID=$(cat $CREDENTIALS_DIRECTORY/restic-b2-account-id); export B2_ACCOUNT_KEY=$(cat $CREDENTIALS_DIRECTORY/restic-b2-account-key); restic -r b2:krasovsky-homelab:app-data --verbose forget --keep-daily 14 --keep-weekly 8 --keep-monthly 12 --prune"
 
@@ -680,13 +683,14 @@ systemd:
         Description=Apply retention policy to the Storj repository
         Wants=network-online.target
         After=network-online.target restic-storj.service
+        RequiresMountsFor=/var/mnt/docker
 
         [Service]
         Type=oneshot
         LoadCredential=restic-aws-access-key-id
         LoadCredential=restic-aws-secret-access-key
         LoadCredential=restic-password
-        Environment=RESTIC_CACHE_DIR=/var/cache/restic
+        Environment=RESTIC_CACHE_DIR=/var/mnt/docker/restic-cache
         Environment=RESTIC_PASSWORD_FILE=%d/restic-password
         ExecStart=/bin/bash -c "export AWS_ACCESS_KEY_ID=$(cat $CREDENTIALS_DIRECTORY/restic-aws-access-key-id); export AWS_SECRET_ACCESS_KEY=$(cat $CREDENTIALS_DIRECTORY/restic-aws-secret-access-key); restic -r s3:https://gateway.eu1.storjshare.io/homelab-backup/app-data --verbose forget --keep-daily 14 --keep-weekly 8 --keep-monthly 12 --prune"
 

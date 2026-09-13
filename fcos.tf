@@ -72,7 +72,7 @@ resource "proxmox_virtual_environment_vm" "fcos" {
   disk {
     interface    = "virtio0"
     datastore_id = "local-zfs"
-    file_id      = proxmox_virtual_environment_file.fcos_qcow2.id
+    file_id      = proxmox_download_file.fcos_qcow2.id
     size         = 32
   }
 

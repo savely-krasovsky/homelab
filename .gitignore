@@ -45,6 +45,3 @@ terraform.rc
 
 # Locally built deployment tools
 .build/
-
-# Fedora CoreOS image
-fedora-coreos.qcow2.img

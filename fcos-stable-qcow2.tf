@@ -1,24 +1,36 @@
-resource "null_resource" "fcos_qcow2" {
-  provisioner "local-exec" {
-    command = "mv $(docker run --security-opt label=disable --pull=always --rm -v .:/data -w /data quay.io/coreos/coreos-installer:release download -p qemu -f qcow2.xz -s stable -a x86_64 -d) fedora-coreos.qcow2.img"
-    interpreter = ["PowerShell", "-Command"]
-  }
+data "http" "fcos_stream" {
+  url = "https://builds.coreos.fedoraproject.org/streams/${var.fcos_config.stream}.json"
 
-  provisioner "local-exec" {
-    when    = destroy
-    command = "rm -f fedora-coreos.qcow2.img"
-    interpreter = ["PowerShell", "-Command"]
+  request_headers = {
+    Accept = "application/json"
   }
 }
 
-resource "proxmox_virtual_environment_file" "fcos_qcow2" {
-  content_type = "iso"
-  datastore_id = "local"
+locals {
+  fcos_qemu = jsondecode(data.http.fcos_stream.response_body).architectures.x86_64.artifacts.qemu
+  fcos_disk = local.fcos_qemu.formats["qcow2.xz"].disk
+}
+
+output "fcos_release" {
+  value = local.fcos_qemu.release
+}
+
+resource "proxmox_download_file" "fcos_qcow2" {
   node_name    = "pve"
+  datastore_id = "local"
+  content_type = "iso"
 
-  depends_on = [null_resource.fcos_qcow2]
+  url       = local.fcos_disk.location
+  file_name = "fedora-coreos-${var.fcos_config.stream}.img"
 
-  source_file {
-    path = "fedora-coreos.qcow2.img"
-  }
+  # PVE has no xz algorithm, but its `zst` path runs `zstd -q -d -c`, which
+  # reads xz too. The `.img` name passes validation that rejects `.xz`.
+  checksum                = local.fcos_disk.sha256
+  checksum_algorithm      = "sha256"
+  decompression_algorithm = "zst"
+
+  overwrite           = false
+  overwrite_unmanaged = true
+
+  upload_timeout = 1800
 }

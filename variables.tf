@@ -112,6 +112,7 @@ variable "fcos_config" {
   description = "Fedora CoreOS Configuration"
   type = object({
     hostname        = string
+    stream          = optional(string, "stable")
     ssh_keys        = list(string)
     deploy_ssh_keys = optional(list(string), [])
     root_ca         = string

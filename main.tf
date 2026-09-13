@@ -15,9 +15,9 @@ terraform {
       source  = "poseidon/ct"
       version = "0.14.0"
     }
-    null = {
-      source  = "hashicorp/null"
-      version = "3.3.2"
+    http = {
+      source  = "hashicorp/http"
+      version = "3.5.0"
     }
     homelab = {
       source  = "registry.terraform.io/savely-krasovsky/homelab-helpers"

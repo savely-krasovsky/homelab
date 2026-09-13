@@ -4,9 +4,6 @@
     "config:recommended"
   ],
   "timezone": "Europe/Belgrade",
-  "schedule": [
-    "after 2am and before 7am on monday"
-  ],
   "prHourlyLimit": 0,
   "prConcurrentLimit": 10,
   "quadlet": {
@@ -75,6 +72,13 @@
         "terraform"
       ],
       "groupName": "opentofu providers"
+    },
+    {
+      "description": "atcr.io is the ATProto container registry — Renovate has no datasource for it, so every run reports a lookup failure. Bump tangled by hand.",
+      "matchPackageNames": [
+        "atcr.io/tangled.org/knot"
+      ],
+      "enabled": false
     }
   ]
 }

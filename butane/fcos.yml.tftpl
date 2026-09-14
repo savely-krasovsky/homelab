@@ -224,7 +224,7 @@ storage:
           [Service]
           Type=simple
           WorkingDirectory=/var/home/core/.local/bin
-          ExecStartPre=/usr/bin/tar -xvf systemd_exporter.tar.gz systemd_exporter-0.7.0.linux-amd64/systemd_exporter --strip-components=1
+          ExecStartPre=/usr/bin/tar -xf systemd_exporter.tar.gz --strip-components=1 --wildcards '*/systemd_exporter'
           ExecStart=/var/home/core/.local/bin/systemd_exporter
 
           [Install]
@@ -253,7 +253,7 @@ storage:
           [Service]
           Type=simple
           WorkingDirectory=/var/home/core/.local/bin
-          ExecStartPre=/usr/bin/tar -xvf node_exporter.tar.gz node_exporter-1.10.2.linux-amd64/node_exporter --strip-components=1
+          ExecStartPre=/usr/bin/tar -xf node_exporter.tar.gz --strip-components=1 --wildcards '*/node_exporter'
           ExecStart=/var/home/core/.local/bin/node_exporter --collector.systemd --collector.processes
 
           [Install]

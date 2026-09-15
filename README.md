@@ -8,9 +8,7 @@ Configuration and deployment scripts for my personal homelab.
 - VM can be fully removed and re-provisioned in a few minutes, including container autostart.
 - Provisioning is done with OpenTofu/Terraform.
 - Configs are rendered from templates and deployed over SSH by my
-  [deployment provider](https://github.com/savely-krasovsky/terraform-provider-quadlet),
-  with computed unit ownership and deployment-wide activation in
-  [deployment.tf](deployment.tf).
+  [deployment provider](https://github.com/savely-krasovsky/terraform-provider-quadlet).
 - Image bumps arrive as Renovate PRs; `AutoUpdate=registry` is kept only on rolling tags,
   whose patch releases Renovate cannot see.
 - Secrets are provided using Bitwarden Secrets Manager.
@@ -96,23 +94,26 @@ I also have some observability:
 | VictoriaMetrics (`victoria-metrics`)                            | Metrics Storage                                   | ☑️  |
 | VictoriaTraces (`victoria-traces`)                              | Tracing Storage                                   | ☑️  |
 | vmauth (`victoria-vmauth`)                                      | Authorization module for VictoriaMetrics products | ☑️  |
-| Gatus                                                           | Uptime Monitoring[^2]                             |     |
+| Gatus                                                           | Uptime Monitoring[^gatus]                         |     |
 
-## Deployment policy
+## Deployment
 
-[deployment.tf](deployment.tf) renders the single [configs](configs) tree.
-The `applications` map declares 37 independent deployments. Each entry lists
-its source paths, units to restart, optional native units to enable, and secret
-names to watch. Paths are relative to the host's user configuration directory;
-a directory includes its contents and a unit includes its addressed drop-ins.
-Every source has an explicit owner, checked by the tests.
+[deployment.tf](deployment.tf) renders files from [configs](configs) and groups
+them into applications. Each application owns its configuration, containers,
+networks and volumes. The resources in [fcos.tf](fcos.tf) install its files and
+activate its units when the files, secret revisions or activation settings change.
 
-An application owns its containers, configuration, internal network and named
-volumes. For example, Miniflux owns both its server and PostgreSQL. MatrixRTC and
-the Element clients can be updated independently of the Matrix homeserver.
+The `applications` map defines each deployment:
+
+| Field | Purpose |
+| --- | --- |
+| `paths` | Files or directories under `configs`, including the selected units' drop-ins. |
+| `restart` | Services, pods or targets to start or restart. |
+| `try_restart` | Units to restart only when already active. |
+| `enable` | Native systemd units to enable at boot. Quadlets use their own `[Install]` section. |
+| `secrets` | Podman secrets whose rotation activates the deployment. List shared secrets for every consumer. |
 
 Related Quadlets live together under `configs/containers/systemd/<application>/`:
-containers, their pod, internal network and named volumes. For example:
 
 ```text
 configs/containers/systemd/miniflux/
@@ -122,106 +123,58 @@ configs/containers/systemd/miniflux/
 └── miniflux.network
 ```
 
-Standalone containers without supporting Quadlets stay directly in
-`configs/containers/systemd/`. The shared reverse-proxy network stays in
-`configs/containers/systemd/networks/`; native units stay in `configs/systemd/user/`.
-Source paths map directly to host paths, with only `.tftpl` removed.
+Standalone services stay directly in `configs/containers/systemd/`. Native user
+units live in `configs/systemd/user/`. Source paths map to paths under the host's
+`~/.config`, with `.tftpl` removed after rendering. Every deployed file and unit
+belongs to one application; the tests check ownership and isolation.
 
-| Application | Terraform resource | Activation |
-| --- | --- | --- |
-| Single-container applications, including Glance | `quadlet_deployment.applications["<name>"]` | Their service |
-| Applications contained in one pod | `quadlet_deployment.applications["<name>"]` | Their `<name>-pod.service` |
-| Traefik and its configuration and sockets | `quadlet_deployment.applications["traefik"]` | Restart sockets, then `try_restart` the service |
-| OpenCloud | `quadlet_deployment.applications["opencloud"]` | `opencloud.target` |
-| OAuth2 Proxy | `quadlet_deployment.applications["oauth2-proxy"]` | `oauth2-proxy-pod.service` |
-| Shared reverse-proxy network | `quadlet_deployment.reverse_proxy_network` | `reverse-proxy-network.service` |
+### Startup and updates
 
-All applications use the same resource block in [fcos.tf](fcos.tf).
-OpenCloud Collaboration waits for Collabora's health check and fetches discovery
-directly at `http://127.0.0.1:9980` inside their pod. Collabora's `server_name`
-and TLS termination settings keep the discovered browser URLs on its public
-HTTPS domain. OAuth2 Proxy waits for its own Valkey; if Pocket ID or Traefik is
-unavailable, the existing `Restart=always` and `RestartSec=10s` retry startup.
-Its deployment can complete before OIDC discovery succeeds and login is ready.
+Pod-based applications restart their `<name>-pod.service`. Containers join with
+`Pod=<name>.pod`, and the pod's `[Install] WantedBy=default.target` enables boot
+startup. Single-container applications restart their service and declare their
+own `[Install]` section. Networks and volumes start through unit dependencies.
 
-Changing an application's files, secret installation revisions or activation
-policy activates only that deployment. Shared secrets are listed for every
-consumer: rotating `miniflux-postgres-password` activates Miniflux and Grafana
-Alloy; rotating `vmauth-traefik-bearer-token` activates Victoria and Traefik.
-Traefik owns the shared routing configuration; Alloy owns its collector config.
-The provider discovers unit ownership from native files and generated Quadlets.
+The shared reverse-proxy network is installed before applications. Consumers use
+its Podman name, `systemd-reverse-proxy`, and declare `Requires=` and `After=` on
+`reverse-proxy-network.service`.
 
-The shared network declares its Podman name, `systemd-reverse-proxy`,
-with `NetworkName=`. Consumers use this actual name and
-declare `Requires=` and `After=` on `reverse-proxy-network.service`. Terraform
-installs the network deployment first.
+Traefik restarts its sockets and uses `try_restart` for its socket-activated
+service. OpenCloud uses a native target to manage its application and extension
+update timer together. Restart completion does not guarantee application
+readiness; containers can still be waiting for health checks or external services.
 
-Applications contained in one pod use the generated `<name>-pod.service` as
-their entry point. The `.pod` file declares `[Install] WantedBy=default.target`
-for autostart. Containers join it with `Pod=<name>.pod`; Quadlet's default
-`StartWithPod=true` generates the start, stop and restart dependencies.
-Networks and volumes are created through unit dependencies and remain in place
-when the pod restarts. A successful pod restart reports completion of the pod
-unit job; container readiness is tracked by each container's unit and health check.
+[Common container defaults](configs/containers/systemd/container.d/10-restart.conf)
+are copied into a drop-in for each container. Editing them activates every
+application with containers. Before startup, containers check the data mount and
+create their required application directories under `/var/mnt/docker/app_data`.
 
-OpenCloud uses a native target because it also manages an extension update
-timer outside the pod. Its target starts and stops both the application and
-the timer. Single containers declare their Quadlet boot links.
+To add an application, add its files under `configs`, declare its ownership and
+activation settings in `applications`, and configure its boot dependencies.
+Bump the matching `secret_versions` entries after rotating Bitwarden secrets.
 
-The [common container defaults](configs/containers/systemd/container.d/10-restart.conf) produce
-an addressed drop-in for every container, so no deployment owns a global
-`container.d`. This source file itself is excluded from deployment. Editing it
-updates each container's copy and activates the affected deployments.
+### Provisioning and checks
 
-Each container checks that `/var/mnt/docker` is mounted using `ExecStartPre`.
-Containers with bind mounts under `app_data` then check that the root directory
-exists and create only their required subdirectories with `mkdir -p -m 0755`.
-These commands live directly in the corresponding Quadlet's `[Service]` section,
-run as the container host user and preserve existing permissions. A failed mount
-check prevents directory creation and container startup.
+Provision a fresh host with fresh Terraform state. The Quadlet provider sets
+`insecure_skip_host_key_check = true` for this homelab, so fresh or reinstalled
+FCOS hosts do not require a `known_hosts` entry. SSH encrypts traffic and
+authenticates the client, but does not verify the server's identity.
 
-### Deployment and checks
-
-Provision a fresh host with fresh Terraform state. The provider stores ownership
-and activation status in one `deployment.json` record per application.
-
-The Quadlet provider sets `insecure_skip_host_key_check = true` for this homelab.
-Fresh or reinstalled FCOS hosts do not require a `known_hosts` entry. SSH still
-encrypts traffic and authenticates the client, but does not verify the server's
-identity. This allows server impersonation. Host private keys stay on FCOS.
-
-Repeated connections rejected before authentication can trigger OpenSSH's
-`PerSourcePenalties`; check the earlier SSH errors and `journalctl -u sshd`
-if an apply reports many `SSH handshake: connection reset by peer` errors.
-
-Run `go test ./...` from [tests](tests) to render the actual Terraform deployment
-locals with synthetic values, validate each deployment with the installed Quadlet
-generator, check the combined units with `systemd-analyze verify`, and check
-directory preparation and file/secret isolation. These checks do not contact the
-homelab or start containers.
-
-To add an application, add its files under `configs` and an entry in
-`applications`. Put a standalone service or the pod's generated service directly
-in `restart`, and declare its boot link in the Quadlet's `[Install]` section.
-The `enable` list is only for native units, such as Traefik's sockets or
-OpenCloud's target. Use a target when an application needs to manage additional
-units outside its pod, such as a timer.
+Run `go test ./...` from [tests](tests) to render the deployment configuration,
+validate it with the installed Quadlet generator and `systemd-analyze verify`,
+and check file ownership, secret isolation and directory preparation. The tests
+use synthetic values and do not contact the homelab or start containers.
 
 ### Restic secrets
 
-Restic uses the same `quadlet_podman_secret.containers` resources as applications:
-`restic-password`, `restic-b2-account-id`, `restic-b2-account-key`,
-`restic-aws-access-key-id` and `restic-aws-secret-access-key`.
-Ignition installs `/etc/restic/run` as root. The system services use this wrapper
-to read the selected backend's secrets as `core`, then execute restic as root for
-snapshot access. Values travel through pipes and the restic process environment;
-no secret value is embedded in the wrapper or unit files.
+The root backup and prune services use [the restic wrapper](butane/restic-with-secrets.sh)
+to read `restic-password`, `restic-b2-account-id`, `restic-b2-account-key`,
+`restic-aws-access-key-id` and `restic-aws-secret-access-key` from core's Podman
+secret store. These are installed by the same `quadlet_podman_secret.containers`
+resources as application secrets.
 
-Bump the matching `secret_versions` entries after a Bitwarden rotation. The next
-backup or prune invocation reads the installed values, so no service restart is
-needed. Backup units check that secrets can be read before creating a snapshot.
-A missing secret fails the job. This depends on core's Podman storage being
-available, already covered by the units' `/var/mnt/docker` mount requirement.
+The wrapper reads the values at each invocation, so rotation needs no service
+restart. Backup jobs check secret availability before creating an LVM snapshot.
 
 ## Caveats
 
@@ -231,25 +184,15 @@ etc.).
 You can adapt it, but copying it as-is is not realistic.
 I see this repository more as a template for your own setup.
 
-Applying also needs a patched Bitwarden provider: the released `maxlaverse/bitwarden` 0.18.0 has no
-ephemeral resources at all, so both `ephemeral "bitwarden_secret"` and `ephemeral "bitwarden_secrets"`
-come from [my fork](https://github.com/savely-krasovsky/terraform-provider-bitwarden) — `v0.18.0` plus
-commits `aa47a52` and `042ae61`, upstream as [PR #406](https://github.com/maxlaverse/terraform-provider-bitwarden/pull/406).
-Build it with `go build -o bin/ .` and point `.terraformrc` at that `bin/` directory.
-
-The SSH verification option also currently requires the local Quadlet provider
-build: `insecure_skip_host_key_check` is not in release `0.4.1`. Run `make build`
-in the provider repository and use its `bin/` directory in `.terraformrc`.
-Set `TF_CLI_CONFIG_FILE="$PWD/.terraformrc"` when running OpenTofu from this
-repository so both development overrides are loaded.
+Ephemeral secrets require [my Bitwarden provider fork](https://github.com/savely-krasovsky/terraform-provider-bitwarden).
+Build it with `go build -o bin/ .` and configure a development override in
+`.terraformrc` pointing to that `bin/` directory. Set
+`TF_CLI_CONFIG_FILE="$PWD/.terraformrc"` when running OpenTofu from this repository.
 
 ## Future plans
 
-- [x] Move Traefik, Grafana Alloy and other configs to the repository.
-- [ ] Consider switching to Flatcar Linux. I still like it more, but missing pieces were a blocker.
-- [x] Monitor uptime and setup alerts with an external monitor[^1].
+- [ ] Consider switching to Flatcar Linux.
 - [ ] Harden network setup; some parts are still permissive.
 - [ ] Integrate `hashicorp/assert` support.
 
-[^1]: It lives outside this repository.
-[^2]: It lives outside this homelab host.
+[^gatus]: It lives outside this homelab host.

@@ -9,7 +9,7 @@ After=podman.socket
 Image=docker.io/grafana/alloy:v1.19.2
 ContainerName=grafana-alloy
 
-# Grafana Alloy doesn't work under non-root user
+# Grafana Alloy requires root inside the container.
 
 Secret=remnawave-metrics-pass
 Secret=meili-master-key

@@ -1,6 +1,5 @@
-# The web and websecure entry points do not listen on 8080/8443.
-# Instead, they use systemd socket activation.
-# To allow requests between Podman networks, I also exposed real 80/443.
+# web and websecure use systemd-provided sockets.
+# podmanWeb and podmanWebsecure serve container traffic on ports 80/443.
 entryPoints:
   web:
     address: ":8080"

@@ -8,7 +8,7 @@ terraform {
     }
     bitwarden = {
       source = "maxlaverse/bitwarden"
-      # Ephemeral secrets currently require the local .terraformrc override.
+      # Ephemeral secrets use the Bitwarden fork configured in .terraformrc.
       version = "0.18.0"
     }
     ct = {
@@ -40,10 +40,10 @@ ephemeral "bitwarden_secrets" "containers" {
 }
 
 provider "proxmox" {
-  # Straight to the node: Traefik runs on the VM being replaced
+  # Direct node access keeps provisioning independent of Traefik.
   endpoint = "https://pve.lan.${var.containers_config.base_domain}:8006"
 
-  // Unfortunately Proxmox can execute a lot of actions only under root user...
+  # This configuration uses Proxmox operations restricted to root@pam.
   username = "root@pam"
   password = ephemeral.bitwarden_secret.proxmox_password.value
 

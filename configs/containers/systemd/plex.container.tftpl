@@ -8,7 +8,7 @@ Image=docker.io/plexinc/pms-docker:plexpass
 AutoUpdate=registry
 ContainerName=plex
 
-# Unfortunately plex cannot fully work under non-root user
+# Plex does not fully support a non-root container user.
 GroupAdd=keep-groups
 
 Environment=PLEX_UID=1000

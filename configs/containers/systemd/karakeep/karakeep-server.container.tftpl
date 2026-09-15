@@ -6,7 +6,7 @@ Image=ghcr.io/karakeep-app/karakeep:release
 AutoUpdate=registry
 ContainerName=karakeep-server
 
-# Unfortunately Karakeep cannot fully under non-root user: https://github.com/karakeep-app/karakeep/issues/606
+# Karakeep does not fully support a non-root container user: https://github.com/karakeep-app/karakeep/issues/606
 
 Environment=MEILI_ADDR=http://karakeep-meilisearch:7700
 Environment=BROWSER_WEB_URL=http://karakeep-chrome:9222

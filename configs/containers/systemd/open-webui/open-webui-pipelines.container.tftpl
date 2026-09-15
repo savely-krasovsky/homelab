@@ -5,7 +5,7 @@ Description=Open WebUI Pipelines Quadlet
 Image=ghcr.io/open-webui/pipelines:main@sha256:b48e9bc338ce2be0acfbeff01810db72408a12f07739f9e3879c1f2b00952d6e
 ContainerName=open-webui-pipelines
 
-# Unfortunately open-webui cannot work under non-root user
+# This image requires root inside the container.
 
 Secret=open-webui-anthropic-api-key,type=env,target=ANTHROPIC_API_KEY
 Secret=open-webui-google-api-key,type=env,target=GOOGLE_API_KEY

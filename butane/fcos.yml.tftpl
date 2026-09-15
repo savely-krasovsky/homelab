@@ -93,8 +93,6 @@ storage:
       group:
         name: core
 
-    # Enable http and https sockets for traefik
-
     # Enable Podman auto updates
     - path: /var/home/core/.config/systemd/user/timers.target.wants/podman-auto-update.timer
       target: /usr/lib/systemd/user/podman-auto-update.timer
@@ -102,8 +100,6 @@ storage:
         name: core
       group:
         name: core
-
-    # Refresh oneshot OpenCloud extensions
 
     # Hometown timezone
     - path: /etc/localtime
@@ -126,8 +122,6 @@ storage:
         name: core
 
   files:
-    # sockets for traefik
-
     - path: /etc/containers/storage.conf
       contents:
         inline: |
@@ -184,8 +178,7 @@ storage:
       mode: 0644
       contents:
         inline: |
-          # I have a lot of SSH keys, unfortunately Terraform hasn't "IdentitiesOnly yes" alternative, so it just tries
-          # all keys on machine, reaching the limit.
+          # Allow multiple identities offered by SSH agents.
           MaxAuthTries 10
 
     # Firewall configuration

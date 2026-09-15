@@ -12,9 +12,7 @@ ContainerName=traefik
 User=1000:1000
 UserNS=keep-id:uid=1000,gid=1000
 
-# I use CNAMEs to point to my homelab;
-# Variable name could be misleading, since overwise
-# Lego tries to issue cert for you CNAME host.
+# Keep DNS challenges in the requested domain's zone instead of following CNAMEs.
 Environment=LEGO_DISABLE_CNAME_SUPPORT=true
 Secret=traefik-cf-dns-api-token,type=env,target=CF_DNS_API_TOKEN
 Secret=traefik-crowdsec-lapi-key,type=env,target=CROWDSEC_LAPI_KEY

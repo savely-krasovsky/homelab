@@ -5,7 +5,7 @@ Description=Open WebUI Quadlet
 Image=ghcr.io/open-webui/open-webui:v0.11.3
 ContainerName=open-webui
 
-# Unfortunately open-webui cannot work under non-root user
+# Open WebUI requires root inside the container.
 
 Environment=WEBUI_URL=https://ai.${base_domain}
 Environment=ENABLE_LOGIN_FORM=False

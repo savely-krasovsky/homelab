@@ -132,14 +132,17 @@ Source paths map directly to host paths, with only `.tftpl` removed.
 | Single-container applications, including Glance | `quadlet_deployment.applications["<name>"]` | Their service |
 | Applications contained in one pod | `quadlet_deployment.applications["<name>"]` | Their `<name>-pod.service` |
 | Traefik and its configuration and sockets | `quadlet_deployment.applications["traefik"]` | Restart sockets, then `try_restart` the service |
-| OpenCloud | `quadlet_deployment.opencloud` | `opencloud.target`, after Traefik is installed |
-| OAuth2 Proxy | `quadlet_deployment.oauth2_proxy` | `oauth2-proxy-pod.service`, after Traefik and Pocket ID are installed |
+| OpenCloud | `quadlet_deployment.applications["opencloud"]` | `opencloud.target` |
+| OAuth2 Proxy | `quadlet_deployment.applications["oauth2-proxy"]` | `oauth2-proxy-pod.service` |
 | Shared reverse-proxy network | `quadlet_deployment.reverse_proxy_network` | `reverse-proxy-network.service` |
 
-OpenCloud and OAuth2 Proxy use separate resource blocks in [fcos.tf](fcos.tf)
-to express their installation dependencies directly. OpenCloud waits for the
-Collabora URL through Traefik; OAuth2 Proxy discovers Pocket ID through Traefik.
-Their application definitions live in the same `applications` map.
+All applications use the same resource block in [fcos.tf](fcos.tf).
+OpenCloud Collaboration waits for Collabora's health check and fetches discovery
+directly at `http://127.0.0.1:9980` inside their pod. Collabora's `server_name`
+and TLS termination settings keep the discovered browser URLs on its public
+HTTPS domain. OAuth2 Proxy waits for its own Valkey; if Pocket ID or Traefik is
+unavailable, the existing `Restart=always` and `RestartSec=10s` retry startup.
+Its deployment can complete before OIDC discovery succeeds and login is ready.
 
 Changing an application's files, secret installation revisions or activation
 policy activates only that deployment. Shared secrets are listed for every

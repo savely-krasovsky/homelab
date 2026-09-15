@@ -1,8 +1,8 @@
 [Unit]
 Description=OAuth2 Proxy Server Quadlet
-# OIDC discovery reaches Pocket ID through Traefik; Valkey must be healthy too.
-Wants=pocket-id.service traefik.service oauth2-proxy-valkey.service
-After=pocket-id.service traefik.service oauth2-proxy-valkey.service
+# Wait for Valkey in this pod. Restart retries OIDC discovery until Pocket ID is reachable.
+Wants=oauth2-proxy-valkey.service
+After=oauth2-proxy-valkey.service
 
 [Container]
 Image=quay.io/oauth2-proxy/oauth2-proxy:v7.15.4

@@ -264,6 +264,7 @@ func TestActivationReferencesInstalledUnits(t *testing.T) {
 func TestDeploymentsGenerateIndependentlyAndOwnTheirSupportFiles(t *testing.T) {
 	config := renderDeployments(t, nil)
 	fileOwners, unitOwners := map[string]string{}, map[string]string{}
+	unitContents := map[string]string{}
 	for owner, files := range config.Files {
 		generated := generate(t, files)
 		for name := range files {
@@ -278,11 +279,12 @@ func TestDeploymentsGenerateIndependentlyAndOwnTheirSupportFiles(t *testing.T) {
 				generated[filepath.Base(name)] = files[name]
 			}
 		}
-		for name := range generated {
+		for name, content := range generated {
 			if previous, exists := unitOwners[name]; exists {
 				t.Errorf("%s and %s both own unit %s", owner, previous, name)
 			}
 			unitOwners[name] = owner
+			unitContents[name] = content
 		}
 
 		for name, source := range files {
@@ -336,6 +338,20 @@ func TestDeploymentsGenerateIndependentlyAndOwnTheirSupportFiles(t *testing.T) {
 
 	if unitOwners["reverse-proxy-network.service"] != "reverse-proxy" {
 		t.Error("the shared network must have its own deployment")
+	}
+
+	// Only the shared network is installed before every application. Even soft
+	// dependencies must not pull in units managed by another application.
+	dependencies := regexp.MustCompile(`(?m)^(?:Wants|Requires|Requisite|BindsTo|PartOf|After|Before)=(.*)$`)
+	for unit, content := range unitContents {
+		for _, match := range dependencies.FindAllStringSubmatch(content, -1) {
+			for _, dependency := range strings.Fields(match[1]) {
+				owner := unitOwners[dependency]
+				if owner != "" && owner != unitOwners[unit] && owner != "reverse-proxy" {
+					t.Errorf("%s in %s depends on %s in independently installed application %s", unit, unitOwners[unit], dependency, owner)
+				}
+			}
+		}
 	}
 }
 

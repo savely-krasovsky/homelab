@@ -17,7 +17,8 @@ Environment=COLLABORATION_DEBUG_ADDR=0.0.0.0:9304
 Environment=COLLABORATION_WOPI_SRC=https://wopiserver.${base_domain}
 Environment=COLLABORATION_APP_NAME=CollaboraOnline
 Environment=COLLABORATION_APP_PRODUCT=Collabora
-Environment=COLLABORATION_APP_ADDR=https://collabora.${base_domain}
+# Discovery stays inside the pod; Collabora advertises its public HTTPS URLs.
+Environment=COLLABORATION_APP_ADDR=http://127.0.0.1:9980
 Environment=COLLABORATION_APP_ICON=https://collabora.${base_domain}/favicon.ico
 Environment=COLLABORATION_LOG_LEVEL=info
 
@@ -44,7 +45,5 @@ Pod=opencloud.pod
 ExecStartPre=/usr/bin/mountpoint -q /var/mnt/docker
 ExecStartPre=/usr/bin/test -d /var/mnt/docker/app_data
 ExecStartPre=/usr/bin/mkdir -p -m 0755 -- /var/mnt/docker/app_data/opencloud
-# App URLs are read once at startup; wait until Traefik routes collabora
-ExecStartPre=/usr/bin/bash -c 'until curl -sfo /dev/null https://collabora.${base_domain}/hosting/discovery; do sleep 2; done'
 TimeoutStartSec=900
 Restart=always

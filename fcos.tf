@@ -122,11 +122,7 @@ resource "quadlet_deployment" "reverse_proxy_network" {
 }
 
 resource "quadlet_deployment" "applications" {
-  # These two applications need other deployments installed before activation.
-  for_each = {
-    for name, app in local.applications : name => app
-    if !contains(["opencloud", "oauth2-proxy"], name)
-  }
+  for_each   = local.applications
   depends_on = [quadlet_deployment.reverse_proxy_network]
 
   name        = each.key
@@ -136,39 +132,6 @@ resource "quadlet_deployment" "applications" {
   enable      = try(each.value.enable, [])
   triggers = {
     for name in try(each.value.secrets, []) : name => quadlet_podman_secret.containers[name].revision
-  }
-
-  lifecycle {
-    replace_triggered_by = [proxmox_virtual_environment_vm.fcos]
-  }
-}
-
-resource "quadlet_deployment" "opencloud" {
-  # Collaboration waits for the Collabora URL routed through Traefik.
-  depends_on = [quadlet_deployment.applications["traefik"]]
-
-  name    = "opencloud"
-  files   = local.deployment_files.opencloud
-  restart = local.applications.opencloud.restart
-  enable  = local.applications.opencloud.enable
-  triggers = {
-    for name in local.applications.opencloud.secrets : name => quadlet_podman_secret.containers[name].revision
-  }
-
-  lifecycle {
-    replace_triggered_by = [proxmox_virtual_environment_vm.fcos]
-  }
-}
-
-resource "quadlet_deployment" "oauth2_proxy" {
-  # OIDC discovery needs both Pocket ID and the proxy serving its public URL.
-  depends_on = [quadlet_deployment.applications["pocket-id"], quadlet_deployment.applications["traefik"]]
-
-  name    = "oauth2-proxy"
-  files   = local.deployment_files["oauth2-proxy"]
-  restart = local.applications["oauth2-proxy"].restart
-  triggers = {
-    for name in local.applications["oauth2-proxy"].secrets : name => quadlet_podman_secret.containers[name].revision
   }
 
   lifecycle {

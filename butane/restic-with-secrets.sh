@@ -7,9 +7,9 @@ case "${1-}" in
     *) echo 'Expected backup backend: backblaze or storj' >&2; exit 2 ;;
 esac
 
-runtime_dir=/run/user/$(id -u core)
+runtime_dir=/run/user/$(id -u homelab)
 secret() {
-    runuser -u core -- env XDG_RUNTIME_DIR="$runtime_dir" \
+    runuser -u homelab -- env XDG_RUNTIME_DIR="$runtime_dir" \
         podman secret inspect --showsecret --format '{{.SecretData}}' "$1"
 }
 

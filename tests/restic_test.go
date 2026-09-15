@@ -21,7 +21,7 @@ func TestResticReadsCurrentPodmanSecrets(t *testing.T) {
 	write("id", "#!/bin/sh\nprintf 1000\n")
 	write("runuser", `#!/bin/sh
 set -eu
-test "$1 $2 $3" = '-u core --'
+test "$1 $2 $3" = '-u homelab --'
 shift 3
 exec "$@"
 `)
@@ -99,18 +99,24 @@ exit "${RESTIC_EXIT:-0}"
 	}
 }
 
-func TestResticUnitsUseTheWrapper(t *testing.T) {
+func renderHost(t *testing.T) string {
+	t.Helper()
 	repo, err := filepath.Abs("..")
 	noError(t, err)
 	// Render the real Butane template through Terraform's templatefile function.
 	dir := t.TempDir()
 	var rendered string
 	console(t, dir, `jsonencode(templatefile("`+filepath.Join(repo, "butane/fcos.yml.tftpl")+`", {
-ssh_keys=[], deploy_ssh_keys=[], hostname="test", truenas_ip="192.0.2.1", truenas_iqn="test",
+ssh_keys=[], homelab_ssh_keys=[], hostname="test", truenas_ip="192.0.2.1", truenas_iqn="test",
 root_ca="synthetic", firewall_config="", mac_address="00:00:00:00:00:01", ip="192.0.2.2",
 gateway="192.0.2.1", mask="255.255.255.0", nameserver="192.0.2.1",
 restic_runner=file("`+filepath.Join(repo, "butane/restic-with-secrets.sh")+`")
 }))`, &rendered)
+	return rendered
+}
+
+func TestResticUnitsUseTheWrapper(t *testing.T) {
+	rendered := renderHost(t)
 	if strings.Contains(rendered, "LoadCredential=restic-") || strings.Contains(rendered, "CREDENTIALS_DIRECTORY") {
 		t.Fatal("restic units must read secrets through the Podman wrapper")
 	}
@@ -126,7 +132,7 @@ restic_runner=file("`+filepath.Join(repo, "butane/restic-with-secrets.sh")+`")
 			t.Fatal("secret check must run before snapshot creation")
 		}
 	}
-	if !strings.Contains(rendered, "    - path: /etc/restic/run\n      mode: 0755") || !strings.Contains(rendered, "runtime_dir=/run/user/$(id -u core)") {
+	if !strings.Contains(rendered, "    - path: /etc/restic/run\n      mode: 0755") || !strings.Contains(rendered, "runtime_dir=/run/user/$(id -u homelab)") {
 		t.Fatal("Ignition did not include the executable wrapper")
 	}
 }

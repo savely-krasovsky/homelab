@@ -13,7 +13,7 @@ locals {
     restic_runner : file("${path.module}/butane/restic-with-secrets.sh"),
   })
 
-  # System restic jobs read their values from core's Podman secret store at startup.
+  # System restic jobs read their values from homelab's Podman secret store at startup.
   podman_secrets = { for name, id in var.containers_secret_config : replace(name, "_", "-") => id }
 }
 

@@ -2,126 +2,169 @@ variant: fcos
 version: 1.5.0
 
 passwd:
+  groups:
+    - name: homelab
+      gid: 1000
+    - name: core
+      gid: 1001
   users:
     - name: core
+      uid: 1001
+      primary_group: core
       ssh_authorized_keys:
 %{ for _, ssh_key in ssh_keys ~}
         - ${ssh_key}
 %{ endfor ~}
-    - name: deploy
-      home_dir: /var/home/deploy
+    - name: homelab
+      # Stable identity for application data and NFS ownership.
+      uid: 1000
+      primary_group: homelab
+      home_dir: /var/home/homelab
       shell: /bin/bash
-%{ if length(deploy_ssh_keys) > 0 ~}
+      groups:
+        - systemd-journal
       ssh_authorized_keys:
-%{ for _, ssh_key in deploy_ssh_keys ~}
+%{ for _, ssh_key in homelab_ssh_keys ~}
         - ${ssh_key}
 %{ endfor ~}
-%{ endif ~}
 
 storage:
   directories:
     # Config dir
-    - path: /var/home/core/.config
+    - path: /var/home/homelab/.config
       user:
-        name: core
+        name: homelab
       group:
-        name: core
+        name: homelab
 
     # Systemd user dir
-    - path: /var/home/core/.config/systemd
+    - path: /var/home/homelab/.config/containers
       user:
-        name: core
+        name: homelab
       group:
-        name: core
-    - path: /var/home/core/.config/systemd/user
+        name: homelab
+    - path: /var/home/homelab/.config/systemd
       user:
-        name: core
+        name: homelab
       group:
-        name: core
+        name: homelab
+    - path: /var/home/homelab/.config/systemd/user
+      user:
+        name: homelab
+      group:
+        name: homelab
     # Declared with the user, or Ignition creates them as root while linking units
-    - path: /var/home/core/.config/systemd/user/default.target.wants
+    - path: /var/home/homelab/.config/systemd/user/default.target.wants
       user:
-        name: core
+        name: homelab
       group:
-        name: core
-    - path: /var/home/core/.config/systemd/user/timers.target.wants
+        name: homelab
+    - path: /var/home/homelab/.config/systemd/user/timers.target.wants
       user:
-        name: core
+        name: homelab
       group:
-        name: core
-    - path: /var/home/core/.config/systemd/user/podman.service.d
+        name: homelab
+    - path: /var/home/homelab/.config/systemd/user/podman.service.d
       user:
-        name: core
+        name: homelab
       group:
-        name: core
+        name: homelab
 
     # Ignition creates implicit parents as root; declare the whole local tree.
-    - path: /var/home/core/.local
+    - path: /var/home/homelab/.local
       mode: 0755
       user:
-        name: core
+        name: homelab
       group:
-        name: core
-    - path: /var/home/core/.local/bin
+        name: homelab
+    - path: /var/home/homelab/.local/bin
       mode: 0755
       user:
-        name: core
+        name: homelab
       group:
-        name: core
-    - path: /var/home/core/.local/state
+        name: homelab
+    - path: /var/home/homelab/.local/state
       mode: 0700
       user:
-        name: core
+        name: homelab
       group:
-        name: core
-    - path: /var/home/core/.local/state/homelab
+        name: homelab
+    - path: /var/home/homelab/.local/state/homelab
       mode: 0700
       user:
-        name: core
+        name: homelab
       group:
-        name: core
+        name: homelab
     # Backup snapshot mounting points
     - path: /var/mnt/snapshots/backblaze
     - path: /var/mnt/snapshots/storj
 
   links:
     # Enable Podman socket for Traefik
-    - path: /var/home/core/.config/systemd/user/timers.target.wants/podman.socket
+    - path: /var/home/homelab/.config/systemd/user/timers.target.wants/podman.socket
       target: /usr/lib/systemd/user/podman.socket
       user:
-        name: core
+        name: homelab
       group:
-        name: core
+        name: homelab
 
     # Enable Podman auto updates
-    - path: /var/home/core/.config/systemd/user/timers.target.wants/podman-auto-update.timer
+    - path: /var/home/homelab/.config/systemd/user/timers.target.wants/podman-auto-update.timer
       target: /usr/lib/systemd/user/podman-auto-update.timer
       user:
-        name: core
+        name: homelab
       group:
-        name: core
+        name: homelab
 
     # Hometown timezone
     - path: /etc/localtime
       target: ../usr/share/zoneinfo/Europe/Belgrade
 
     # Enable systemd_exporter
-    - path: /var/home/core/.config/systemd/user/default.target.wants/systemd-exporter.service
-      target: /var/home/core/.config/systemd/user/systemd-exporter.service
+    - path: /var/home/homelab/.config/systemd/user/default.target.wants/systemd-exporter.service
+      target: /var/home/homelab/.config/systemd/user/systemd-exporter.service
       user:
-        name: core
+        name: homelab
       group:
-        name: core
+        name: homelab
 
     # Enable node_exporter
-    - path: /var/home/core/.config/systemd/user/default.target.wants/node-exporter.service
-      target: /var/home/core/.config/systemd/user/node-exporter.service
+    - path: /var/home/homelab/.config/systemd/user/default.target.wants/node-exporter.service
+      target: /var/home/homelab/.config/systemd/user/node-exporter.service
       user:
-        name: core
+        name: homelab
       group:
-        name: core
+        name: homelab
 
   files:
+    # Fixed, non-overlapping rootless container ID ranges.
+    - path: /etc/subuid
+      overwrite: true
+      mode: 0644
+      contents:
+        inline: |
+          homelab:524288:65536
+          core:655360:65536
+    - path: /etc/subgid
+      overwrite: true
+      mode: 0644
+      contents:
+        inline: |
+          homelab:524288:65536
+          core:655360:65536
+
+    # Podman storage for homelab.
+    - path: /var/home/homelab/.config/containers/storage.conf
+      user:
+        name: homelab
+      group:
+        name: homelab
+      contents:
+        inline: |
+          [storage]
+          driver = "overlay"
+          graphroot = "/mnt/docker/core"
+
     - path: /etc/containers/storage.conf
       contents:
         inline: |
@@ -129,8 +172,8 @@ storage:
           driver = "overlay"
           rootless_storage_path = "/var/mnt/docker/$USER"
 
-    # Enable linger so containers can continue to run even after core user logouts
-    - path: /var/lib/systemd/linger/core
+    # Enable linger so containers can continue to run even after homelab user logouts
+    - path: /var/lib/systemd/linger/homelab
 
     # Set machine hostname
     - path: /etc/hostname
@@ -197,16 +240,16 @@ storage:
           ${indent(10, firewall_config)}
 
     # download systemd_exporter and create systemd user service
-    - path: /var/home/core/.local/bin/systemd_exporter.tar.gz
+    - path: /var/home/homelab/.local/bin/systemd_exporter.tar.gz
       contents:
         source: https://github.com/prometheus-community/systemd_exporter/releases/download/v0.7.0/systemd_exporter-0.7.0.linux-amd64.tar.gz
         verification:
           hash: sha256-2d995ca20249aeeac8f507173176ce5d162f17470a98ca66e289c85b388480c3
       user:
-        name: core
+        name: homelab
       group:
-        name: core
-    - path: /var/home/core/.config/systemd/user/systemd-exporter.service
+        name: homelab
+    - path: /var/home/homelab/.config/systemd/user/systemd-exporter.service
       contents:
         inline: |
           [Unit]
@@ -214,28 +257,28 @@ storage:
 
           [Service]
           Type=simple
-          WorkingDirectory=/var/home/core/.local/bin
+          WorkingDirectory=/var/home/homelab/.local/bin
           ExecStartPre=/usr/bin/tar -xf systemd_exporter.tar.gz --strip-components=1 --wildcards '*/systemd_exporter'
-          ExecStart=/var/home/core/.local/bin/systemd_exporter
+          ExecStart=/var/home/homelab/.local/bin/systemd_exporter
 
           [Install]
           WantedBy=default.target
       user:
-        name: core
+        name: homelab
       group:
-        name: core
+        name: homelab
 
     # download node_exporter and create systemd user service
-    - path: /var/home/core/.local/bin/node_exporter.tar.gz
+    - path: /var/home/homelab/.local/bin/node_exporter.tar.gz
       contents:
         source: https://github.com/prometheus/node_exporter/releases/download/v1.12.1/node_exporter-1.12.1.linux-amd64.tar.gz
         verification:
           hash: sha256-b51d8a76aa2a9156a55d501aca6276fae09e262259a5e4e831d2c2222f084e63
       user:
-        name: core
+        name: homelab
       group:
-        name: core
-    - path: /var/home/core/.config/systemd/user/node-exporter.service
+        name: homelab
+    - path: /var/home/homelab/.config/systemd/user/node-exporter.service
       contents:
         inline: |
           [Unit]
@@ -243,21 +286,21 @@ storage:
 
           [Service]
           Type=simple
-          WorkingDirectory=/var/home/core/.local/bin
+          WorkingDirectory=/var/home/homelab/.local/bin
           ExecStartPre=/usr/bin/tar -xf node_exporter.tar.gz --strip-components=1 --wildcards '*/node_exporter'
-          ExecStart=/var/home/core/.local/bin/node_exporter --collector.systemd --collector.processes
+          ExecStart=/var/home/homelab/.local/bin/node_exporter --collector.systemd --collector.processes
 
           [Install]
           WantedBy=default.target
 
     # Disable Podman access logs
-    - path: /var/home/core/.config/systemd/user/podman.service.d/override.conf
+    - path: /var/home/homelab/.config/systemd/user/podman.service.d/override.conf
       contents:
         inline: |
           [Service]
           Environment=LOGGING="--log-level=warn"
 
-    # Root restic processes obtain current secrets from core's Podman store.
+    # Root restic processes obtain current secrets from homelab's Podman store.
     - path: /etc/restic/run
       mode: 0755
       contents:
@@ -442,7 +485,7 @@ systemd:
         Type=oneshot
         RemainAfterExit=yes
         ExecStart=/usr/bin/mkdir -p /var/mnt/docker/blog
-        ExecStart=/usr/bin/chown deploy:deploy /var/mnt/docker/blog
+        ExecStart=/usr/bin/chown -R homelab:homelab /var/mnt/docker/blog
         ExecStart=/usr/bin/chmod 0755 /var/mnt/docker/blog
         # New files inherit the context, so rsync output stays readable to the container
         ExecStart=/usr/bin/chcon -R -t container_file_t /var/mnt/docker/blog

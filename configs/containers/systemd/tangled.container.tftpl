@@ -1,4 +1,6 @@
 [Unit]
+Requires=reverse-proxy-network.service
+After=reverse-proxy-network.service
 Description=Tangled Knot Quadlet
 
 [Container]
@@ -6,14 +8,13 @@ Image=atcr.io/tangled.org/knot:2
 AutoUpdate=registry
 ContainerName=tangled
 
-# knot 2 serves SSH in-process, so it no longer needs root or a git account
 User=1000:1000
 UserNS=keep-id:uid=1000,gid=1000
 
 Environment=KNOT_HOSTNAME=knot.${base_domain}
 Environment=KNOT_ADMINS="did:web:${base_domain}"
 Environment=KNOT_PLC_DIRECTORY=https://plc.directory
-# Repos migrated from the Go knot are sha1; the binary alone would default to sha256
+# Existing repositories use SHA-1; use the same object format for new repositories
 Environment=KNOT_GIT_OBJECT_FORMAT=sha1
 Environment=KNOT_LISTEN_ADDR=[::]:5555
 Environment=KNOT_SSH_LISTEN_ADDR=[::]:2222
@@ -21,8 +22,7 @@ Environment=KNOT_SCAN_PATH=/data/repos
 Environment=KNOT_SEALED_KEY_FILE=/data/sealed-keys
 Environment=KNOT_SSH_HOST_KEY_FILE=/data/ssh_host_key
 Environment=KNOT_MASTER_KEY_ENV=KNOT_MASTER_KEY
-# The container's own cgroup namespace hides [Service] MemoryMax from the knot,
-# so it would size its caches for the host's 32G. Keep this in step with MemoryMax.
+# Keep in step with MemoryMax; the cgroup namespace hides it from knot
 Environment=KNOT_MAX_MEMORY_BYTES=2147483648
 # Without both of these every client shares Traefik's address in the ratelimiter
 Environment=KNOT_XRPC_TRUSTED_PROXY_HEADER=x-forwarded-for
@@ -39,10 +39,13 @@ Label="traefik.http.services.tangled.loadbalancer.server.port=5555"
 
 Volume=/var/mnt/docker/app_data/tangled/knot2:/data:Z
 
-Network=reverse-proxy.network
+Network=systemd-reverse-proxy
 PublishPort=2222:2222/tcp
 
 [Service]
+ExecStartPre=/usr/bin/mountpoint -q /var/mnt/docker
+ExecStartPre=/usr/bin/test -d /var/mnt/docker/app_data
+ExecStartPre=/usr/bin/mkdir -p -m 0755 -- /var/mnt/docker/app_data/tangled/knot2
 TimeoutStartSec=900
 Restart=always
 MemoryMax=2G

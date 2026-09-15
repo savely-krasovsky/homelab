@@ -14,10 +14,8 @@ Exec=--disable-dev-shm-usage --hide-scrollbars --disable-blink-features=Automati
 Pod=karakeep.pod
 
 [Service]
+ExecStartPre=/usr/bin/mountpoint -q /var/mnt/docker
 TimeoutStartSec=900
 Restart=always
 MemoryHigh=1G
 MemoryMax=2G
-
-[Install]
-WantedBy=multi-user.target default.target

@@ -134,14 +134,14 @@ variable "fcos_config" {
     truenas_ip  = string
     truenas_iqn = string
 
-    # To sync configs afterwards
+    # How the provider reaches the host; the host key, when set, is pinned
     ssh_private_key_path = string
     ssh_host_key         = optional(string)
   })
 }
 
-variable "deployment_secrets_revision" {
-  description = "Bump after rotating Bitwarden values without changing their IDs."
-  type        = string
-  default     = "1"
+variable "secret_versions" {
+  description = "Secret name to rotation version. Change a version to update the corresponding secret value."
+  type        = map(string)
+  default     = {}
 }

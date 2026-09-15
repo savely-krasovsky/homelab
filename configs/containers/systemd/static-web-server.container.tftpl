@@ -1,4 +1,6 @@
 [Unit]
+Requires=reverse-proxy-network.service
+After=reverse-proxy-network.service
 Description=Static Web Server Quadlet
 
 [Container]
@@ -12,9 +14,10 @@ Environment=SERVER_PORT=8080
 
 Volume=/var/mnt/media/downloads/static:/public:ro
 
-Network=reverse-proxy.network
+Network=systemd-reverse-proxy
 
 [Service]
+ExecStartPre=/usr/bin/mountpoint -q /var/mnt/docker
 TimeoutStartSec=900
 Restart=always
 

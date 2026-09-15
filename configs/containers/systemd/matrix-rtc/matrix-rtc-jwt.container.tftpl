@@ -26,9 +26,6 @@ Label="traefik.http.services.matrix-rtc-jwt.loadbalancer.server.port=9090"
 Pod=matrix-rtc.pod
 
 [Service]
+ExecStartPre=/usr/bin/mountpoint -q /var/mnt/docker
 TimeoutStartSec=900
 Restart=always
-
-[Install]
-WantedBy=multi-user.target default.target
-

@@ -1,4 +1,6 @@
 [Unit]
+Requires=reverse-proxy-network.service
+After=reverse-proxy-network.service
 Description=RMQTT Broker Quadlet
 
 [Container]
@@ -19,11 +21,14 @@ Label="alloy.metrics.path=/api/v1/metrics/prometheus"
 Volume=/var/mnt/docker/app_data/rmqtt/logs:/var/log/rmqtt:Z
 Volume=/dev/null:/var/log/rmqtt/hook.log
 
-Network=reverse-proxy.network
+Network=systemd-reverse-proxy
 PublishPort=1883:1883
 PublishPort=6060:6060
 
 [Service]
+ExecStartPre=/usr/bin/mountpoint -q /var/mnt/docker
+ExecStartPre=/usr/bin/test -d /var/mnt/docker/app_data
+ExecStartPre=/usr/bin/mkdir -p -m 0755 -- /var/mnt/docker/app_data/rmqtt/logs
 TimeoutStartSec=900
 Restart=always
 

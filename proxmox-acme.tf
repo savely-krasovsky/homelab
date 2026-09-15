@@ -10,8 +10,7 @@ resource "proxmox_acme_account" "homelab" {
 }
 
 resource "proxmox_acme_dns_plugin" "cloudflare" {
-  # `plugin` is the id this config is stored under; `api` selects acme.sh's
-  # handler and must be `cf` — `cloudflare` is rejected.
+  # api must be cf; cloudflare is rejected
   plugin = "cloudflare"
   api    = "cf"
 
@@ -26,9 +25,7 @@ resource "proxmox_acme_certificate" "pve" {
   node_name = "pve"
   force     = true
 
-  # pve.<domain> is what every service CNAMEs to and is reached through Traefik; the
-  # second name is a leaf that resolves straight to the node, so overriding it locally
-  # cannot drag the rest of the zone onto the hypervisor.
+  # pve.lan is the leaf that resolves straight to the node; pve.<domain> goes through Traefik
   domains = [
     for name in ["pve", "pve.lan"] : {
       domain = "${name}.${var.containers_config.base_domain}"

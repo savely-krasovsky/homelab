@@ -1,4 +1,6 @@
 [Unit]
+Requires=reverse-proxy-network.service
+After=reverse-proxy-network.service
 Description=Prometheus Podman Exporter Quadlet
 Requires=podman.socket
 After=podman.socket
@@ -18,12 +20,13 @@ Exec=--collector.enable-all
 
 Volume=%t/podman/podman.sock:/run/podman/podman.sock
 
-Network=reverse-proxy.network
+Network=systemd-reverse-proxy
 
 # Disable label security to access Podman socket.
 SecurityLabelDisable=true
 
 [Service]
+ExecStartPre=/usr/bin/mountpoint -q /var/mnt/docker
 TimeoutStartSec=900
 Restart=always
 

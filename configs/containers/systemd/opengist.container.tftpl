@@ -1,4 +1,6 @@
 [Unit]
+Requires=reverse-proxy-network.service
+After=reverse-proxy-network.service
 Description=Opengist Quadlet
 
 [Container]
@@ -32,10 +34,13 @@ Label="alloy.metrics.port=6158"
 
 Volume=/var/mnt/docker/app_data/opengist:/opengist:Z
 
-Network=reverse-proxy.network
+Network=systemd-reverse-proxy
 PublishPort=2225:2222/tcp
 
 [Service]
+ExecStartPre=/usr/bin/mountpoint -q /var/mnt/docker
+ExecStartPre=/usr/bin/test -d /var/mnt/docker/app_data
+ExecStartPre=/usr/bin/mkdir -p -m 0755 -- /var/mnt/docker/app_data/opengist
 TimeoutStartSec=900
 Restart=always
 

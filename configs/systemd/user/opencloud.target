@@ -1,0 +1,7 @@
+[Unit]
+Description=opencloud application
+Requires=opencloud-apps-volume.service opencloud-collabora.service opencloud-collaboration.service opencloud-drawio.service opencloud-jsonviewer.service opencloud-maps.service opencloud-network.service opencloud-pod.service opencloud-server.service opencloud-unzip.service opencloud-extensions-update.timer
+After=opencloud-apps-volume.service opencloud-collabora.service opencloud-collaboration.service opencloud-drawio.service opencloud-jsonviewer.service opencloud-maps.service opencloud-network.service opencloud-pod.service opencloud-server.service opencloud-unzip.service opencloud-extensions-update.timer
+
+[Install]
+WantedBy=default.target

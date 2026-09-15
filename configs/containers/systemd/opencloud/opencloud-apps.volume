@@ -1,2 +1,5 @@
+[Unit]
+PartOf=opencloud.target
+
 [Volume]
 VolumeName=opencloud-apps

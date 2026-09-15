@@ -1,4 +1,6 @@
 [Unit]
+Requires=reverse-proxy-network.service
+After=reverse-proxy-network.service
 Description=Blog Quadlet
 
 [Container]
@@ -19,13 +21,14 @@ Label="traefik.http.services.blog.loadbalancer.server.port=8080"
 Volume=/var/mnt/docker/blog:/blog:ro
 Volume=%E/sws/blog.toml:/etc/sws.toml:ro,Z
 
-Network=reverse-proxy.network
+Network=systemd-reverse-proxy
 
 ReadOnly=true
 NoNewPrivileges=true
 DropCapability=all
 
 [Service]
+ExecStartPre=/usr/bin/mountpoint -q /var/mnt/docker
 TimeoutStartSec=900
 Restart=always
 

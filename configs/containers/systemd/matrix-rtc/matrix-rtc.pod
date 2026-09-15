@@ -5,3 +5,6 @@ Description=MatrixRTC Pod
 PodName=matrix-rtc
 UserNS=keep-id:uid=1000,gid=1000
 Network=host
+
+[Install]
+WantedBy=default.target

@@ -1,4 +1,6 @@
 [Unit]
+Requires=reverse-proxy-network.service
+After=reverse-proxy-network.service
 Description=Pocket ID Quadlet
 
 [Container]
@@ -32,10 +34,13 @@ Label="traefik.http.services.pocket-id.loadbalancer.server.scheme=h2c"
 
 Volume=/var/mnt/docker/app_data/pocket-id:/app/data:Z
 
-Network=reverse-proxy.network
+Network=systemd-reverse-proxy
 Notify=true
 
 [Service]
+ExecStartPre=/usr/bin/mountpoint -q /var/mnt/docker
+ExecStartPre=/usr/bin/test -d /var/mnt/docker/app_data
+ExecStartPre=/usr/bin/mkdir -p -m 0755 -- /var/mnt/docker/app_data/pocket-id
 TimeoutStartSec=900
 Restart=always
 

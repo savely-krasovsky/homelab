@@ -1,8 +1,0 @@
-[Unit]
-Description=Karakeep Pod
-
-[Pod]
-PodName=karakeep
-UserNS=keep-id:uid=1000,gid=1000
-Network=karakeep.network
-Network=reverse-proxy.network

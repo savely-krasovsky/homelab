@@ -44,8 +44,6 @@ Pod=remnawave.pod
 Notify=healthy
 
 [Service]
+ExecStartPre=/usr/bin/mountpoint -q /var/mnt/docker
 TimeoutStartSec=900
 Restart=always
-
-[Install]
-WantedBy=multi-user.target default.target

@@ -1,4 +1,5 @@
 [Unit]
+PartOf=opencloud.target
 Description=OpenCloud Maps Extension Quadlet
 
 [Container]
@@ -17,9 +18,7 @@ Volume=opencloud-apps.volume:/apps
 Pod=opencloud.pod
 
 [Service]
+ExecStartPre=/usr/bin/mountpoint -q /var/mnt/docker
 Type=oneshot
 RemainAfterExit=yes
 TimeoutStartSec=900
-
-[Install]
-WantedBy=multi-user.target default.target

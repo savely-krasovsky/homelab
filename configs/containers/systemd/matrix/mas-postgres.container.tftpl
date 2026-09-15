@@ -11,7 +11,6 @@ User=1000:1000
 Environment=POSTGRES_USER=mas
 Environment=POSTGRES_DB=mas
 Environment=POSTGRES_INITDB_ARGS="--data-checksums --encoding=UTF-8 --lc-collate=C --lc-ctype=C"
-# Second Postgres in the pod.
 Environment=PGPORT=5433
 Secret=mas-postgres-password,type=env,target=POSTGRES_PASSWORD
 
@@ -32,8 +31,8 @@ Pod=matrix.pod
 Notify=healthy
 
 [Service]
+ExecStartPre=/usr/bin/mountpoint -q /var/mnt/docker
+ExecStartPre=/usr/bin/test -d /var/mnt/docker/app_data
+ExecStartPre=/usr/bin/mkdir -p -m 0755 -- /var/mnt/docker/app_data/matrix/mas-postgres
 TimeoutStartSec=900
 Restart=always
-
-[Install]
-WantedBy=multi-user.target default.target

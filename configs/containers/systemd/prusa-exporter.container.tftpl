@@ -1,4 +1,6 @@
 [Unit]
+Requires=reverse-proxy-network.service
+After=reverse-proxy-network.service
 Description=Prusa Exporter Quadlet
 
 [Container]
@@ -18,10 +20,11 @@ Exec=--config.file=/app/prusa.yml --log.level=info --udp.listen-address=0.0.0.0:
 
 Volume=%E/prusa-exporter/prusa.yml:/app/prusa.yml:ro,Z
 
-Network=reverse-proxy.network
+Network=systemd-reverse-proxy
 PublishPort=8514:8514/udp
 
 [Service]
+ExecStartPre=/usr/bin/mountpoint -q /var/mnt/docker
 TimeoutStartSec=900
 Restart=always
 

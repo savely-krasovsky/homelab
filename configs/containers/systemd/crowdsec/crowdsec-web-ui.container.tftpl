@@ -33,8 +33,8 @@ Volume=/var/mnt/docker/app_data/crowdsec/web-ui-data:/app/data:Z
 Pod=crowdsec.pod
 
 [Service]
+ExecStartPre=/usr/bin/mountpoint -q /var/mnt/docker
+ExecStartPre=/usr/bin/test -d /var/mnt/docker/app_data
+ExecStartPre=/usr/bin/mkdir -p -m 0755 -- /var/mnt/docker/app_data/crowdsec/web-ui-data
 TimeoutStartSec=900
 Restart=always
-
-[Install]
-WantedBy=multi-user.target default.target

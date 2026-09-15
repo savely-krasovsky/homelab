@@ -19,9 +19,9 @@ terraform {
       source  = "hashicorp/http"
       version = "3.6.2"
     }
-    homelab = {
-      source  = "registry.terraform.io/savely-krasovsky/homelab-helpers"
-      version = "0.3.2"
+    quadlet = {
+      source  = "registry.terraform.io/savely-krasovsky/quadlet"
+      version = "0.4.1"
     }
   }
 }
@@ -40,8 +40,7 @@ ephemeral "bitwarden_secrets" "containers" {
 }
 
 provider "proxmox" {
-  # Straight to the node: routing through Traefik cannot survive replacing the VM that
-  # Traefik itself runs on.
+  # Straight to the node: Traefik runs on the VM being replaced
   endpoint = "https://pve.lan.${var.containers_config.base_domain}:8006"
 
   // Unfortunately Proxmox can execute a lot of actions only under root user...
@@ -51,4 +50,11 @@ provider "proxmox" {
   ssh {
     agent = true
   }
+}
+
+provider "quadlet" {
+  host             = var.fcos_config.ip
+  user             = "core"
+  private_key_file = pathexpand(var.fcos_config.ssh_private_key_path)
+  host_key         = var.fcos_config.ssh_host_key
 }

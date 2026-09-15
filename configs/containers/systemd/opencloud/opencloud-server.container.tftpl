@@ -1,4 +1,5 @@
 [Unit]
+PartOf=opencloud.target
 Description=OpenCloud Server Quadlet
 After=opencloud-drawio.service opencloud-jsonviewer.service opencloud-maps.service opencloud-unzip.service
 
@@ -66,10 +67,10 @@ Volume=opencloud-apps.volume:/var/lib/opencloud/web/assets/apps
 Pod=opencloud.pod
 
 [Service]
+ExecStartPre=/usr/bin/mountpoint -q /var/mnt/docker
+ExecStartPre=/usr/bin/test -d /var/mnt/docker/app_data
+ExecStartPre=/usr/bin/mkdir -p -m 0755 -- /var/mnt/docker/app_data/opencloud
 TimeoutStartSec=900
 Restart=always
 MemoryHigh=2G
 MemoryMax=3G
-
-[Install]
-WantedBy=multi-user.target default.target

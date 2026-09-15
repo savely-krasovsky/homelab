@@ -1,4 +1,6 @@
 [Unit]
+Requires=reverse-proxy-network.service
+After=reverse-proxy-network.service
 Description=DavMail Quadlet
 
 [Container]
@@ -54,9 +56,10 @@ Label="glance.hide=false"
 
 Volume=davmail-config.volume:/davmail-config
 
-Network=reverse-proxy.network
+Network=systemd-reverse-proxy
 
 [Service]
+ExecStartPre=/usr/bin/mountpoint -q /var/mnt/docker
 TimeoutStartSec=900
 Restart=always
 

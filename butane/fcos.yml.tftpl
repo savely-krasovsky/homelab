@@ -20,8 +20,7 @@ passwd:
 
 storage:
   directories:
-    # Config dir. The subtree below it is created by the deployment provider as
-    # it installs files, so only the roots that must predate it are listed here.
+    # Config dir
     - path: /var/home/core/.config
       user:
         name: core
@@ -39,8 +38,7 @@ storage:
         name: core
       group:
         name: core
-    # Ignition would create these as root while linking units into them, and then
-    # `systemctl --user enable/disable` cannot write to them.
+    # Declared with the user, or Ignition creates them as root while linking units
     - path: /var/home/core/.config/systemd/user/default.target.wants
       user:
         name: core
@@ -266,8 +264,14 @@ storage:
           [Service]
           Environment=LOGGING="--log-level=warn"
 
-    # Paths restic must not upload. The wildcard covers both snapshot mount
-    # points (/mnt/snapshots/backblaze and /mnt/snapshots/storj).
+    # Root restic processes obtain current secrets from core's Podman store.
+    - path: /etc/restic/run
+      mode: 0755
+      contents:
+        inline: |
+          ${indent(10, restic_runner)}
+
+    # restic excludes; the wildcard covers both snapshot mounts
     - path: /etc/restic/excludes.txt
       overwrite: true
       mode: 0644
@@ -445,10 +449,9 @@ systemd:
         Type=oneshot
         RemainAfterExit=yes
         ExecStart=/usr/bin/mkdir -p /var/mnt/docker/blog
-        # rsync -a sets perms and times on the target itself, which needs ownership.
         ExecStart=/usr/bin/chown deploy:deploy /var/mnt/docker/blog
         ExecStart=/usr/bin/chmod 0755 /var/mnt/docker/blog
-        # New files inherit this from the directory, so rsync output stays readable to the container.
+        # New files inherit the context, so rsync output stays readable to the container
         ExecStart=/usr/bin/chcon -R -t container_file_t /var/mnt/docker/blog
 
         [Install]
@@ -464,16 +467,14 @@ systemd:
 
         [Service]
         Type=oneshot
-        LoadCredential=restic-b2-account-id
-        LoadCredential=restic-b2-account-key
-        LoadCredential=restic-password
         Environment=RESTIC_CACHE_DIR=/var/mnt/docker/restic-cache
-        Environment=RESTIC_PASSWORD_FILE=%d/restic-password
+        # Fail on missing secrets before creating a snapshot.
+        ExecStartPre=/etc/restic/run backblaze version
         # Create LVM snapshot and do backup
         ExecStart=/bin/bash -c "lvremove -y vg0/restic-backblaze || true"
         ExecStart=/usr/sbin/lvcreate --size 15G --snapshot --name restic-backblaze vg0/lv0
         ExecStart=/usr/bin/mount -o nouuid /dev/vg0/restic-backblaze /mnt/snapshots/backblaze
-        ExecStart=/bin/bash -c "export B2_ACCOUNT_ID=$(cat $CREDENTIALS_DIRECTORY/restic-b2-account-id); export B2_ACCOUNT_KEY=$(cat $CREDENTIALS_DIRECTORY/restic-b2-account-key); restic -r b2:krasovsky-homelab:app-data --verbose --exclude-file=/etc/restic/excludes.txt backup /mnt/snapshots/backblaze/app_data"
+        ExecStart=/etc/restic/run backblaze -r b2:krasovsky-homelab:app-data --verbose --exclude-file=/etc/restic/excludes.txt backup /mnt/snapshots/backblaze/app_data
         ExecStart=/bin/bash -c "umount /mnt/snapshots/backblaze || true"
         ExecStart=/usr/sbin/lvremove -y vg0/restic-backblaze
 
@@ -504,16 +505,14 @@ systemd:
 
         [Service]
         Type=oneshot
-        LoadCredential=restic-aws-access-key-id
-        LoadCredential=restic-aws-secret-access-key
-        LoadCredential=restic-password
         Environment=RESTIC_CACHE_DIR=/var/mnt/docker/restic-cache
-        Environment=RESTIC_PASSWORD_FILE=%d/restic-password
+        # Fail on missing secrets before creating a snapshot.
+        ExecStartPre=/etc/restic/run storj version
         # Create LVM snapshot and do backup
         ExecStart=/bin/bash -c "lvremove -y vg0/restic-storj || true"
         ExecStart=/usr/sbin/lvcreate --size 15G --snapshot --name restic-storj vg0/lv0
         ExecStart=/usr/bin/mount -o nouuid /dev/vg0/restic-storj /mnt/snapshots/storj
-        ExecStart=/bin/bash -c "export AWS_ACCESS_KEY_ID=$(cat $CREDENTIALS_DIRECTORY/restic-aws-access-key-id); export AWS_SECRET_ACCESS_KEY=$(cat $CREDENTIALS_DIRECTORY/restic-aws-secret-access-key); restic -r s3:https://gateway.eu1.storjshare.io/homelab-backup/app-data --verbose --exclude-file=/etc/restic/excludes.txt backup /mnt/snapshots/storj/app_data"
+        ExecStart=/etc/restic/run storj -r s3:https://gateway.eu1.storjshare.io/homelab-backup/app-data --verbose --exclude-file=/etc/restic/excludes.txt backup /mnt/snapshots/storj/app_data
         ExecStart=/bin/bash -c "umount /mnt/snapshots/storj || true"
         ExecStart=/usr/sbin/lvremove -y vg0/restic-storj
 
@@ -544,12 +543,8 @@ systemd:
 
         [Service]
         Type=oneshot
-        LoadCredential=restic-b2-account-id
-        LoadCredential=restic-b2-account-key
-        LoadCredential=restic-password
         Environment=RESTIC_CACHE_DIR=/var/mnt/docker/restic-cache
-        Environment=RESTIC_PASSWORD_FILE=%d/restic-password
-        ExecStart=/bin/bash -c "export B2_ACCOUNT_ID=$(cat $CREDENTIALS_DIRECTORY/restic-b2-account-id); export B2_ACCOUNT_KEY=$(cat $CREDENTIALS_DIRECTORY/restic-b2-account-key); restic -r b2:krasovsky-homelab:app-data --verbose forget --keep-daily 14 --keep-weekly 8 --keep-monthly 12 --prune"
+        ExecStart=/etc/restic/run backblaze -r b2:krasovsky-homelab:app-data --verbose forget --keep-daily 14 --keep-weekly 8 --keep-monthly 12 --prune
 
         [Install]
         WantedBy=multi-user.target
@@ -578,12 +573,8 @@ systemd:
 
         [Service]
         Type=oneshot
-        LoadCredential=restic-aws-access-key-id
-        LoadCredential=restic-aws-secret-access-key
-        LoadCredential=restic-password
         Environment=RESTIC_CACHE_DIR=/var/mnt/docker/restic-cache
-        Environment=RESTIC_PASSWORD_FILE=%d/restic-password
-        ExecStart=/bin/bash -c "export AWS_ACCESS_KEY_ID=$(cat $CREDENTIALS_DIRECTORY/restic-aws-access-key-id); export AWS_SECRET_ACCESS_KEY=$(cat $CREDENTIALS_DIRECTORY/restic-aws-secret-access-key); restic -r s3:https://gateway.eu1.storjshare.io/homelab-backup/app-data --verbose forget --keep-daily 14 --keep-weekly 8 --keep-monthly 12 --prune"
+        ExecStart=/etc/restic/run storj -r s3:https://gateway.eu1.storjshare.io/homelab-backup/app-data --verbose forget --keep-daily 14 --keep-weekly 8 --keep-monthly 12 --prune
 
         [Install]
         WantedBy=multi-user.target

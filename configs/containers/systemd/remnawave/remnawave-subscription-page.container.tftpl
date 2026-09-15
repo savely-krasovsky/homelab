@@ -24,8 +24,6 @@ Label="traefik.http.services.remnawave-subscription-page.loadbalancer.server.por
 Pod=remnawave.pod
 
 [Service]
+ExecStartPre=/usr/bin/mountpoint -q /var/mnt/docker
 TimeoutStartSec=900
 Restart=always
-
-[Install]
-WantedBy=multi-user.target default.target

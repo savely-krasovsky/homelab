@@ -1,8 +1,0 @@
-[Unit]
-Description=Immich Pod
-
-[Pod]
-PodName=immich
-UserNS=keep-id:uid=1000,gid=1000
-Network=immich.network
-Network=reverse-proxy.network

@@ -1,4 +1,6 @@
 [Unit]
+Requires=reverse-proxy-network.service
+After=reverse-proxy-network.service
 Description=Plex Quadlet
 
 [Container]
@@ -30,7 +32,7 @@ Volume=/var/mnt/media/movies:/data/movies:z
 Volume=/var/mnt/media/music:/data/music:z
 Tmpfs=/transcode:size=8G,rw:Z
 
-Network=reverse-proxy.network
+Network=systemd-reverse-proxy
 PublishPort=32410:32410/udp
 PublishPort=32412:32412/udp
 PublishPort=32413:32413/udp
@@ -39,6 +41,9 @@ PublishPort=32414:32414/udp
 AddDevice=/dev/dri
 
 [Service]
+ExecStartPre=/usr/bin/mountpoint -q /var/mnt/docker
+ExecStartPre=/usr/bin/test -d /var/mnt/docker/app_data
+ExecStartPre=/usr/bin/mkdir -p -m 0755 -- /var/mnt/docker/app_data/plex
 TimeoutStartSec=900
 Restart=always
 

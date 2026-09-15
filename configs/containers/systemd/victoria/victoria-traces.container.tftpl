@@ -23,10 +23,8 @@ Volume=/var/mnt/observability/traces:/victoria-traces-data:Z
 Pod=victoria.pod
 
 [Service]
+ExecStartPre=/usr/bin/mountpoint -q /var/mnt/docker
 TimeoutStartSec=900
 Restart=always
 MemoryHigh=2G
 MemoryMax=3G
-
-[Install]
-WantedBy=multi-user.target default.target

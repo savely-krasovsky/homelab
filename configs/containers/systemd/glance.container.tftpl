@@ -1,4 +1,6 @@
 [Unit]
+Requires=reverse-proxy-network.service
+After=reverse-proxy-network.service
 Description=Glance Quadlet
 Requires=podman.socket
 After=podman.socket
@@ -31,14 +33,17 @@ Volume=%E/glance:/app/config:Z
 Volume=/var/mnt/docker/app_data/glance/assets:/app/assets:Z
 Volume=%t/podman/podman.sock:/var/run/docker.sock
 
-Network=reverse-proxy.network
+Network=systemd-reverse-proxy
 
 # Disable label security to access Podman socket.
 SecurityLabelDisable=true
 
 [Service]
+ExecStartPre=/usr/bin/mountpoint -q /var/mnt/docker
+ExecStartPre=/usr/bin/test -d /var/mnt/docker/app_data
+ExecStartPre=/usr/bin/mkdir -p -m 0755 -- /var/mnt/docker/app_data/glance/assets
 TimeoutStartSec=900
 Restart=always
 
 [Install]
-WantedBy=multi-user.target default.target
+WantedBy=default.target

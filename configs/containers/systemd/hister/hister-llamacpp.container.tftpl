@@ -26,10 +26,10 @@ Pod=hister.pod
 Exec=--hf-repo Qwen/Qwen3-Embedding-0.6B-GGUF:F16 --embedding --pooling last --port 8080 --ctx-size 512 --parallel 2 --cache-ram 0 --metrics --log-jsonl
 
 [Service]
+ExecStartPre=/usr/bin/mountpoint -q /var/mnt/docker
+ExecStartPre=/usr/bin/test -d /var/mnt/docker/app_data
+ExecStartPre=/usr/bin/mkdir -p -m 0755 -- /var/mnt/docker/app_data/hister/llamacpp
 TimeoutStartSec=900
 Restart=always
 MemoryHigh=3G
 MemoryMax=4G
-
-[Install]
-WantedBy=multi-user.target default.target

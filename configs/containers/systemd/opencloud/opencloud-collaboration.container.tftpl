@@ -1,4 +1,5 @@
 [Unit]
+PartOf=opencloud.target
 Description=OpenCloud Collaboration Quadlet
 Requires=opencloud-collabora.service
 After=opencloud-server.service opencloud-collabora.service
@@ -40,11 +41,10 @@ Volume=/var/mnt/docker/app_data/opencloud:/etc/opencloud:z
 Pod=opencloud.pod
 
 [Service]
-# App URLs are read once at startup and never retried, so wait for Traefik to
-# route collabora — it must go through Traefik to advertise public urlsrc.
+ExecStartPre=/usr/bin/mountpoint -q /var/mnt/docker
+ExecStartPre=/usr/bin/test -d /var/mnt/docker/app_data
+ExecStartPre=/usr/bin/mkdir -p -m 0755 -- /var/mnt/docker/app_data/opencloud
+# App URLs are read once at startup; wait until Traefik routes collabora
 ExecStartPre=/usr/bin/bash -c 'until curl -sfo /dev/null https://collabora.${base_domain}/hosting/discovery; do sleep 2; done'
 TimeoutStartSec=900
 Restart=always
-
-[Install]
-WantedBy=multi-user.target default.target

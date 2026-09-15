@@ -1,0 +1,13 @@
+[Unit]
+Requires=reverse-proxy-network.service
+After=reverse-proxy-network.service
+Description=Immich Pod
+
+[Pod]
+PodName=immich
+UserNS=keep-id:uid=1000,gid=1000
+Network=immich.network
+Network=systemd-reverse-proxy
+
+[Install]
+WantedBy=default.target

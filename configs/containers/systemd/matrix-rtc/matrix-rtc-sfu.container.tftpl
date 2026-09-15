@@ -40,9 +40,6 @@ Volume=%E/matrix-rtc/livekit.yaml:/etc/livekit.yaml:Z
 Pod=matrix-rtc.pod
 
 [Service]
+ExecStartPre=/usr/bin/mountpoint -q /var/mnt/docker
 TimeoutStartSec=900
 Restart=always
-
-[Install]
-WantedBy=multi-user.target default.target
-

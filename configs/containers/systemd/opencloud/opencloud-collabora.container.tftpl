@@ -1,4 +1,5 @@
 [Unit]
+PartOf=opencloud.target
 Description=OpenCloud Collabora Quadlet
 
 [Container]
@@ -31,10 +32,8 @@ Pod=opencloud.pod
 AddCapability=MKNOD
 
 [Service]
+ExecStartPre=/usr/bin/mountpoint -q /var/mnt/docker
 TimeoutStartSec=900
 Restart=always
 MemoryHigh=2G
 MemoryMax=3G
-
-[Install]
-WantedBy=multi-user.target default.target

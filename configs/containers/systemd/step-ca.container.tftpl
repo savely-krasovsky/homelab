@@ -1,4 +1,6 @@
 [Unit]
+Requires=reverse-proxy-network.service
+After=reverse-proxy-network.service
 Description=Smallstep step-ca Server Quadlet
 
 [Container]
@@ -29,9 +31,12 @@ Environment=DOCKER_STEPCA_INIT_REMOTE_MANAGEMENT=true
 
 Volume=/var/mnt/docker/app_data/smallstep:/home/step:Z
 
-Network=reverse-proxy.network
+Network=systemd-reverse-proxy
 
 [Service]
+ExecStartPre=/usr/bin/mountpoint -q /var/mnt/docker
+ExecStartPre=/usr/bin/test -d /var/mnt/docker/app_data
+ExecStartPre=/usr/bin/mkdir -p -m 0755 -- /var/mnt/docker/app_data/smallstep
 TimeoutStartSec=900
 Restart=always
 

@@ -41,10 +41,10 @@ Volume=/var/mnt/docker/app_data/open-webui:/app/backend/data:Z
 Pod=open-webui.pod
 
 [Service]
+ExecStartPre=/usr/bin/mountpoint -q /var/mnt/docker
+ExecStartPre=/usr/bin/test -d /var/mnt/docker/app_data
+ExecStartPre=/usr/bin/mkdir -p -m 0755 -- /var/mnt/docker/app_data/open-webui
 TimeoutStartSec=900
 Restart=always
 MemoryHigh=3G
 MemoryMax=4G
-
-[Install]
-WantedBy=multi-user.target default.target

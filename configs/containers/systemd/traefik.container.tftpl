@@ -1,4 +1,6 @@
 [Unit]
+Requires=reverse-proxy-network.service
+After=reverse-proxy-network.service
 Description=Traefik Quadlet
 Requires=http.socket https.socket imaps.socket smtps.socket ldaps.socket podman.socket
 After=http.socket https.socket imaps.socket smtps.socket ldaps.socket podman.socket
@@ -40,7 +42,7 @@ Volume=/var/mnt/docker/app_data/traefik/plugins:/plugins-storage:Z
 
 Volume=%t/podman/podman.sock:/var/run/docker.sock
 
-Network=reverse-proxy.network
+Network=systemd-reverse-proxy
 NetworkAlias=cloud.${base_domain}
 NetworkAlias=collabora.${base_domain}
 NetworkAlias=id.${base_domain}
@@ -60,6 +62,9 @@ SecurityLabelDisable=true
 AddCapability=CAP_NET_BIND_SERVICE
 
 [Service]
+ExecStartPre=/usr/bin/mountpoint -q /var/mnt/docker
+ExecStartPre=/usr/bin/test -d /var/mnt/docker/app_data
+ExecStartPre=/usr/bin/mkdir -p -m 0755 -- /var/mnt/docker/app_data/traefik/acme /var/mnt/docker/app_data/traefik/plugins
 TimeoutStartSec=900
 Restart=always
 Sockets=http.socket https.socket imaps.socket smtps.socket ldaps.socket

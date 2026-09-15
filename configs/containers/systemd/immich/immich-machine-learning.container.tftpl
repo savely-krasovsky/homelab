@@ -24,10 +24,8 @@ AddDevice=/dev/dri
 Pod=immich.pod
 
 [Service]
+ExecStartPre=/usr/bin/mountpoint -q /var/mnt/docker
 TimeoutStartSec=900
 Restart=always
 MemoryHigh=3G
 MemoryMax=4G
-
-[Install]
-WantedBy=multi-user.target default.target

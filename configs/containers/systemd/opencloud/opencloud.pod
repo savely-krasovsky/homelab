@@ -1,0 +1,11 @@
+[Unit]
+PartOf=opencloud.target
+Requires=reverse-proxy-network.service
+After=reverse-proxy-network.service
+Description=OpenCloud Pod
+
+[Pod]
+PodName=opencloud
+UserNS=keep-id:uid=1000,gid=1000
+Network=opencloud.network
+Network=systemd-reverse-proxy

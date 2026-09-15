@@ -1,4 +1,6 @@
 [Unit]
+Requires=reverse-proxy-network.service
+After=reverse-proxy-network.service
 Description=Element Web Quadlet
 
 [Container]
@@ -20,9 +22,10 @@ Label="traefik.http.routers.element-web.rule=Host(`element.${base_domain}`)"
 
 Volume=%E/element/web.json:/app/config.json:Z
 
-Network=reverse-proxy.network
+Network=systemd-reverse-proxy
 
 [Service]
+ExecStartPre=/usr/bin/mountpoint -q /var/mnt/docker
 TimeoutStartSec=900
 Restart=always
 

@@ -1,4 +1,6 @@
 [Unit]
+Requires=reverse-proxy-network.service
+After=reverse-proxy-network.service
 Description=Grafana Alloy Quadlet
 Requires=podman.socket
 After=podman.socket
@@ -41,13 +43,15 @@ Volume=%E/alloy/config.alloy:/etc/alloy/config.alloy:Z
 Volume=%t/podman/podman.sock:/var/run/docker.sock
 Volume=/var/mnt/docker/app_data/alloy:/var/lib/alloy/data:Z
 
-Network=reverse-proxy.network
+Network=systemd-reverse-proxy
 
 # Disable label security to access Podman socket.
 SecurityLabelDisable=true
 
 [Service]
-ExecStartPre=/usr/bin/mkdir -p /var/mnt/docker/app_data/alloy
+ExecStartPre=/usr/bin/mountpoint -q /var/mnt/docker
+ExecStartPre=/usr/bin/test -d /var/mnt/docker/app_data
+ExecStartPre=/usr/bin/mkdir -p -m 0755 -- /var/mnt/docker/app_data/alloy
 TimeoutStartSec=900
 Restart=always
 MemoryHigh=1.5G

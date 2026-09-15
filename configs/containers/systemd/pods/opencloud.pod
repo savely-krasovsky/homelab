@@ -1,8 +1,0 @@
-[Unit]
-Description=OpenCloud Pod
-
-[Pod]
-PodName=opencloud
-UserNS=keep-id:uid=1000,gid=1000
-Network=opencloud.network
-Network=reverse-proxy.network

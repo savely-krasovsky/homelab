@@ -1,0 +1,12 @@
+[Unit]
+Requires=reverse-proxy-network.service
+After=reverse-proxy-network.service
+Description=Open WebUI Pod
+
+[Pod]
+PodName=open-webui
+Network=open-webui.network
+Network=systemd-reverse-proxy
+
+[Install]
+WantedBy=default.target

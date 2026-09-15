@@ -1,4 +1,6 @@
 [Unit]
+Requires=reverse-proxy-network.service
+After=reverse-proxy-network.service
 Description=Masked Email Bot Quadlet
 
 [Container]
@@ -18,9 +20,12 @@ Label="traefik.http.services.masked-email-bot.loadbalancer.server.port=8080"
 
 Volume=/var/mnt/docker/app_data/masked-email-bot:/data:Z
 
-Network=reverse-proxy.network
+Network=systemd-reverse-proxy
 
 [Service]
+ExecStartPre=/usr/bin/mountpoint -q /var/mnt/docker
+ExecStartPre=/usr/bin/test -d /var/mnt/docker/app_data
+ExecStartPre=/usr/bin/mkdir -p -m 0755 -- /var/mnt/docker/app_data/masked-email-bot
 TimeoutStartSec=900
 Restart=always
 

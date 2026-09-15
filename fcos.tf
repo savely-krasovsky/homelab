@@ -1,24 +1,20 @@
 locals {
-  # Shared template values. Secret contents are passed only through secret_values_wo.
   containers_config = merge(var.containers_config, {
     proxmox_ip : var.proxmox_config.host,
     truenas_ip : var.fcos_config.truenas_ip,
     fcos_ip : var.fcos_config.ip,
   })
 
-  # Get a list of all files in the specified directory
-  config_paths = fileset("${path.module}/configs", "**")
-  config_files = {
-    for cfgpath in local.config_paths :
-    trimsuffix(cfgpath, ".tftpl") => templatefile("${path.module}/configs/${cfgpath}", local.containers_config)
-  }
-
   firewall_config = file("${path.module}/butane/nftables.nft")
 
   butane_config = merge(var.fcos_config, {
     base_domain : var.containers_config.base_domain,
     firewall_config : local.firewall_config,
+    restic_runner : file("${path.module}/butane/restic-with-secrets.sh"),
   })
+
+  # System restic jobs read their values from core's Podman secret store at startup.
+  podman_secrets = { for name, id in var.containers_secret_config : replace(name, "_", "-") => id }
 }
 
 data "ct_config" "fcos_ignition" {
@@ -96,30 +92,83 @@ resource "proxmox_virtual_environment_vm" "fcos" {
     enabled = true
   }
 
-  # An inlined config outgrew what PVE passes to QEMU and was dropped without an error.
+  # Load Ignition from a file to stay within PVE's QEMU argument size limit.
   kvm_arguments = "-fw_cfg name=opt/com.coreos/config,file=/var/lib/vz/snippets/${proxmox_virtual_environment_file.fcos_ignition.source_raw[0].file_name}"
 }
 
-resource "homelab_config" "fcos" {
+resource "quadlet_podman_secret" "containers" {
+  for_each   = local.podman_secrets
   depends_on = [proxmox_virtual_environment_vm.fcos]
 
-  host             = var.fcos_config.ip
-  user             = "core"
-  private_key_file = pathexpand(var.fcos_config.ssh_private_key_path)
-  host_key         = var.fcos_config.ssh_host_key
+  name     = each.key
+  value_wo = ephemeral.bitwarden_secrets.containers.values[lower(each.value)]
+  version  = lookup(var.secret_versions, each.key, "1")
 
-  files            = local.config_files
-  firewall         = local.firewall_config
-  secrets          = var.containers_secret_config
-  secrets_revision = var.deployment_secrets_revision
+  lifecycle {
+    replace_triggered_by = [proxmox_virtual_environment_vm.fcos]
+  }
+}
 
-  # Volume sources below this root are created before the units start; the root
-  # itself must be mounted. The NFS shares stay outside it on purpose.
-  data_root = "/var/mnt/docker/app_data"
+resource "quadlet_deployment" "reverse_proxy_network" {
+  depends_on = [proxmox_virtual_environment_vm.fcos]
 
-  secret_values_wo = {
-    for name, id in var.containers_secret_config :
-    name => ephemeral.bitwarden_secrets.containers.values[lower(id)]
+  name    = "reverse-proxy"
+  files   = local.deployment_files["reverse-proxy"]
+  restart = ["reverse-proxy-network.service"]
+
+  lifecycle {
+    replace_triggered_by = [proxmox_virtual_environment_vm.fcos]
+  }
+}
+
+resource "quadlet_deployment" "applications" {
+  # These two applications need other deployments installed before activation.
+  for_each = {
+    for name, app in local.applications : name => app
+    if !contains(["opencloud", "oauth2-proxy"], name)
+  }
+  depends_on = [quadlet_deployment.reverse_proxy_network]
+
+  name        = each.key
+  files       = local.deployment_files[each.key]
+  restart     = each.value.restart
+  try_restart = try(each.value.try_restart, [])
+  enable      = try(each.value.enable, [])
+  triggers = {
+    for name in try(each.value.secrets, []) : name => quadlet_podman_secret.containers[name].revision
+  }
+
+  lifecycle {
+    replace_triggered_by = [proxmox_virtual_environment_vm.fcos]
+  }
+}
+
+resource "quadlet_deployment" "opencloud" {
+  # Collaboration waits for the Collabora URL routed through Traefik.
+  depends_on = [quadlet_deployment.applications["traefik"]]
+
+  name    = "opencloud"
+  files   = local.deployment_files.opencloud
+  restart = local.applications.opencloud.restart
+  enable  = local.applications.opencloud.enable
+  triggers = {
+    for name in local.applications.opencloud.secrets : name => quadlet_podman_secret.containers[name].revision
+  }
+
+  lifecycle {
+    replace_triggered_by = [proxmox_virtual_environment_vm.fcos]
+  }
+}
+
+resource "quadlet_deployment" "oauth2_proxy" {
+  # OIDC discovery needs both Pocket ID and the proxy serving its public URL.
+  depends_on = [quadlet_deployment.applications["pocket-id"], quadlet_deployment.applications["traefik"]]
+
+  name    = "oauth2-proxy"
+  files   = local.deployment_files["oauth2-proxy"]
+  restart = local.applications["oauth2-proxy"].restart
+  triggers = {
+    for name in local.applications["oauth2-proxy"].secrets : name => quadlet_podman_secret.containers[name].revision
   }
 
   lifecycle {

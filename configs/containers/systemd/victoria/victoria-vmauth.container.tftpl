@@ -36,8 +36,6 @@ Volume=%E/vmauth/auth.yml:/etc/auth.yml:Z
 Pod=victoria.pod
 
 [Service]
+ExecStartPre=/usr/bin/mountpoint -q /var/mnt/docker
 TimeoutStartSec=900
 Restart=always
-
-[Install]
-WantedBy=multi-user.target default.target

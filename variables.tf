@@ -134,9 +134,8 @@ variable "fcos_config" {
     truenas_ip  = string
     truenas_iqn = string
 
-    # How the provider reaches the host; the host key, when set, is pinned
+    # How the provider authenticates to the host.
     ssh_private_key_path = string
-    ssh_host_key         = optional(string)
   })
 }
 

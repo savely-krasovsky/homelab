@@ -21,7 +21,7 @@ terraform {
     }
     quadlet = {
       source  = "registry.terraform.io/savely-krasovsky/quadlet"
-      version = "0.4.1"
+      version = "0.4.2"
     }
   }
 }
@@ -53,8 +53,8 @@ provider "proxmox" {
 }
 
 provider "quadlet" {
-  host             = var.fcos_config.ip
-  user             = "core"
-  private_key_file = pathexpand(var.fcos_config.ssh_private_key_path)
-  host_key         = var.fcos_config.ssh_host_key
+  host                         = var.fcos_config.ip
+  user                         = "core"
+  private_key_file             = pathexpand(var.fcos_config.ssh_private_key_path)
+  insecure_skip_host_key_check = true
 }

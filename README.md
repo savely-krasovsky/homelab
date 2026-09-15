@@ -185,9 +185,11 @@ check prevents directory creation and container startup.
 Provision a fresh host with fresh Terraform state. The provider stores ownership
 and activation status in one `deployment.json` record per application.
 
-SSH host verification uses `fcos_config.ssh_host_key` when set, otherwise
-`~/.ssh/known_hosts` must contain the verified key for `fcos_config.ip`.
-A key saved only for an SSH alias such as `fcos.lan` does not cover the IP.
+The Quadlet provider sets `insecure_skip_host_key_check = true` for this homelab.
+Fresh or reinstalled FCOS hosts do not require a `known_hosts` entry. SSH still
+encrypts traffic and authenticates the client, but does not verify the server's
+identity. This allows server impersonation. Host private keys stay on FCOS.
+
 Repeated connections rejected before authentication can trigger OpenSSH's
 `PerSourcePenalties`; check the earlier SSH errors and `journalctl -u sshd`
 if an apply reports many `SSH handshake: connection reset by peer` errors.
@@ -234,6 +236,12 @@ ephemeral resources at all, so both `ephemeral "bitwarden_secret"` and `ephemera
 come from [my fork](https://github.com/savely-krasovsky/terraform-provider-bitwarden) — `v0.18.0` plus
 commits `aa47a52` and `042ae61`, upstream as [PR #406](https://github.com/maxlaverse/terraform-provider-bitwarden/pull/406).
 Build it with `go build -o bin/ .` and point `.terraformrc` at that `bin/` directory.
+
+The SSH verification option also currently requires the local Quadlet provider
+build: `insecure_skip_host_key_check` is not in release `0.4.1`. Run `make build`
+in the provider repository and use its `bin/` directory in `.terraformrc`.
+Set `TF_CLI_CONFIG_FILE="$PWD/.terraformrc"` when running OpenTofu from this
+repository so both development overrides are loaded.
 
 ## Future plans
 

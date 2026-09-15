@@ -1,39 +1,6 @@
 # This file is maintained automatically by "tofu init".
 # Manual edits may be lost in future updates.
 
-provider "registry.opentofu.org/ansible/ansible" {
-  version = "1.5.0"
-  hashes = [
-    "h1:8RScKkD5ZCSpPJ8zTwgz56WDTV9wUnhKBrHfUrIA+SA=",
-    "h1:8p/LQkmVBKmD/ikiSonFsfvZlBFjhUuAxVwjIcSAaUA=",
-    "h1:DzSyFW8OqgcdRJhXUngt0hoi6Jeb2xsnxQl57+3FzMc=",
-    "h1:E1tGpgFVgGgUp9KBFGW7ngyWYTOf0dN1plFJ0GRotR8=",
-    "h1:JEyKY2Ke5i7q1VKA5W5NIcbI3SBgVaPtOCeRmXZD4ko=",
-    "h1:cgmhJg35RcHLerFv4hJGhZpc+KrIBovL8oFfCYW2oZc=",
-    "h1:hkY/61k5DG8jKzE4pkZHen/YpZUuM04Ay6JozTz3eSM=",
-    "h1:iP373tLOqcf4kNh/F+lvwqLA484yXLMKt3xqlKCpThA=",
-    "h1:jmvS1owqCufoVGlORixtteUywf0bncq1pFqXiKQ1OZ4=",
-    "h1:mpXXUIeJ/SnzhDw/YJZxetJjuxAKaw77E0YUCp504hY=",
-    "h1:tG0oly3Zdl9WU8I22QHPPOS71GWMwZ1j2o1wClS8yw4=",
-    "h1:wV+X/CiaPATLfEXY7dxkFa3gGrImJn/OrxwokVewkwA=",
-    "h1:x/g3i7RM8P5QccT487j9opEgX4AQwKNf1tNtkPiROpw=",
-    "zh:0332643192233c9baa751318b1e22a3eec54ab6bf5172fa97788ed9d32ed36e0",
-    "zh:1242308c08544dd881cf274ca27aa5d7eb41c26f987759a29f0fda410c01d771",
-    "zh:1cc36a7fe58be3cd5c39c278cf0e71e0a4005fc6317dffa23dcf2b86df8c7e15",
-    "zh:297966b5682a31320f8a5968589c0119ffbd8efb3de2371a222c3af1899ca595",
-    "zh:50c044cfeca5bca7c92b560241799c13076357da798bb2f0c99155d3d4a25155",
-    "zh:5e1dc7ba6066a7939c47e05988eda6bc4225d703594cf0827270c25b52b226a4",
-    "zh:6aa1999ee2b84247125d1623c67e58134eb56a7b0f70148f0c1dd90bdd480f90",
-    "zh:986f96ea929844dde94732b3a120ea513dda432653be36a500cc383254964950",
-    "zh:b383f7050f9102007a78988c4cb1dc325ecd7ec47e4a64491b09bda06f905565",
-    "zh:cdaba8b4cd23f5e23d9e9dffc29d72a41fbbc196cc9022f502b5e73c1620d603",
-    "zh:e22cbe70257af2c82545a66fc4f64264879105298ccd93063afcf21dff6759b5",
-    "zh:ebaa0509bceb1722cae9d60c379eff50234726ace7af57e75ab9efbec5649d94",
-    "zh:f569b65999264a9416862bca5cd2a6177d94ccb0424f3a4ef424428912b9cb3c",
-    "zh:f5f52882e3bf07e6c53fb280b88aa5480d65556307d35f0e601a2514d2ce2d5c",
-  ]
-}
-
 provider "registry.opentofu.org/bpg/proxmox" {
   version     = "0.113.1"
   constraints = "0.113.1"
@@ -154,16 +121,16 @@ provider "registry.opentofu.org/poseidon/ct" {
 }
 
 provider "registry.terraform.io/savely-krasovsky/quadlet" {
-  version     = "0.4.1"
-  constraints = "0.4.1"
+  version     = "0.4.2"
+  constraints = "0.4.2"
   hashes = [
-    "h1:0mDDdypFKOyEZ3jnmv5YQTR70cGIKBeeDoUpZLPu38E=",
-    "zh:22d1cd9ba01bcd2985cdf7c545321f01b90cbe36cbd05ac6406e66858149a0d8",
-    "zh:8804c3a228d2be2c37cdf198a15dc0ee13f37288790d241d4fc2216c566be6fd",
-    "zh:916c14de874fe9ec1bfca99bff71db419fc848b63378cb77e1bfdcf7d3d6dd1e",
-    "zh:917732d156ab807a8c6221149cebc1c62e1ef7da337091a450ae93ced982c1a1",
-    "zh:c53843ad4ebddb985e2c5b2bcc38083535b20ca25b4154c2dd09cebb039a0d1a",
-    "zh:f4dbdcd6767b7ce1f46ef352b224ae2e651effc124d8fb3d550bcb862f329d52",
+    "h1:k64izpHkB9XNCVehfgeCqUg4BL9y+01w2gxSRQHilQo=",
+    "zh:327b3cd38f5db64eb792b3c9f878f0196df3c4f8c136d42b3c95f72c320bb37c",
+    "zh:824834e2db0fb4f03e80403eb87d6f87132aa649214537c97e9d390d2593f82a",
+    "zh:92832f3e7c69aad8026d5f1be84316f3bc8082b44aab59453a3bbd44e03c39dc",
+    "zh:a235f7720728abd80444c17223fbef0f3f7ae9452ea8abab84a271823bf53b3c",
+    "zh:cbc5f7addca8bd7803d571a92d36f11444ab712595f21d0df1b498599a49cbd0",
+    "zh:dee0ca27024bdb905225a38e14554f5216f98ee20865dc8493d137c7f7a03803",
     "zh:f809ab383cca0a5f83072981c64208cbd7fa67e986a86ee02dd2c82333221e32",
   ]
 }

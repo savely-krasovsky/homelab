@@ -4,25 +4,57 @@ users:
     url_map:
       - src_hosts:
           - "metrics\\.${replace(base_domain, ".", "\\\\.")}"
-        url_prefix: "http://victoria-metrics:8428/"
+        url_prefix: "http://127.0.0.1:8428/"
       - src_hosts:
           - "logs\\.${replace(base_domain, ".", "\\\\.")}"
-        url_prefix: "http://victoria-logs:9428/"
+        url_prefix: "http://127.0.0.1:9428/"
       - src_hosts:
           - "traces\\.${replace(base_domain, ".", "\\\\.")}"
-        url_prefix: "http://victoria-traces:10428/"
+        url_prefix: "http://127.0.0.1:10428/"
   # Proxmox
   - bearer_token: "%%{VMAUTH_PROXMOX_BEARER_TOKEN}"
     url_map:
       - src_hosts:
           - "metrics\\.${replace(base_domain, ".", "\\\\.")}:443"
-        url_prefix: "http://victoria-metrics:8428/"
+        url_prefix: "http://127.0.0.1:8428/"
       - src_hosts:
           - "logs\\.${replace(base_domain, ".", "\\\\.")}"
-        url_prefix: "http://victoria-logs:9428/"
+        url_prefix: "http://127.0.0.1:9428/"
   # Fedora CoreOS
   - bearer_token: "%%{VMAUTH_FEDORA_COREOS_BEARER_TOKEN}"
     url_map:
       - src_hosts:
           - "logs\\.${replace(base_domain, ".", "\\\\.")}"
-        url_prefix: "http://victoria-logs:9428/"
+        url_prefix: "http://127.0.0.1:9428/"
+  # Alloy: ingestion and backend self-metrics.
+  - bearer_token: "%%{VMAUTH_ALLOY_BEARER_TOKEN}"
+    url_map:
+      - src_paths:
+          - "/vm/prometheus/api/v1/write"
+          - "/vm/opentelemetry/v1/metrics"
+          - "/vm/metrics"
+        drop_src_path_prefix_parts: 1
+        url_prefix: "http://127.0.0.1:8428/"
+      - src_paths:
+          - "/vl/insert/loki/api/v1/push"
+          - "/vl/insert/opentelemetry/v1/logs"
+          - "/vl/metrics"
+        drop_src_path_prefix_parts: 1
+        url_prefix: "http://127.0.0.1:9428/"
+      - src_paths:
+          - "/vt/insert/opentelemetry/v1/traces"
+          - "/vt/metrics"
+        drop_src_path_prefix_parts: 1
+        url_prefix: "http://127.0.0.1:10428/"
+  # Grafana: authenticated access to the existing backend APIs.
+  - bearer_token: "%%{VMAUTH_GRAFANA_BEARER_TOKEN}"
+    url_map:
+      - src_paths: ["/vm/.*"]
+        drop_src_path_prefix_parts: 1
+        url_prefix: "http://127.0.0.1:8428/"
+      - src_paths: ["/vl/.*"]
+        drop_src_path_prefix_parts: 1
+        url_prefix: "http://127.0.0.1:9428/"
+      - src_paths: ["/vt/.*"]
+        drop_src_path_prefix_parts: 1
+        url_prefix: "http://127.0.0.1:10428/"

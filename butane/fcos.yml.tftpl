@@ -163,7 +163,7 @@ storage:
         inline: |
           [storage]
           driver = "overlay"
-          graphroot = "/mnt/docker/core"
+          graphroot = "/mnt/docker/homelab"
 
     - path: /etc/containers/storage.conf
       contents:
@@ -419,7 +419,7 @@ systemd:
         [Service]
         Type=oneshot
         RemainAfterExit=yes
-        ExecStart=/usr/bin/chcon -R -t container_file_t /var/mnt/docker/core
+        ExecStart=/usr/bin/chcon -R -t container_file_t /var/mnt/docker/homelab
         ExecStart=/bin/touch /var/lib/%N.stamp
 
         [Install]

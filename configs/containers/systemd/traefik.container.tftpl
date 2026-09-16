@@ -2,8 +2,10 @@
 Requires=reverse-proxy-network.service
 After=reverse-proxy-network.service
 Description=Traefik Quadlet
-Requires=http.socket https.socket imaps.socket smtps.socket ldaps.socket podman.socket
-After=http.socket https.socket imaps.socket smtps.socket ldaps.socket podman.socket
+Wants=socket-proxy.service
+After=socket-proxy.service
+Requires=http.socket https.socket imaps.socket smtps.socket ldaps.socket
+After=http.socket https.socket imaps.socket smtps.socket ldaps.socket
 
 [Container]
 Image=docker.io/library/traefik:v3.7.13
@@ -38,7 +40,7 @@ Volume=%E/traefik/file:/etc/traefik/file:Z
 Volume=/var/mnt/docker/app_data/traefik/acme:/etc/traefik/acme:Z
 Volume=/var/mnt/docker/app_data/traefik/plugins:/plugins-storage:Z
 
-Volume=%t/podman/podman.sock:/var/run/docker.sock
+Volume=%t/socket-proxy:/run/socket-proxy:ro,z
 
 Network=systemd-reverse-proxy
 NetworkAlias=cloud.${base_domain}
@@ -55,8 +57,6 @@ DNS=1.0.0.1
 
 Notify=true
 
-# Disable label security to access Podman socket.
-SecurityLabelDisable=true
 AddCapability=CAP_NET_BIND_SERVICE
 
 [Service]

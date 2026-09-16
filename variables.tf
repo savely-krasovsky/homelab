@@ -39,6 +39,8 @@ variable "containers_secret_config" {
     vmauth_traefik_bearer_token               = "fba802cf-948f-4ff7-8965-b29f00e2da48"
     vmauth_proxmox_bearer_token               = "bb281df0-e5e8-4348-a92e-b2a300a30117"
     vmauth_fedora_coreos_bearer_token         = "2558d1e5-9e89-48c6-82e1-b3e300bb400b"
+    vmauth_alloy_bearer_token                 = "8c957f03-c7d9-48cf-a72e-b4c700191830"
+    vmauth_grafana_bearer_token               = "76585c5f-560f-4def-af1a-b4c700193fbc"
     oauth2_proxy_cookie_secret                = "289c0832-27c2-463b-97b7-b29200a8cebd"
     oauth2_proxy_client_secret                = "afdb8ef2-a3d4-4a17-b839-b29200ab6f87"
     pocket_id_encryption_key                  = "60f943d2-0a2a-49da-95f7-b3c60143ecbb"

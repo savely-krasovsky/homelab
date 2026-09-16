@@ -2,8 +2,8 @@
 Requires=reverse-proxy-network.service
 After=reverse-proxy-network.service
 Description=Grafana Alloy Quadlet
-Requires=podman.socket
-After=podman.socket
+Wants=socket-proxy.service
+After=socket-proxy.service
 
 [Container]
 Image=docker.io/grafana/alloy:v1.19.2
@@ -20,6 +20,7 @@ Secret=mas-postgres-password
 Secret=outline-postgres-password
 Secret=remnawave-postgres-password
 Secret=miniflux-postgres-password,type=env,target=PGPASSWORD
+Secret=vmauth-alloy-bearer-token
 
 Label="glance.name=Grafana Alloy"
 Label="glance.icon=di:alloy"
@@ -40,13 +41,11 @@ Label="alloy.metrics.enable=true"
 Label="alloy.metrics.port=12345"
 
 Volume=%E/alloy/config.alloy:/etc/alloy/config.alloy:Z
-Volume=%t/podman/podman.sock:/var/run/docker.sock
 Volume=/var/mnt/docker/app_data/alloy:/var/lib/alloy/data:Z
 
-Network=systemd-reverse-proxy
+Volume=%t/socket-proxy:/run/socket-proxy:ro,z
 
-# Disable label security to access Podman socket.
-SecurityLabelDisable=true
+Network=systemd-reverse-proxy
 
 [Service]
 ExecStartPre=/usr/bin/mountpoint -q /var/mnt/docker

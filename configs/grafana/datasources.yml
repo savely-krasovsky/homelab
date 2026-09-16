@@ -1,0 +1,54 @@
+apiVersion: 1
+
+# Keep the existing UIDs so dashboards and correlations retain their sources.
+datasources:
+  - name: victoriametrics-metrics-datasource
+    uid: feg0coquq4q9sa
+    type: victoriametrics-metrics-datasource
+    access: proxy
+    url: http://victoria:8427/vm/
+    isDefault: true
+    editable: true
+    jsonData:
+      httpMethod: POST
+      httpHeaderName1: Authorization
+    secureJsonData:
+      httpHeaderValue1: Bearer $VMAUTH_GRAFANA_BEARER_TOKEN
+
+  - name: victoriametrics-logs-datasource
+    uid: eeg0cv8m1ymm8f
+    type: victoriametrics-logs-datasource
+    access: proxy
+    url: http://victoria:8427/vl/
+    editable: true
+    jsonData:
+      httpHeaderName1: Authorization
+    secureJsonData:
+      httpHeaderValue1: Bearer $VMAUTH_GRAFANA_BEARER_TOKEN
+
+  - name: prometheus
+    uid: af67vn4d5tczka
+    type: prometheus
+    access: proxy
+    url: http://victoria:8427/vm/
+    editable: true
+    jsonData:
+      httpMethod: POST
+      pdcInjected: false
+      prometheusType: Prometheus
+      prometheusVersion: 2.24.0
+      httpHeaderName1: Authorization
+    secureJsonData:
+      httpHeaderValue1: Bearer $VMAUTH_GRAFANA_BEARER_TOKEN
+
+  - name: jaeger
+    uid: cf67sdvdb8cg0b
+    type: jaeger
+    access: proxy
+    url: http://victoria:8427/vt/select/jaeger
+    editable: true
+    jsonData:
+      pdcInjected: false
+      httpHeaderName1: Authorization
+    secureJsonData:
+      httpHeaderValue1: Bearer $VMAUTH_GRAFANA_BEARER_TOKEN

@@ -96,21 +96,44 @@ resource "proxmox_virtual_environment_vm" "fcos" {
   kvm_arguments = "-fw_cfg name=opt/com.coreos/config,file=/var/lib/vz/snippets/${proxmox_virtual_environment_file.fcos_ignition.source_raw[0].file_name}"
 }
 
-resource "quadlet_podman_secret" "containers" {
-  for_each   = local.podman_secrets
+resource "terraform_data" "fcos_ready" {
   depends_on = [proxmox_virtual_environment_vm.fcos]
 
-  name     = each.key
-  value_wo = ephemeral.bitwarden_secrets.containers.values[lower(each.value)]
-  version  = lookup(var.secret_versions, each.key, "1")
+  connection {
+    type        = "ssh"
+    host        = var.fcos_config.ip
+    user        = "homelab"
+    private_key = sensitive(file(pathexpand(var.fcos_config.ssh_private_key_path)))
+    agent       = false
+    timeout     = "10m"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "set -eu",
+      "systemctl is-active --quiet systemd-user-sessions.service",
+      "mountpoint -q /var/mnt/docker",
+      "systemctl --user is-active --quiet default.target",
+      "podman info --format '{{.Store.GraphRoot}}'",
+    ]
+  }
 
   lifecycle {
     replace_triggered_by = [proxmox_virtual_environment_vm.fcos]
   }
 }
 
+resource "quadlet_podman_secret" "containers" {
+  for_each   = local.podman_secrets
+  depends_on = [terraform_data.fcos_ready]
+
+  name     = each.key
+  value_wo = ephemeral.bitwarden_secrets.containers.values[lower(each.value)]
+  version  = lookup(var.secret_versions, each.key, "1")
+}
+
 resource "quadlet_deployment" "reverse_proxy_network" {
-  depends_on = [proxmox_virtual_environment_vm.fcos]
+  depends_on = [terraform_data.fcos_ready]
 
   name    = "reverse-proxy"
   files   = local.deployment_files["reverse-proxy"]
@@ -121,9 +144,21 @@ resource "quadlet_deployment" "reverse_proxy_network" {
   }
 }
 
+resource "quadlet_deployment" "socket_proxy" {
+  depends_on = [terraform_data.fcos_ready]
+
+  name    = "socket-proxy"
+  files   = local.deployment_files["socket-proxy"]
+  restart = ["socket-proxy.service"]
+
+  lifecycle {
+    replace_triggered_by = [proxmox_virtual_environment_vm.fcos]
+  }
+}
+
 resource "quadlet_deployment" "applications" {
   for_each   = local.applications
-  depends_on = [quadlet_deployment.reverse_proxy_network]
+  depends_on = [quadlet_deployment.reverse_proxy_network, quadlet_deployment.socket_proxy]
 
   name        = each.key
   files       = local.deployment_files[each.key]

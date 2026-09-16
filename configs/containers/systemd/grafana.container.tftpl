@@ -32,6 +32,7 @@ Environment=GF_LOG_MODE=console
 Environment=GF_LOG_CONSOLE_FORMAT=json
 Environment=GF_PLUGINS_PREINSTALL=victoriametrics-metrics-datasource,victoriametrics-logs-datasource
 Secret=grafana-oauth2-client-secret,type=env,target=GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET
+Secret=vmauth-grafana-bearer-token,type=env,target=VMAUTH_GRAFANA_BEARER_TOKEN
 
 Label="glance.name=Grafana"
 Label="glance.icon=di:grafana"
@@ -46,6 +47,7 @@ Label="alloy.metrics.enable=true"
 Label="alloy.metrics.port=3000"
 
 Volume=/var/mnt/docker/app_data/grafana/data:/var/lib/grafana:Z
+Volume=%E/grafana/datasources.yml:/etc/grafana/provisioning/datasources/victoria.yml:ro,Z
 
 Network=systemd-reverse-proxy
 

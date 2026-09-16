@@ -2,8 +2,8 @@
 Requires=reverse-proxy-network.service
 After=reverse-proxy-network.service
 Description=Glance Quadlet
-Requires=podman.socket
-After=podman.socket
+Wants=socket-proxy.service
+After=socket-proxy.service
 
 [Container]
 Image=docker.io/glanceapp/glance:v0.8.6
@@ -31,12 +31,10 @@ Label="traefik.http.routers.glance-private.priority=2"
 
 Volume=%E/glance:/app/config:Z
 Volume=/var/mnt/docker/app_data/glance/assets:/app/assets:Z
-Volume=%t/podman/podman.sock:/var/run/docker.sock
+
+Volume=%t/socket-proxy:/run/socket-proxy:ro,z
 
 Network=systemd-reverse-proxy
-
-# Disable label security to access Podman socket.
-SecurityLabelDisable=true
 
 [Service]
 ExecStartPre=/usr/bin/mountpoint -q /var/mnt/docker

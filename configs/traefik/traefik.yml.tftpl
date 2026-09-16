@@ -57,6 +57,7 @@ entryPoints:
 
 providers:
   docker:
+    endpoint: unix:///run/socket-proxy/podman.sock
     exposedByDefault: false
     network: systemd-reverse-proxy
   file:

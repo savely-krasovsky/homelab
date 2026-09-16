@@ -64,9 +64,9 @@ locals {
     }
 
     grafana = {
-      paths   = ["containers/systemd/grafana.container"]
+      paths   = ["containers/systemd/grafana.container", "grafana"]
       restart = ["grafana.service"]
-      secrets = ["grafana-oauth2-client-secret"]
+      secrets = ["grafana-oauth2-client-secret", "vmauth-grafana-bearer-token"]
     }
 
     grafana-alloy = {
@@ -82,6 +82,7 @@ locals {
         "remnawave-metrics-pass",
         "remnawave-postgres-password",
         "synapse-postgres-password",
+        "vmauth-alloy-bearer-token",
       ]
     }
 
@@ -312,7 +313,9 @@ locals {
       paths   = ["containers/systemd/victoria", "vmauth"]
       restart = ["victoria-pod.service"]
       secrets = [
+        "vmauth-alloy-bearer-token",
         "vmauth-fedora-coreos-bearer-token",
+        "vmauth-grafana-bearer-token",
         "vmauth-proxmox-bearer-token",
         "vmauth-traefik-bearer-token",
       ]
@@ -327,7 +330,10 @@ locals {
 
   deployment_paths = merge(
     { for name, app in local.applications : name => app.paths },
-    { reverse-proxy = ["containers/systemd/networks/reverse-proxy.network"] },
+    {
+      reverse-proxy = ["containers/systemd/networks/reverse-proxy.network"]
+      socket-proxy  = ["containers/systemd/socket-proxy.container"]
+    },
   )
 
   deployment_sources = {

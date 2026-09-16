@@ -14,11 +14,8 @@ Label="glance.url=https://metrics.${base_domain}"
 Label="glance.description=Metrics Storage"
 Label="glance.hide=false"
 
-Label="alloy.metrics.enable=true"
-Label="alloy.metrics.port=8428"
-
 # Retention suffixes: a capital M means months, a lower case m means minutes and is rejected.
-Exec=--loggerFormat=json --graphiteListenAddr=:2003 --retentionPeriod=6M --memory.allowedBytes=1000MB --storage.minFreeDiskSpaceBytes=16GB
+Exec=--loggerFormat=json --httpListenAddr=127.0.0.1:8428 --graphiteListenAddr=:2003 --retentionPeriod=6M --memory.allowedBytes=1000MB --storage.minFreeDiskSpaceBytes=16GB
 
 Volume=/var/mnt/observability/metrics:/victoria-metrics-data:Z
 

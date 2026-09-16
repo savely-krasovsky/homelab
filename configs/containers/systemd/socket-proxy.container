@@ -1,0 +1,34 @@
+[Unit]
+Description=Restricted Podman API
+Requires=podman.socket
+After=podman.socket
+
+[Container]
+Image=ghcr.io/wollomatic/socket-proxy:1.13.1
+ContainerName=socket-proxy
+UserNS=keep-id:uid=65534,gid=65534
+
+Environment=SP_PROXYSOCKETENDPOINT=/run/socket-proxy/podman.sock
+# Exact paths only; all unlisted methods and endpoints are denied.
+Environment=SP_ALLOW_GET=(/v[0-9]+[.][0-9]+([.][0-9]+)?)?/(_ping|version|containers/json|containers/[A-Za-z0-9][A-Za-z0-9_.-]*/(json|logs)|networks|events)
+Environment=SP_ALLOW_GET_2=(/v[0-9]+[.][0-9]+([.][0-9]+)?)?/libpod/(_ping|containers/(json|stats)|images/json|networks/json|pods/json|volumes/json|info|events)
+Environment=SP_ALLOW_HEAD=(/v[0-9]+[.][0-9]+([.][0-9]+)?)?/_ping
+
+Volume=%t/podman/podman.sock:/var/run/docker.sock:ro
+Volume=%t/socket-proxy:/run/socket-proxy:z
+Network=none
+
+# Only the proxy needs access to the host's Podman socket.
+SecurityLabelDisable=true
+
+[Service]
+RuntimeDirectory=socket-proxy
+RuntimeDirectoryMode=0700
+# Keep the directory inode mounted by the consumer across proxy restarts.
+RuntimeDirectoryPreserve=yes
+ExecStartPre=/usr/bin/mountpoint -q /var/mnt/docker
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=default.target

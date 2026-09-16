@@ -7,8 +7,13 @@ livedebugging {
   enabled = true
 }
 
+local.file "vmauth_token" {
+  filename  = "/run/secrets/vmauth-alloy-bearer-token"
+  is_secret = true
+}
+
 discovery.docker "fcos" {
-  host = "unix:///var/run/docker.sock"
+  host = "unix:///run/socket-proxy/podman.sock"
 }
 
 discovery.relabel "docker" {
@@ -21,7 +26,7 @@ discovery.relabel "docker" {
 }
 
 loki.source.docker "podman" {
-  host          = "unix:///var/run/docker.sock"
+  host          = "unix:///run/socket-proxy/podman.sock"
   targets       = discovery.docker.fcos.targets
   labels        = { "source_name" = "podman" }
   forward_to    = [loki.write.victoria_logs.receiver]
@@ -32,7 +37,8 @@ loki.write "victoria_logs" {
   endpoint {
     // Services name their message field differently; VictoriaLogs picks the first one present.
     // Traefik logs some errors with no message field at all, hence the trailing error.
-    url = "http://victoria:9428/insert/loki/api/v1/push?_stream_fields=source_name,container_name&_msg_field=_msg,msg,message,log,fields.message,error"
+    url          = "http://victoria:8427/vl/insert/loki/api/v1/push?_stream_fields=source_name,container_name&_msg_field=_msg,msg,message,log,fields.message,error"
+    bearer_token = local.file.vmauth_token.content
   }
 }
 
@@ -48,7 +54,7 @@ prometheus.scrape "scrape_metrics" {
 
 // Containers opt in with alloy.metrics.* labels. Addressed by IP: pod members do not resolve by name.
 discovery.docker "metrics" {
-  host                = "unix:///var/run/docker.sock"
+  host                = "unix:///run/socket-proxy/podman.sock"
   refresh_interval    = "15s"
   match_first_network = false // default: only the alphabetically first network of a pod
 }
@@ -118,6 +124,19 @@ discovery.relabel "metrics" {
 
 prometheus.scrape "containers" {
   targets         = discovery.relabel.metrics.output
+  forward_to      = [prometheus.remote_write.victoria_metrics.receiver]
+  scrape_interval = "10s"
+}
+
+// Backends only listen inside the Victoria pod. Preserve their previous series labels.
+prometheus.scrape "victoria" {
+  targets = [
+    { __address__ = "victoria:8427", __metrics_path__ = "/vm/metrics", instance = "victoria-metrics:8428" },
+    { __address__ = "victoria:8427", __metrics_path__ = "/vl/metrics", instance = "victoria-logs:9428" },
+    { __address__ = "victoria:8427", __metrics_path__ = "/vt/metrics", instance = "victoria-traces:10428" },
+  ]
+  job_name        = "prometheus.scrape.containers"
+  bearer_token    = local.file.vmauth_token.content
   forward_to      = [prometheus.remote_write.victoria_metrics.receiver]
   scrape_interval = "10s"
 }
@@ -300,7 +319,8 @@ prometheus.scrape "scrape_postgres_metrics" {
 
 prometheus.remote_write "victoria_metrics" {
   endpoint {
-    url = "http://victoria:8428/prometheus/api/v1/write"
+    url          = "http://victoria:8427/vm/prometheus/api/v1/write"
+    bearer_token = local.file.vmauth_token.content
   }
 }
 
@@ -323,20 +343,27 @@ otelcol.processor.batch "default" {
   }
 }
 
+otelcol.auth.bearer "vmauth" {
+  token = local.file.vmauth_token.content
+}
+
 otelcol.exporter.otlphttp "victoria_metrics" {
   client {
-    endpoint = "http://victoria:8428/opentelemetry"
+    endpoint = "http://victoria:8427/vm/opentelemetry"
+    auth     = otelcol.auth.bearer.vmauth.handler
   }
 }
 
 otelcol.exporter.otlphttp "victoria_logs" {
   client {
-    endpoint = "http://victoria:9428/insert/opentelemetry"
+    endpoint = "http://victoria:8427/vl/insert/opentelemetry"
+    auth     = otelcol.auth.bearer.vmauth.handler
   }
 }
 
 otelcol.exporter.otlphttp "victoria_traces" {
   client {
-    endpoint = "http://victoria:10428/insert/opentelemetry"
+    endpoint = "http://victoria:8427/vt/insert/opentelemetry"
+    auth     = otelcol.auth.bearer.vmauth.handler
   }
 }

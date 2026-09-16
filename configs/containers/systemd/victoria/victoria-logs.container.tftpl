@@ -13,10 +13,7 @@ Label="glance.url=https://logs.${base_domain}"
 Label="glance.description=Logs Storage"
 Label="glance.hide=false"
 
-Label="alloy.metrics.enable=true"
-Label="alloy.metrics.port=9428"
-
-Exec=--loggerFormat=json --retentionPeriod=6M --retention.maxDiskSpaceUsageBytes=30GB --memory.allowedBytes=1500MB --storage.minFreeDiskSpaceBytes=32GB
+Exec=--loggerFormat=json --httpListenAddr=127.0.0.1:9428 --retentionPeriod=6M --retention.maxDiskSpaceUsageBytes=30GB --memory.allowedBytes=1500MB --storage.minFreeDiskSpaceBytes=32GB
 
 Volume=/var/mnt/observability/logs:/victoria-logs-data:Z
 

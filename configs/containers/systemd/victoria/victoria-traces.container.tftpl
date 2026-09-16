@@ -13,10 +13,7 @@ Label="glance.url=https://traces.${base_domain}"
 Label="glance.description=Tracing Data Storage"
 Label="glance.hide=false"
 
-Label="alloy.metrics.enable=true"
-Label="alloy.metrics.port=10428"
-
-Exec=--loggerFormat=json --retentionPeriod=7d --retention.maxDiskSpaceUsageBytes=20GB --memory.allowedBytes=1500MB --storage.minFreeDiskSpaceBytes=48GB
+Exec=--loggerFormat=json --httpListenAddr=127.0.0.1:10428 --retentionPeriod=7d --retention.maxDiskSpaceUsageBytes=20GB --memory.allowedBytes=1500MB --storage.minFreeDiskSpaceBytes=48GB
 
 Volume=/var/mnt/observability/traces:/victoria-traces-data:Z
 

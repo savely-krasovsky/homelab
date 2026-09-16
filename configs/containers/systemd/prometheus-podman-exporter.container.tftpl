@@ -2,8 +2,8 @@
 Requires=reverse-proxy-network.service
 After=reverse-proxy-network.service
 Description=Prometheus Podman Exporter Quadlet
-Requires=podman.socket
-After=podman.socket
+Wants=socket-proxy.service
+After=socket-proxy.service
 
 [Container]
 Image=quay.io/navidys/prometheus-podman-exporter:v2.0.0
@@ -11,19 +11,16 @@ ContainerName=prometheus-podman-exporter
 
 UserNS=keep-id:uid=65534
 
-Environment=CONTAINER_HOST=unix:///run/podman/podman.sock
+Environment=CONTAINER_HOST=unix:///run/socket-proxy/podman.sock
 
 Label="alloy.metrics.enable=true"
 Label="alloy.metrics.port=9882"
 
 Exec=--collector.enable-all
 
-Volume=%t/podman/podman.sock:/run/podman/podman.sock
+Volume=%t/socket-proxy:/run/socket-proxy:ro,z
 
 Network=systemd-reverse-proxy
-
-# Disable label security to access Podman socket.
-SecurityLabelDisable=true
 
 [Service]
 ExecStartPre=/usr/bin/mountpoint -q /var/mnt/docker

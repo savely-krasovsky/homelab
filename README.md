@@ -31,6 +31,13 @@ Grafana Alloy collects and routes metrics, logs and traces to VictoriaMetrics,
 VictoriaLogs and VictoriaTraces; Grafana provides visualization. Containers opt
 into scraping with `alloy.metrics.*` labels discovered over the Podman socket.
 Traefik exports telemetry through OTLP, and Telegraf converts MQTT data to OTLP.
+Victoria's HTTP backends listen only on pod loopback. Alloy and Grafana use
+authenticated vmauth routes; see [Victoria access and Grafana provisioning](docs/victoria-access.md).
+
+Traefik, Glance, Alloy and Podman Exporter access the API through one shared
+`wollomatic/socket-proxy` with an explicit read allowlist. The proxy uses a Unix
+socket and `Network=none`; only it mounts the raw Podman socket. All four clients
+receive the same read permissions. See [socket access and verification](docs/socket-proxy.md).
 
 ## Services
 
@@ -151,8 +158,8 @@ Use separate keys for administration and application deployment.
 The `homelab` account runs applications without sudo, with UID/GID `1000:1000`
 and subordinate UID/GID range `524288:65536`. The administrator `core` uses
 `1001:1001`. The `homelab` account can read system journals through `systemd-journal`.
-Podman stores images, secrets and named volumes at `/mnt/docker/core`
-(also accessible as `/var/mnt/docker/core`).
+Podman stores images, secrets and named volumes at `/mnt/docker/homelab`
+(also accessible as `/var/mnt/docker/homelab`).
 
 Blog uploads connect as `homelab` and write to `/var/mnt/docker/blog`, which
 is owned by `homelab`.
@@ -172,7 +179,7 @@ tofu apply
 
 The resources download the FCOS image, upload Ignition and create the VM.
 Ignition configures the host on first boot. Once SSH is available, the Quadlet
-provider installs the shared reverse-proxy network, application files and
+provider installs the shared reverse-proxy network and socket proxy, application files and
 secrets, then activates the applications with their required dependencies.
 
 This homelab sets `insecure_skip_host_key_check = true`, so a fresh or reinstalled

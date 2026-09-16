@@ -1,20 +1,51 @@
 locals {
-  containers_config = merge(var.containers_config, {
-    proxmox_ip : var.proxmox_config.host,
-    truenas_ip : var.fcos_config.truenas_ip,
-    fcos_ip : var.fcos_config.ip,
+  template_config = merge(var.site_config, {
+    proxmox_ip : var.proxmox_config.upstream_ip,
+    truenas_ip : var.fcos_config.storage.truenas_ip,
+    fcos_ip : var.fcos_config.network.ip,
   })
 
   firewall_config = file("${path.module}/butane/nftables.nft")
 
-  butane_config = merge(var.fcos_config, {
-    base_domain : var.containers_config.base_domain,
+  butane_config = {
+    hostname : var.fcos_config.hostname,
+    ssh_keys : var.fcos_config.ssh_authorized_keys.admin,
+    homelab_ssh_keys : var.fcos_config.ssh_authorized_keys.applications,
+    root_ca : var.fcos_config.root_ca,
+    mac_address : var.fcos_config.network.mac_address,
+    ip : var.fcos_config.network.ip,
+    gateway : var.fcos_config.network.gateway,
+    mask : var.fcos_config.network.netmask,
+    nameserver : var.fcos_config.network.nameserver,
+    truenas_ip : var.fcos_config.storage.truenas_ip,
+    truenas_iqn : var.fcos_config.storage.truenas_iqn,
+    base_domain : var.site_config.base_domain,
     firewall_config : local.firewall_config,
     restic_runner : file("${path.module}/butane/restic-with-secrets.sh"),
-  })
+  }
 
-  # System restic jobs read their values from homelab's Podman secret store at startup.
-  podman_secrets = { for name, id in var.containers_secret_config : replace(name, "_", "-") => id }
+  # Host services outside the application deployments also consume Podman secrets.
+  host_podman_secret_names = toset([
+    "restic-aws-access-key-id",
+    "restic-aws-secret-access-key",
+    "restic-b2-account-id",
+    "restic-b2-account-key",
+    "restic-password",
+  ])
+
+  required_podman_secret_names = setunion(
+    local.host_podman_secret_names,
+    toset(flatten([
+      for _, application in local.applications : try(application.secrets, [])
+    ])),
+  )
+
+  # The indexed map makes a missing required tfvars entry fail during planning.
+  # Merging it back preserves additional secrets without changing their resource addresses.
+  podman_secrets = merge(
+    var.secret_config.podman,
+    { for name in local.required_podman_secret_names : name => var.secret_config.podman[name] },
+  )
 }
 
 data "ct_config" "fcos_ignition" {
@@ -23,7 +54,7 @@ data "ct_config" "fcos_ignition" {
 }
 
 resource "proxmox_virtual_environment_vm" "fcos" {
-  node_name   = "pve"
+  node_name   = var.proxmox_config.node_name
   name        = "fcos"
   description = "Managed by OpenTofu"
 
@@ -72,7 +103,7 @@ resource "proxmox_virtual_environment_vm" "fcos" {
   network_device {
     bridge      = "vmbr0"
     vlan_id     = 100
-    mac_address = var.fcos_config.mac_address
+    mac_address = var.fcos_config.network.mac_address
   }
 
   # Linux 6.x
@@ -101,9 +132,9 @@ resource "terraform_data" "fcos_ready" {
 
   connection {
     type        = "ssh"
-    host        = var.fcos_config.ip
+    host        = var.fcos_config.network.ip
     user        = "homelab"
-    private_key = sensitive(file(pathexpand(var.fcos_config.ssh_private_key_path)))
+    private_key = sensitive(file(pathexpand(var.deployment_config.ssh_private_key_path)))
     agent       = false
     timeout     = "10m"
   }
@@ -128,8 +159,8 @@ resource "quadlet_podman_secret" "containers" {
   depends_on = [terraform_data.fcos_ready]
 
   name     = each.key
-  value_wo = ephemeral.bitwarden_secrets.containers.values[lower(each.value)]
-  version  = lookup(var.secret_versions, each.key, "1")
+  value_wo = ephemeral.bitwarden_secrets.containers.values[lower(each.value.id)]
+  version  = tostring(each.value.revision)
 }
 
 resource "quadlet_deployment" "reverse_proxy_network" {

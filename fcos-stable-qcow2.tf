@@ -16,7 +16,7 @@ output "fcos_release" {
 }
 
 resource "proxmox_download_file" "fcos_qcow2" {
-  node_name    = "pve"
+  node_name    = var.proxmox_config.node_name
   datastore_id = "local"
   content_type = "iso"
 
@@ -36,7 +36,7 @@ resource "proxmox_download_file" "fcos_qcow2" {
 }
 
 resource "proxmox_virtual_environment_file" "fcos_ignition" {
-  node_name    = "pve"
+  node_name    = var.proxmox_config.node_name
   datastore_id = "local"
   content_type = "snippets"
 

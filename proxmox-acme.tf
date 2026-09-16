@@ -1,10 +1,10 @@
 ephemeral "bitwarden_secret" "acme_cf_token" {
-  id = var.proxmox_config.acme_cf_token_secret_id
+  id = var.secret_config.proxmox_acme_cloudflare_token.id
 }
 
 resource "proxmox_acme_account" "homelab" {
   name      = "homelab"
-  contact   = var.containers_config.email
+  contact   = var.site_config.email
   directory = "https://acme-v02.api.letsencrypt.org/directory"
   tos       = "https://letsencrypt.org/documents/LE-SA-v1.8-July-06-2026.pdf"
 }
@@ -17,18 +17,18 @@ resource "proxmox_acme_dns_plugin" "cloudflare" {
   data_wo = {
     CF_Token = ephemeral.bitwarden_secret.acme_cf_token.value
   }
-  data_wo_version = var.proxmox_acme_token_revision
+  data_wo_version = var.secret_config.proxmox_acme_cloudflare_token.revision
 }
 
 resource "proxmox_acme_certificate" "pve" {
   account   = proxmox_acme_account.homelab.name
-  node_name = "pve"
+  node_name = var.proxmox_config.node_name
   force     = true
 
   # pve.lan is the leaf that resolves straight to the node; pve.<domain> goes through Traefik
   domains = [
     for name in ["pve", "pve.lan"] : {
-      domain = "${name}.${var.containers_config.base_domain}"
+      domain = "${name}.${var.site_config.base_domain}"
       plugin = proxmox_acme_dns_plugin.cloudflare.plugin
     }
   ]

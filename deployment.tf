@@ -325,7 +325,7 @@ locals {
 
   config_files = {
     for cfgpath in fileset("${path.module}/configs", "**") :
-    trimsuffix(cfgpath, ".tftpl") => templatefile("${path.module}/configs/${cfgpath}", local.containers_config)
+    trimsuffix(cfgpath, ".tftpl") => templatefile("${path.module}/configs/${cfgpath}", local.template_config)
   }
 
   deployment_paths = merge(

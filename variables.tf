@@ -1,148 +1,140 @@
 variable "bws_access_token" {
-  description = "Bitwarden Secrets Manager access token for the local provider."
+  description = "Bitwarden Secrets Manager access token."
   type        = string
   sensitive   = true
   ephemeral   = true
 }
 
-variable "proxmox_config" {
-  description = "Proxmox credentials"
-  type = object({
-    host               = string
-    password_secret_id = string
-
-    acme_cf_token_secret_id = optional(string, "85834ead-fb0c-4774-b748-b4c400e98a41")
-  })
-}
-
-variable "proxmox_acme_token_revision" {
-  description = "Bump after rotating the Cloudflare token without changing its Bitwarden ID."
-  type        = number
-  default     = 1
-}
-
-variable "containers_config" {
-  description = "Shared configuration"
+variable "site_config" {
+  description = "Site-wide identity and public addressing shared by applications."
   type = object({
     email       = string
     base_domain = string
     ews_domain  = string
     public_ip   = string
   })
+
+  validation {
+    condition = (
+      length(trimspace(var.site_config.email)) > 0 &&
+      length(trimspace(var.site_config.base_domain)) > 0 &&
+      length(trimspace(var.site_config.ews_domain)) > 0 &&
+      can(cidrhost("${var.site_config.public_ip}/32", 0))
+    )
+    error_message = "site_config requires non-empty email and domain values plus an IPv4 public_ip."
+  }
 }
 
-variable "containers_secret_config" {
-  description = "Quadlet Secret"
-  type        = map(string)
-  default = {
-    traefik_cf_dns_api_token                  = "e9e0f0f0-abc8-4bde-b05f-b292018179bb"
-    vmauth_traefik_bearer_token               = "fba802cf-948f-4ff7-8965-b29f00e2da48"
-    vmauth_proxmox_bearer_token               = "bb281df0-e5e8-4348-a92e-b2a300a30117"
-    vmauth_fedora_coreos_bearer_token         = "2558d1e5-9e89-48c6-82e1-b3e300bb400b"
-    vmauth_alloy_bearer_token                 = "8c957f03-c7d9-48cf-a72e-b4c700191830"
-    vmauth_grafana_bearer_token               = "76585c5f-560f-4def-af1a-b4c700193fbc"
-    oauth2_proxy_cookie_secret                = "289c0832-27c2-463b-97b7-b29200a8cebd"
-    oauth2_proxy_client_secret                = "afdb8ef2-a3d4-4a17-b839-b29200ab6f87"
-    pocket_id_encryption_key                  = "60f943d2-0a2a-49da-95f7-b3c60143ecbb"
-    pocket_id_maxmind_license_key             = "08c549a4-bf48-4998-8cb0-b29200ac845d"
-    actual_openid_client_secret               = "5754702b-d9d5-4127-b5ab-b29200abdd6a"
-    open_webui_secret_key                     = "aeeb7cdd-d10e-41d4-abb4-b33300dabc1a"
-    open_webui_oauth_client_secret            = "b595040b-a23a-44af-8bff-b29200ad6258"
-    open_webui_google_drive_api_key           = "d24bf77b-622d-4ef0-88ae-b2b200d67ee1"
-    open_webui_anthropic_api_key              = "104a349b-a4be-4d3a-9c0b-b2c700e64c9a"
-    open_webui_google_api_key                 = "3016f3ef-c14c-4f4c-8439-b2c700e62f21"
-    open_webui_openai_api_key                 = "24fd45e2-0fd3-42cd-8fd5-b2c700e66731"
-    karakeep_oauth_client_secret              = "784d379b-bcaf-424f-bc77-b29500ff1be6"
-    karakeep_openai_api_key                   = "98f5ccdf-d4b1-4883-b4e3-b295010ba589"
-    meili_master_key                          = "a67874c5-95c2-4f7a-b335-b295010010e0"
-    nextauth_secret                           = "94b4b746-f005-46e0-b60a-b29501010c06"
-    immich_postgres_password                  = "386f1adc-878f-4755-a06b-b29700b15cd0"
-    immich_map_key                            = "b5735614-bc05-441d-a2e2-b29800d3b25c"
-    miniflux_postgres_password                = "1c6a587e-9dda-47de-953a-b29a01697231"
-    miniflux_database_url                     = "456f8488-cdeb-4246-959d-b29a016be9ac"
-    miniflux_oauth2_client_secret             = "3bb3cedd-1ee4-4624-b865-b29a016c2318"
-    pds_jwt_secret                            = "b9dfaefd-3083-4e2f-a23f-b29a017db774"
-    pds_admin_password                        = "00e810b5-6d8b-4342-8189-b29a017dca5e"
-    pds_plc_rotation_key_k256_private_key_hex = "e0825e62-8d49-4b4a-99cd-b29a017def90"
-    pds_email_smtp_url                        = "5a940d99-28cb-4792-9825-b29a017e11ad"
-    outline_secret_key                        = "501e040c-5574-4058-a0c0-b29d01010c09"
-    outline_utils_secret                      = "b032948f-bce3-46bb-bd26-b29d01012dde"
-    outline_database_url                      = "5887f243-6332-4041-8457-b29d0104be2e"
-    outline_postgres_password                 = "4212e3a7-acd3-4804-ac0e-b29d01015850"
-    outline_oidc_client_secret                = "9c8cae9a-db6d-45d0-8cc0-b29d0101844c"
-    outline_smtp_password                     = "5fdbfb32-257e-4cc3-8b07-b29d01063ba6"
-    grafana_oauth2_client_secret              = "697cf367-a80c-41f6-b975-b2a200a986d8"
-    glance_github_token                       = "de3353d8-09d9-4063-b513-b2a3008cc2c9"
-    forward_info_bot_telegram_token           = "f8eda775-f945-4eb8-b48a-b2b80092cf54"
-    masked_email_bot_telegram_token           = "3995096e-2497-4319-adb1-b3f201587265"
-    restic_aws_access_key_id                  = "2743cf63-05ae-45b4-997f-b2c700dfabef"
-    restic_aws_secret_access_key              = "134279a9-b3ee-4309-ae9e-b2c700dfe86c"
-    restic_b2_account_id                      = "3e058bd3-e13d-4b6a-9d48-b2c700e00d62"
-    restic_b2_account_key                     = "ddc2f07b-47ca-49b2-ae41-b2c700e02f01"
-    restic_password                           = "52ce5eb2-98ae-4243-ba08-b2c700e04b7e"
-    opencloud_collabora_password              = "bced1168-9741-4b8e-abf4-b2d4000e2c9e"
-    opencloud_collabora_proof_key             = "88d40ec2-b73c-439a-9efe-b4c400aa419c"
-    opencloud_smtp_password                   = "5e0889ac-3b11-4fc4-81ca-b2d400170e85"
-    coturn_turn_shared_secret                 = "5b69585c-03e8-454f-94e0-b357000002d4"
-    synapse_postgres_password                 = "2209bd8d-f6a7-43e0-afa8-b37a00bbfd2c"
-    synapse_registration_shared_secret        = "9dab9863-5dac-4748-a1fc-b37a0145f7f1"
-    synapse_macaroon_secret_key               = "cfa20ae3-8103-46be-a129-b37a014627aa"
-    synapse_form_secret                       = "c11840ef-11f0-40c7-a08e-b37a0146564f"
-    mas_oidc_client_secret                    = "6e0f179f-631c-480c-b9ec-b37a0146e95c"
-    matrix_rtc_livekit_key                    = "5c336187-6139-413b-bbf1-b37a01588b03"
-    matrix_rtc_livekit_secret                 = "a24e0995-d297-4c23-849f-b37a0158a5d4"
-    matrix_rtc_livekit_keys                   = "078916ef-ac5d-432f-a44a-b3eb00026bdf"
-    mas_postgres_password                     = "de2a2838-0317-4329-b9b7-b4c30108cc7f"
-    mas_secret                                = "bcaa7f79-c9fc-4448-9c79-b37a016954f5"
-    mas_secrets_encryption                    = "012d8da3-3f7c-471a-b9cb-b37b0001dc1b"
-    mas_secrets_rsa_key                       = "c2c1d0d3-1c80-4c36-961e-b37b000049ca"
-    mas_secrets_p256_key                      = "8a19b557-c518-43f7-90a8-b37b0000b7c6"
-    mas_secrets_p384_key                      = "557701bc-7430-4dc8-98ae-b37b0000e3c1"
-    mas_secrets_secp256k1_key                 = "a6624b6b-1f2c-4883-94dd-b37b00010dc9"
-    mas_smtp_password                         = "e25452b1-480c-4581-b407-b37b00042943"
-    remnawave_jwt_auth_secret                 = "9fb99592-a129-4669-848f-b3b800f42a01"
-    remnawave_jwt_api_tokens_secret           = "aaec18fb-81d8-4e22-9f14-b3b800f4539a"
-    remnawave_postgres_password               = "940eafe8-28fb-49fb-bc60-b3b800f48af5"
-    remnawave_database_url                    = "53437e56-c71e-4887-bfd1-b3b800f50ea5"
-    remnawave_metrics_pass                    = "1cb78e43-698f-48db-a76d-b3b800fb7524"
-    remnawave_node_vless_xhttp_secret_key     = "87cadb81-1969-4625-b57e-b3b80105ce9e"
-    remnawave_node_vless_reality_secret_key   = "903369ff-bbc1-42a9-8461-b3b9017a0ab3"
-    remnawave_api_token                       = "a0b134ef-a7ee-4972-bae4-b3b9003e6788"
-    remnawave_xhttp_path                      = "23bd5525-ac0c-49db-bbd5-b3b90041b8ed"
-    traefik_crowdsec_lapi_key                 = "20c5ff35-d5c2-47b7-8907-b3dd0130e9cf"
-    opengist_oidc_secret                      = "56f84185-870a-4377-8c64-b3ec00b2f13f"
-    crowdsec_lapi_password                    = "bf604d19-bdbc-4beb-80b0-b3f200cc0e8e"
-    crowdsec_auth_oidc_client_secret          = "0fb63d05-5193-47d9-b753-b47800a3099e"
-    hister_oidc_client_secret                 = "73cebba6-4b33-4282-a62d-b4b8010972c8"
-    knot_master_key                           = "49172165-d619-44de-bd9d-b4c30167700b"
+variable "proxmox_config" {
+  description = "Proxmox API connection and the node address exposed through Traefik."
+  type = object({
+    endpoint    = string
+    node_name   = optional(string, "pve")
+    upstream_ip = string
+  })
+
+  validation {
+    condition = (
+      startswith(var.proxmox_config.endpoint, "https://") &&
+      length(trimspace(var.proxmox_config.node_name)) > 0 &&
+      can(cidrhost("${var.proxmox_config.upstream_ip}/32", 0))
+    )
+    error_message = "proxmox_config.endpoint must use HTTPS, node_name must be non-empty, and upstream_ip must be IPv4."
   }
 }
 
 variable "fcos_config" {
-  description = "Fedora CoreOS Configuration"
+  description = "Fedora CoreOS image and first-boot configuration. Changes require VM replacement to affect an existing host."
   type = object({
-    hostname         = string
-    stream           = optional(string, "stable")
-    ssh_keys         = list(string)
-    homelab_ssh_keys = list(string)
-    root_ca          = string
+    stream   = optional(string, "stable")
+    hostname = string
+    root_ca  = string
 
-    mac_address = string
-    ip          = string
-    gateway     = string
-    mask        = string
-    nameserver  = string
+    ssh_authorized_keys = object({
+      admin        = set(string)
+      applications = set(string)
+    })
 
-    truenas_ip  = string
-    truenas_iqn = string
+    network = object({
+      mac_address = string
+      ip          = string
+      gateway     = string
+      netmask     = string
+      nameserver  = string
+    })
 
-    # How the provider authenticates to the host.
-    ssh_private_key_path = string
+    storage = object({
+      truenas_ip  = string
+      truenas_iqn = string
+    })
   })
+
+  validation {
+    condition = (
+      length(trimspace(var.fcos_config.hostname)) > 0 &&
+      length(var.fcos_config.ssh_authorized_keys.admin) > 0 &&
+      length(var.fcos_config.ssh_authorized_keys.applications) > 0 &&
+      can(regex("^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$", var.fcos_config.network.mac_address)) &&
+      can(cidrhost("${var.fcos_config.network.ip}/32", 0)) &&
+      can(cidrhost("${var.fcos_config.network.gateway}/32", 0)) &&
+      can(cidrhost("${var.fcos_config.network.nameserver}/32", 0)) &&
+      can(cidrhost("${var.fcos_config.storage.truenas_ip}/32", 0))
+    )
+    error_message = "fcos_config requires a hostname, both SSH key sets, a valid MAC address, and IPv4 host, gateway, DNS, and TrueNAS addresses."
+  }
 }
 
-variable "secret_versions" {
-  description = "Secret name to rotation version. Change a version to update the corresponding secret value."
-  type        = map(string)
-  default     = {}
+variable "deployment_config" {
+  description = "Machine-local settings used by OpenTofu to deploy applications over SSH."
+  type = object({
+    ssh_private_key_path = string
+  })
+
+  validation {
+    condition     = length(trimspace(var.deployment_config.ssh_private_key_path)) > 0
+    error_message = "deployment_config.ssh_private_key_path must be non-empty."
+  }
+}
+
+variable "secret_config" {
+  description = "Bitwarden secret references. Podman map keys are the final hyphenated secret names."
+  type = object({
+    proxmox_password = object({
+      id = string
+    })
+    proxmox_acme_cloudflare_token = object({
+      id       = string
+      revision = optional(number, 1)
+    })
+    podman = map(object({
+      id       = string
+      revision = optional(number, 1)
+    }))
+  })
+
+  validation {
+    condition = (
+      length(trimspace(var.secret_config.proxmox_password.id)) > 0 &&
+      length(trimspace(var.secret_config.proxmox_acme_cloudflare_token.id)) > 0 &&
+      var.secret_config.proxmox_acme_cloudflare_token.revision >= 1 &&
+      alltrue([
+        for name, secret in var.secret_config.podman :
+        can(regex("^[a-z0-9]+(-[a-z0-9]+)*$", name)) &&
+        length(trimspace(secret.id)) > 0 &&
+        secret.revision >= 1
+      ])
+    )
+    error_message = "Secret IDs must be non-empty, revisions must be at least 1, and Podman secret names must use lowercase kebab-case."
+  }
+
+  validation {
+    condition = length(toset(concat(
+      [
+        var.secret_config.proxmox_password.id,
+        var.secret_config.proxmox_acme_cloudflare_token.id,
+      ],
+      [for secret in values(var.secret_config.podman) : secret.id],
+    ))) == length(var.secret_config.podman) + 2
+    error_message = "Every Bitwarden secret reference must use a distinct ID."
+  }
 }

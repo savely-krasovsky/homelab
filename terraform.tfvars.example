@@ -1,0 +1,141 @@
+# Copy this file to terraform.tfvars, replace every example value, and run:
+# chmod 600 terraform.tfvars
+
+bws_access_token = "replace-with-bitwarden-machine-access-token"
+
+site_config = {
+  email       = "admin@example.com"
+  base_domain = "example.com"
+  ews_domain  = "mail.example.com"
+  public_ip   = "203.0.113.10"
+}
+
+proxmox_config = {
+  endpoint    = "https://pve.lan.example.com:8006"
+  node_name   = "pve"
+  upstream_ip = "192.0.2.10"
+}
+
+fcos_config = {
+  stream   = "stable"
+  hostname = "fcos"
+  root_ca  = "replace-with-PEM-encoded-root-CA"
+
+  ssh_authorized_keys = {
+    admin = [
+      "ssh-ed25519 replace-with-admin-public-key",
+    ]
+    applications = [
+      "ssh-ed25519 replace-with-application-deployment-public-key",
+    ]
+  }
+
+  network = {
+    mac_address = "02:00:00:00:00:10"
+    ip          = "192.0.2.20"
+    gateway     = "192.0.2.1"
+    netmask     = "255.255.255.0"
+    nameserver  = "192.0.2.1"
+  }
+
+  storage = {
+    truenas_ip  = "192.0.2.30"
+    truenas_iqn = "iqn.2005-10.org.example:homelab"
+  }
+}
+
+deployment_config = {
+  ssh_private_key_path = "/home/user/.ssh/homelab-deployment"
+}
+
+secret_config = {
+  proxmox_password = {
+    id = "replace-with-proxmox-password-bitwarden-secret-id"
+  }
+  proxmox_acme_cloudflare_token = {
+    id       = "replace-with-proxmox-acme-bitwarden-secret-id"
+    revision = 1
+  }
+  podman = {
+    "actual-openid-client-secret" = { id = "replace-with-actual-openid-client-secret-bitwarden-secret-id" }
+    "coturn-turn-shared-secret" = { id = "replace-with-coturn-turn-shared-secret-bitwarden-secret-id" }
+    "crowdsec-auth-oidc-client-secret" = { id = "replace-with-crowdsec-auth-oidc-client-secret-bitwarden-secret-id" }
+    "crowdsec-lapi-password" = { id = "replace-with-crowdsec-lapi-password-bitwarden-secret-id" }
+    "forward-info-bot-telegram-token" = { id = "replace-with-forward-info-bot-telegram-token-bitwarden-secret-id" }
+    "glance-github-token" = { id = "replace-with-glance-github-token-bitwarden-secret-id" }
+    "grafana-oauth2-client-secret" = { id = "replace-with-grafana-oauth2-client-secret-bitwarden-secret-id" }
+    "hister-oidc-client-secret" = { id = "replace-with-hister-oidc-client-secret-bitwarden-secret-id" }
+    "immich-map-key" = { id = "replace-with-immich-map-key-bitwarden-secret-id" }
+    "immich-postgres-password" = { id = "replace-with-immich-postgres-password-bitwarden-secret-id" }
+    "karakeep-oauth-client-secret" = { id = "replace-with-karakeep-oauth-client-secret-bitwarden-secret-id" }
+    "karakeep-openai-api-key" = { id = "replace-with-karakeep-openai-api-key-bitwarden-secret-id" }
+    "knot-master-key" = { id = "replace-with-knot-master-key-bitwarden-secret-id" }
+    "mas-oidc-client-secret" = { id = "replace-with-mas-oidc-client-secret-bitwarden-secret-id" }
+    "mas-postgres-password" = { id = "replace-with-mas-postgres-password-bitwarden-secret-id" }
+    "mas-secret" = { id = "replace-with-mas-secret-bitwarden-secret-id" }
+    "mas-secrets-encryption" = { id = "replace-with-mas-secrets-encryption-bitwarden-secret-id" }
+    "mas-secrets-p256-key" = { id = "replace-with-mas-secrets-p256-key-bitwarden-secret-id" }
+    "mas-secrets-p384-key" = { id = "replace-with-mas-secrets-p384-key-bitwarden-secret-id" }
+    "mas-secrets-rsa-key" = { id = "replace-with-mas-secrets-rsa-key-bitwarden-secret-id" }
+    "mas-secrets-secp256k1-key" = { id = "replace-with-mas-secrets-secp256k1-key-bitwarden-secret-id" }
+    "mas-smtp-password" = { id = "replace-with-mas-smtp-password-bitwarden-secret-id" }
+    "masked-email-bot-telegram-token" = { id = "replace-with-masked-email-bot-telegram-token-bitwarden-secret-id" }
+    "matrix-rtc-livekit-key" = { id = "replace-with-matrix-rtc-livekit-key-bitwarden-secret-id" }
+    "matrix-rtc-livekit-keys" = { id = "replace-with-matrix-rtc-livekit-keys-bitwarden-secret-id" }
+    "matrix-rtc-livekit-secret" = { id = "replace-with-matrix-rtc-livekit-secret-bitwarden-secret-id" }
+    "meili-master-key" = { id = "replace-with-meili-master-key-bitwarden-secret-id" }
+    "miniflux-database-url" = { id = "replace-with-miniflux-database-url-bitwarden-secret-id" }
+    "miniflux-oauth2-client-secret" = { id = "replace-with-miniflux-oauth2-client-secret-bitwarden-secret-id" }
+    "miniflux-postgres-password" = { id = "replace-with-miniflux-postgres-password-bitwarden-secret-id" }
+    "nextauth-secret" = { id = "replace-with-nextauth-secret-bitwarden-secret-id" }
+    "oauth2-proxy-client-secret" = { id = "replace-with-oauth2-proxy-client-secret-bitwarden-secret-id" }
+    "oauth2-proxy-cookie-secret" = { id = "replace-with-oauth2-proxy-cookie-secret-bitwarden-secret-id" }
+    "open-webui-anthropic-api-key" = { id = "replace-with-open-webui-anthropic-api-key-bitwarden-secret-id" }
+    "open-webui-google-api-key" = { id = "replace-with-open-webui-google-api-key-bitwarden-secret-id" }
+    "open-webui-google-drive-api-key" = { id = "replace-with-open-webui-google-drive-api-key-bitwarden-secret-id" }
+    "open-webui-oauth-client-secret" = { id = "replace-with-open-webui-oauth-client-secret-bitwarden-secret-id" }
+    "open-webui-openai-api-key" = { id = "replace-with-open-webui-openai-api-key-bitwarden-secret-id" }
+    "open-webui-secret-key" = { id = "replace-with-open-webui-secret-key-bitwarden-secret-id" }
+    "opencloud-collabora-password" = { id = "replace-with-opencloud-collabora-password-bitwarden-secret-id" }
+    "opencloud-collabora-proof-key" = { id = "replace-with-opencloud-collabora-proof-key-bitwarden-secret-id" }
+    "opencloud-smtp-password" = { id = "replace-with-opencloud-smtp-password-bitwarden-secret-id" }
+    "opengist-oidc-secret" = { id = "replace-with-opengist-oidc-secret-bitwarden-secret-id" }
+    "outline-database-url" = { id = "replace-with-outline-database-url-bitwarden-secret-id" }
+    "outline-oidc-client-secret" = { id = "replace-with-outline-oidc-client-secret-bitwarden-secret-id" }
+    "outline-postgres-password" = { id = "replace-with-outline-postgres-password-bitwarden-secret-id" }
+    "outline-secret-key" = { id = "replace-with-outline-secret-key-bitwarden-secret-id" }
+    "outline-smtp-password" = { id = "replace-with-outline-smtp-password-bitwarden-secret-id" }
+    "outline-utils-secret" = { id = "replace-with-outline-utils-secret-bitwarden-secret-id" }
+    "pds-admin-password" = { id = "replace-with-pds-admin-password-bitwarden-secret-id" }
+    "pds-email-smtp-url" = { id = "replace-with-pds-email-smtp-url-bitwarden-secret-id" }
+    "pds-jwt-secret" = { id = "replace-with-pds-jwt-secret-bitwarden-secret-id" }
+    "pds-plc-rotation-key-k256-private-key-hex" = { id = "replace-with-pds-plc-rotation-key-k256-private-key-hex-bitwarden-secret-id" }
+    "pocket-id-encryption-key" = { id = "replace-with-pocket-id-encryption-key-bitwarden-secret-id" }
+    "pocket-id-maxmind-license-key" = { id = "replace-with-pocket-id-maxmind-license-key-bitwarden-secret-id" }
+    "remnawave-api-token" = { id = "replace-with-remnawave-api-token-bitwarden-secret-id" }
+    "remnawave-database-url" = { id = "replace-with-remnawave-database-url-bitwarden-secret-id" }
+    "remnawave-jwt-auth-secret" = { id = "replace-with-remnawave-jwt-auth-secret-bitwarden-secret-id" }
+    "remnawave-jwt-api-tokens-secret" = { id = "replace-with-remnawave-jwt-api-tokens-secret-bitwarden-secret-id" }
+    "remnawave-metrics-pass" = { id = "replace-with-remnawave-metrics-pass-bitwarden-secret-id" }
+    "remnawave-node-vless-reality-secret-key" = { id = "replace-with-remnawave-node-vless-reality-secret-key-bitwarden-secret-id" }
+    "remnawave-node-vless-xhttp-secret-key" = { id = "replace-with-remnawave-node-vless-xhttp-secret-key-bitwarden-secret-id" }
+    "remnawave-postgres-password" = { id = "replace-with-remnawave-postgres-password-bitwarden-secret-id" }
+    "remnawave-xhttp-path" = { id = "replace-with-remnawave-xhttp-path-bitwarden-secret-id" }
+    "restic-aws-access-key-id" = { id = "replace-with-restic-aws-access-key-id-bitwarden-secret-id" }
+    "restic-aws-secret-access-key" = { id = "replace-with-restic-aws-secret-access-key-bitwarden-secret-id" }
+    "restic-b2-account-id" = { id = "replace-with-restic-b2-account-id-bitwarden-secret-id" }
+    "restic-b2-account-key" = { id = "replace-with-restic-b2-account-key-bitwarden-secret-id" }
+    "restic-password" = { id = "replace-with-restic-password-bitwarden-secret-id" }
+    "synapse-form-secret" = { id = "replace-with-synapse-form-secret-bitwarden-secret-id" }
+    "synapse-macaroon-secret-key" = { id = "replace-with-synapse-macaroon-secret-key-bitwarden-secret-id" }
+    "synapse-postgres-password" = { id = "replace-with-synapse-postgres-password-bitwarden-secret-id" }
+    "synapse-registration-shared-secret" = { id = "replace-with-synapse-registration-shared-secret-bitwarden-secret-id" }
+    "traefik-cf-dns-api-token" = { id = "replace-with-traefik-cf-dns-api-token-bitwarden-secret-id" }
+    "traefik-crowdsec-lapi-key" = { id = "replace-with-traefik-crowdsec-lapi-key-bitwarden-secret-id" }
+    "vmauth-alloy-bearer-token" = { id = "replace-with-vmauth-alloy-bearer-token-bitwarden-secret-id" }
+    "vmauth-fedora-coreos-bearer-token" = { id = "replace-with-vmauth-fedora-coreos-bearer-token-bitwarden-secret-id" }
+    "vmauth-grafana-bearer-token" = { id = "replace-with-vmauth-grafana-bearer-token-bitwarden-secret-id" }
+    "vmauth-proxmox-bearer-token" = { id = "replace-with-vmauth-proxmox-bearer-token-bitwarden-secret-id" }
+    "vmauth-traefik-bearer-token" = { id = "replace-with-vmauth-traefik-bearer-token-bitwarden-secret-id" }
+  }
+}

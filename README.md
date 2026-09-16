@@ -132,16 +132,19 @@ pointing to that `bin/` directory. From this repository, set:
 export TF_CLI_CONFIG_FILE="$PWD/.terraformrc"
 ```
 
-Supply `proxmox_config`, `fcos_config` and `containers_config` from
-[variables.tf](variables.tf), for example in an ignored `terraform.tfvars` file.
-Replace the default Bitwarden secret IDs in `containers_secret_config` with your
-own and provide the ephemeral `bws_access_token` input.
+Copy `terraform.tfvars.example` to the ignored `terraform.tfvars` file and
+replace the example values.
+
+`terraform.tfvars` is intentionally untracked and may contain access tokens,
+private infrastructure details and Bitwarden secret IDs. Restrict it to the
+local user, for example with `chmod 600 terraform.tfvars`.
 
 Load a key authorized for Proxmox into the SSH agent. For FCOS, keep
-administrator public keys in `fcos_config.ssh_keys`; connect as `core` for
-host maintenance with sudo. Set `fcos_config.ssh_private_key_path` to the
-application deployment key and put its public key in
-`fcos_config.homelab_ssh_keys`; the Quadlet provider connects as `homelab`.
+administrator public keys in `fcos_config.ssh_authorized_keys.admin`; connect as
+`core` for host maintenance with sudo. Set
+`deployment_config.ssh_private_key_path` to the application deployment key and
+put its public key in `fcos_config.ssh_authorized_keys.applications`; the
+Quadlet provider connects as `homelab`.
 Use separate keys for administration and application deployment.
 
 The `homelab` account runs applications without sudo, with UID/GID `1000:1000`
@@ -232,10 +235,11 @@ prepare their required directories under `/var/mnt/docker/app_data`.
 ### Secrets and image updates
 
 After rotating a Bitwarden application or backup secret, bump its entry in
-`secret_versions` and apply. Keys use the Podman secret name with hyphens, such
-as `miniflux-postgres-password`. Application consumers declare these names in
-`applications.<name>.secrets` so a changed secret revision activates them.
-The Proxmox ACME token uses the separate `proxmox_acme_token_revision` input.
+`secret_config.podman.<name>.revision` and apply. Map keys are the final Podman
+secret names with hyphens, such as `miniflux-postgres-password`. Application
+consumers declare these names in `applications.<name>.secrets` so a changed
+revision activates them. Rotate the Proxmox ACME token by bumping
+`secret_config.proxmox_acme_cloudflare_token.revision`.
 
 [Renovate](renovate.json) proposes image and provider updates. Selected rolling
 tags use `AutoUpdate=registry`; some images are pinned by digest. OpenCloud's

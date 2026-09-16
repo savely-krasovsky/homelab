@@ -32,16 +32,15 @@ provider "bitwarden" {
 }
 
 ephemeral "bitwarden_secret" "proxmox_password" {
-  id = var.proxmox_config.password_secret_id
+  id = var.secret_config.proxmox_password.id
 }
 
 ephemeral "bitwarden_secrets" "containers" {
-  ids = toset(values(var.containers_secret_config))
+  ids = toset([for secret in values(local.podman_secrets) : secret.id])
 }
 
 provider "proxmox" {
-  # Direct node access keeps provisioning independent of Traefik.
-  endpoint = "https://pve.lan.${var.containers_config.base_domain}:8006"
+  endpoint = var.proxmox_config.endpoint
 
   # This configuration uses Proxmox operations restricted to root@pam.
   username = "root@pam"
@@ -53,8 +52,8 @@ provider "proxmox" {
 }
 
 provider "quadlet" {
-  host                         = var.fcos_config.ip
+  host                         = var.fcos_config.network.ip
   user                         = "homelab"
-  private_key_file             = pathexpand(var.fcos_config.ssh_private_key_path)
+  private_key_file             = pathexpand(var.deployment_config.ssh_private_key_path)
   insecure_skip_host_key_check = true
 }

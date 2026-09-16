@@ -26,16 +26,8 @@ requires the infrastructure and configuration described below.
 - Bitwarden Secrets Manager supplies credentials through ephemeral provider values
   and write-only resource arguments. Application and backup secrets are installed
   in Podman's secret store, keeping their values out of Ignition and Terraform state.
-
-Grafana Alloy collects and routes metrics, logs and traces to VictoriaMetrics,
-VictoriaLogs and VictoriaTraces; Grafana provides visualization. Containers opt
-into scraping with `alloy.metrics.*` labels discovered over the Podman socket.
-Traefik exports telemetry through OTLP, and Telegraf converts MQTT data to OTLP.
-Victoria's HTTP backends listen only on pod loopback. Alloy and Grafana use
-authenticated vmauth routes.
-
-Traefik, Glance, Alloy and Podman Exporter access the API through one shared
-`wollomatic/socket-proxy` over a Unix socket with a read allowlist.
+- Grafana Alloy collects metrics, logs and traces. VictoriaMetrics, VictoriaLogs
+  and VictoriaTraces store them, and Grafana provides dashboards.
 
 ## Services
 
@@ -176,8 +168,7 @@ tofu apply
 
 The resources download the FCOS image, upload Ignition and create the VM.
 Ignition configures the host on first boot. Once SSH is available, the Quadlet
-provider installs the shared reverse-proxy network and socket proxy, application files and
-secrets, then activates the applications with their required dependencies.
+provider installs application configuration and secrets, then starts the services.
 
 This homelab sets `insecure_skip_host_key_check = true`, so a fresh or reinstalled
 FCOS host does not need a `known_hosts` entry. SSH encrypts traffic and authenticates

@@ -32,12 +32,10 @@ VictoriaLogs and VictoriaTraces; Grafana provides visualization. Containers opt
 into scraping with `alloy.metrics.*` labels discovered over the Podman socket.
 Traefik exports telemetry through OTLP, and Telegraf converts MQTT data to OTLP.
 Victoria's HTTP backends listen only on pod loopback. Alloy and Grafana use
-authenticated vmauth routes; see [Victoria access and Grafana provisioning](docs/victoria-access.md).
+authenticated vmauth routes.
 
 Traefik, Glance, Alloy and Podman Exporter access the API through one shared
-`wollomatic/socket-proxy` with an explicit read allowlist. The proxy uses a Unix
-socket and `Network=none`; only it mounts the raw Podman socket. All four clients
-receive the same read permissions. See [socket access and verification](docs/socket-proxy.md).
+`wollomatic/socket-proxy` over a Unix socket with a read allowlist.
 
 ## Services
 
@@ -99,7 +97,6 @@ Gatus monitors uptime from outside this homelab host.
 | [deployment.tf](deployment.tf) | Application ownership, file rendering and activation settings. |
 | [butane/](butane) | Host configuration, firewall and backup wrapper. |
 | [configs/](configs) | Quadlets, native user units and application configuration. |
-| [tests/](tests) | Configuration and backup-wrapper checks. |
 | [renovate.json](renovate.json) | Image and provider update policy. |
 
 Related Quadlets live together under `configs/containers/systemd/<application>/`:
@@ -215,9 +212,9 @@ The `applications` map in `deployment.tf` defines each deployment:
 
 Every deployed file and unit has one owner. To add an application, add its files
 under `configs`, declare its paths and activation settings in `applications`, and
-configure its boot dependencies. Run the checks below, then review `tofu plan`
-and apply the changes. File changes, secret revisions and activation settings
-trigger the corresponding deployments.
+configure its boot dependencies. Review `tofu plan` and apply the changes.
+File changes, secret revisions and activation settings trigger the corresponding
+deployments.
 
 ### Startup and activation
 
@@ -252,7 +249,7 @@ The Proxmox ACME token uses the separate `proxmox_acme_token_revision` input.
 [Renovate](renovate.json) proposes image and provider updates. Selected rolling
 tags use `AutoUpdate=registry`; some images are pinned by digest. OpenCloud's
 extension images are refreshed by its daily systemd timer. Review updates using
-the same configuration checks and plan/apply workflow.
+the same plan/apply workflow.
 
 ## Backups
 
@@ -270,23 +267,6 @@ application secrets.
 
 The wrapper reads values at each invocation, so rotation needs no service
 restart. Backup jobs check secret availability before creating an LVM snapshot.
-
-## Checks
-
-The configuration tests require Linux, Go matching [tests/go.mod](tests/go.mod),
-OpenTofu (`tofu`), Podman's Quadlet generator and `systemd-analyze`. From the
-repository root, run:
-
-```sh
-cd tests
-go test ./...
-```
-
-The tests render configuration with synthetic values, generate Quadlet units,
-validate systemd dependencies, and check file ownership, deployment isolation,
-secret consumers, directory preparation and backup-secret handling. They do not
-contact the homelab or start containers. The firewall syntax check also uses
-`nft` and `unshare`; it skips when unprivileged network namespaces are unavailable.
 
 ## Future plans
 

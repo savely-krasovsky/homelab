@@ -254,6 +254,11 @@ locals {
       restart = ["rmqtt.service"]
     }
 
+    stash = {
+      paths   = ["containers/systemd/stash.container"]
+      restart = ["stash.service"]
+    }
+
     static-web-server = {
       paths   = ["containers/systemd/static-web-server.container"]
       restart = ["static-web-server.service"]

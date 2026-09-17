@@ -29,7 +29,8 @@ Label="traefik.http.routers.qbittorrent-auth.rule=Host(`qb.${base_domain}`) && P
 Label="traefik.http.routers.qbittorrent-auth.service=oauth2-proxy"
 
 Volume=/var/mnt/docker/app_data/qbittorrent:/config:Z
-Volume=/var/mnt/media:/media:z
+Volume=/var/mnt/media:/media
+Volume=/var/mnt/random:/random
 
 PublishPort=6881:6881/tcp
 
@@ -37,6 +38,7 @@ Network=systemd-reverse-proxy
 
 [Service]
 ExecStartPre=/usr/bin/mountpoint -q /var/mnt/docker
+ExecStartPre=/usr/bin/mountpoint -q /var/mnt/random
 ExecStartPre=/usr/bin/test -d /var/mnt/docker/app_data
 ExecStartPre=/usr/bin/mkdir -p -m 0755 -- /var/mnt/docker/app_data/qbittorrent
 TimeoutStartSec=900

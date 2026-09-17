@@ -61,7 +61,7 @@ Label="alloy.metrics.port=9205"
 Volume=%E/opencloud/app-registry.yaml:/etc/opencloud/app-registry.yaml:Z
 Volume=%E/opencloud/csp.yaml:/etc/opencloud/csp.yaml:Z
 Volume=/var/mnt/docker/app_data/opencloud:/etc/opencloud:z
-Volume=/var/mnt/personal/opencloud:/var/lib/opencloud:Z
+Volume=/var/mnt/personal/opencloud:/var/lib/opencloud
 Volume=opencloud-apps.volume:/var/lib/opencloud/web/assets/apps
 
 Pod=opencloud.pod

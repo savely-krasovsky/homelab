@@ -116,7 +116,7 @@ resource "proxmox_virtual_environment_vm" "fcos" {
 
   # Preserve the tested virtiofs0/1/2 order, not alphabetical map ordering.
   dynamic "virtiofs" {
-    for_each = ["media", "personal", "observability"]
+    for_each = ["media", "personal", "observability", "random"]
     content {
       mapping    = proxmox_hardware_mapping_dir.fcos[virtiofs.value].name
       cache      = "auto"
@@ -177,6 +177,7 @@ resource "terraform_data" "fcos_ready" {
       "mountpoint -q /var/mnt/media",
       "mountpoint -q /var/mnt/personal",
       "mountpoint -q /var/mnt/observability",
+      "mountpoint -q /var/mnt/random",
       "systemctl --user is-active --quiet default.target",
       "podman info --format '{{.Store.GraphRoot}}'",
     ]

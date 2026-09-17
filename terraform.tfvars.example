@@ -48,6 +48,7 @@ fcos_config = {
       media         = "/mnt/spool/media"
       personal      = "/mnt/spool/personal"
       observability = "/mnt/spool/observability"
+      random        = "/mnt/spool/random"
     }
   }
 }

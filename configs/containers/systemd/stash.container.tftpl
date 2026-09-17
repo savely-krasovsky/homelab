@@ -1,0 +1,39 @@
+[Unit]
+Description=Stash
+Requires=reverse-proxy-network.service
+After=reverse-proxy-network.service
+
+[Container]
+Image=docker.io/stashapp/stash:latest
+ContainerName=stash
+Network=systemd-reverse-proxy
+
+Label="traefik.enable=true"
+Label="traefik.http.routers.stash.rule=Host(`stash.${base_domain}`)"
+Label="traefik.http.routers.stash.middlewares=oauth2-proxy@file"
+Label="traefik.http.services.stash.loadbalancer.server.port=9999"
+Label="traefik.http.routers.stash-auth.rule=Host(`stash.${base_domain}`) && PathPrefix(`/oauth2/`)"
+Label="traefik.http.routers.stash-auth.service=oauth2-proxy"
+
+Environment=STASH_STASH=/data/
+Environment=STASH_METADATA=/metadata/
+Environment=STASH_CACHE=/cache/
+Environment=STASH_GENERATED=/generated/
+
+Volume=/var/mnt/random:/data:ro
+Volume=/var/mnt/docker/app_data/stash/config:/root/.stash:Z
+Volume=/var/mnt/docker/app_data/stash/metadata:/metadata:Z
+Volume=/var/mnt/docker/app_data/stash/cache:/cache:Z
+Volume=/var/mnt/docker/app_data/stash/blobs:/blobs:Z
+Volume=/var/mnt/docker/app_data/stash/generated:/generated:Z
+
+[Service]
+ExecStartPre=/usr/bin/mountpoint -q /var/mnt/docker
+ExecStartPre=/usr/bin/test -d /var/mnt/docker/app_data
+ExecStartPre=/usr/bin/mountpoint -q /var/mnt/random
+ExecStartPre=/usr/bin/mkdir -p /var/mnt/docker/app_data/stash/config /var/mnt/docker/app_data/stash/metadata /var/mnt/docker/app_data/stash/cache /var/mnt/docker/app_data/stash/blobs /var/mnt/docker/app_data/stash/generated
+Restart=on-failure
+TimeoutStartSec=900
+
+[Install]
+WantedBy=multi-user.target default.target

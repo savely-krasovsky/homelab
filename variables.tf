@@ -98,6 +98,7 @@ variable "fcos_config" {
         media         = string
         personal      = string
         observability = string
+        random        = string
       })
     })
   })

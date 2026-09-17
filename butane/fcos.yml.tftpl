@@ -399,13 +399,14 @@ systemd:
         - name: 90-storage.conf
           contents: |
             [Unit]
-            RequiresMountsFor=/var/mnt/docker /var/mnt/personal /var/mnt/media /var/mnt/observability
+            RequiresMountsFor=/var/mnt/docker /var/mnt/personal /var/mnt/media /var/mnt/observability /var/mnt/random
 
             [Service]
             ExecStartPre=/usr/bin/mountpoint -q /var/mnt/docker
             ExecStartPre=/usr/bin/mountpoint -q /var/mnt/personal
             ExecStartPre=/usr/bin/mountpoint -q /var/mnt/media
             ExecStartPre=/usr/bin/mountpoint -q /var/mnt/observability
+            ExecStartPre=/usr/bin/mountpoint -q /var/mnt/random
 
     - name: podman-fix-selinux-context.service
       enabled: true
@@ -425,6 +426,22 @@ systemd:
         [Install]
         WantedBy=multi-user.target
 
+    - name: var-mnt-random.mount
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Mount random dataset from PVE via VirtIO-FS
+        Before=local-fs.target
+
+        [Mount]
+        What=homelab-random
+        Where=/var/mnt/random
+        Type=virtiofs
+        Options=relatime,context=system_u:object_r:container_file_t:s0
+
+        [Install]
+        WantedBy=local-fs.target
+
     - name: var-mnt-observability.mount
       enabled: true
       contents: |
@@ -436,7 +453,7 @@ systemd:
         What=homelab-observability
         Where=/var/mnt/observability
         Type=virtiofs
-        Options=rw,relatime,context=system_u:object_r:container_file_t:s0
+        Options=relatime,context=system_u:object_r:container_file_t:s0
 
         [Install]
         WantedBy=local-fs.target
@@ -452,7 +469,7 @@ systemd:
         What=homelab-media
         Where=/var/mnt/media
         Type=virtiofs
-        Options=rw,relatime,context=system_u:object_r:container_file_t:s0
+        Options=relatime,context=system_u:object_r:container_file_t:s0
 
         [Install]
         WantedBy=local-fs.target
@@ -468,7 +485,7 @@ systemd:
         What=homelab-personal
         Where=/var/mnt/personal
         Type=virtiofs
-        Options=rw,relatime,context=system_u:object_r:container_file_t:s0
+        Options=relatime,context=system_u:object_r:container_file_t:s0
 
         [Install]
         WantedBy=local-fs.target

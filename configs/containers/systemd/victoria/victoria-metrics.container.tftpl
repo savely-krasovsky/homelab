@@ -17,7 +17,7 @@ Label="glance.hide=false"
 # Retention suffixes: a capital M means months, a lower case m means minutes and is rejected.
 Exec=--loggerFormat=json --httpListenAddr=127.0.0.1:8428 --retentionPeriod=6M --memory.allowedBytes=1000MB --storage.minFreeDiskSpaceBytes=16GB
 
-Volume=/var/mnt/observability/metrics:/victoria-metrics-data:Z
+Volume=/var/mnt/observability/metrics:/victoria-metrics-data
 
 Pod=victoria.pod
 

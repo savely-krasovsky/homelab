@@ -1,24 +1,21 @@
 locals {
-  template_config = merge(var.site_config, {
-    proxmox_ip : var.proxmox_config.upstream_ip,
-    truenas_ip : var.fcos_config.storage.truenas_ip,
-    fcos_ip : var.fcos_config.network.ip,
-  })
+  template_config = merge(var.site_config, var.network_config)
 
-  firewall_config = file("${path.module}/butane/nftables.nft")
+  firewall_config = templatefile("${path.module}/butane/nftables.nft.tftpl", {
+    gateway_ip = var.network_config.gateway_ip
+  })
 
   butane_config = {
     hostname : var.fcos_config.hostname,
     ssh_keys : var.fcos_config.ssh_authorized_keys.admin,
     homelab_ssh_keys : var.fcos_config.ssh_authorized_keys.applications,
     root_ca : var.fcos_config.root_ca,
-    mac_address : var.fcos_config.network.mac_address,
-    ip : var.fcos_config.network.ip,
-    gateway : var.fcos_config.network.gateway,
-    mask : var.fcos_config.network.netmask,
-    nameserver : var.fcos_config.network.nameserver,
-    truenas_ip : var.fcos_config.storage.truenas_ip,
-    truenas_iqn : var.fcos_config.storage.truenas_iqn,
+    fcos_mac_address : var.network_config.fcos_mac_address,
+    fcos_ip : var.network_config.fcos_ip,
+    gateway_ip : var.network_config.gateway_ip,
+    subnet_mask : cidrnetmask("0.0.0.0/${var.network_config.subnet_prefix}"),
+    dns_ip : var.network_config.dns_ip,
+    data_pv_uuid : var.fcos_config.storage.data_pv_uuid,
     base_domain : var.site_config.base_domain,
     firewall_config : local.firewall_config,
     restic_runner : file("${path.module}/butane/restic-with-secrets.sh"),
@@ -57,6 +54,9 @@ resource "proxmox_virtual_environment_vm" "fcos" {
   node_name   = var.proxmox_config.node_name
   name        = "fcos"
   description = "Managed by OpenTofu"
+  # Requires the host's OpenZFS boot integration documented in docs/storage.md.
+  # Generated dataset mount units gate pve-guests.service on successful unlock.
+  on_boot = true
 
   lifecycle {
     ignore_changes = [
@@ -96,14 +96,41 @@ resource "proxmox_virtual_environment_vm" "fcos" {
     size         = 32
   }
 
+  # Attach the existing zvol; never allocate/import/copy it into a VM-owned disk.
+  # Its lifetime is independent of this VM. Keep datastore_id empty.
+  disk {
+    interface         = "scsi1"
+    datastore_id      = ""
+    path_in_datastore = var.fcos_config.storage.data_device
+    file_format       = "raw"
+    aio               = "io_uring"
+    cache             = "none"
+    backup            = true
+    replicate         = false
+    iothread          = true
+    serial            = "homelab-data"
+  }
+
+  # Preserve the tested virtiofs0/1/2 order, not alphabetical map ordering.
+  dynamic "virtiofs" {
+    for_each = ["media", "personal", "observability"]
+    content {
+      mapping    = proxmox_hardware_mapping_dir.fcos[virtiofs.value].name
+      cache      = "auto"
+      expose_acl = true
+      # ACL support implies xattrs in PVE; keep provider state in agreement.
+      expose_xattr = true
+    }
+  }
+
   tpm_state {
     datastore_id = "local-zfs"
   }
 
   network_device {
-    bridge      = "vmbr0"
-    vlan_id     = 100
-    mac_address = var.fcos_config.network.mac_address
+    bridge      = var.network_config.bridge
+    vlan_id     = var.network_config.vlan_id
+    mac_address = var.network_config.fcos_mac_address
   }
 
   # Linux 6.x
@@ -132,7 +159,7 @@ resource "terraform_data" "fcos_ready" {
 
   connection {
     type        = "ssh"
-    host        = var.fcos_config.network.ip
+    host        = var.network_config.fcos_ip
     user        = "homelab"
     private_key = sensitive(file(pathexpand(var.deployment_config.ssh_private_key_path)))
     agent       = false
@@ -144,6 +171,9 @@ resource "terraform_data" "fcos_ready" {
       "set -eu",
       "systemctl is-active --quiet systemd-user-sessions.service",
       "mountpoint -q /var/mnt/docker",
+      "mountpoint -q /var/mnt/media",
+      "mountpoint -q /var/mnt/personal",
+      "mountpoint -q /var/mnt/observability",
       "systemctl --user is-active --quiet default.target",
       "podman info --format '{{.Store.GraphRoot}}'",
     ]

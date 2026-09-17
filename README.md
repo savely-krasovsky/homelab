@@ -1,270 +1,118 @@
 # Experimental Homelab
 
-Configuration for my personal homelab: Fedora CoreOS on Proxmox, rootless Podman,
-and Quadlet containers managed with OpenTofu/Terraform.
+Fedora CoreOS on Proxmox, rootless Podman and Quadlet applications managed with OpenTofu.
+This configuration is specific to this homelab; adapt storage, networking and accounts before use.
 
-This repository reflects my hardware, storage, domains and application setup.
-It is a starting point for adapting the design to another homelab; deploying it
-requires the infrastructure and configuration described below.
+## Layout
 
-## Architecture
+- [main.tf](main.tf), [variables.tf](variables.tf): providers, connections and inputs.
+- [fcos.tf](fcos.tf), [butane/](butane/): FCOS VM, first-boot configuration and system services.
+- [deployment.tf](deployment.tf), [configs/](configs/): application list, Quadlets and configuration.
+- [storage.tf](storage.tf): existing ZFS datasets exposed through Proxmox Directory Mappings.
+- [proxmox-acme.tf](proxmox-acme.tf): Proxmox certificates through Cloudflare DNS validation.
+- [Storage guide](docs/storage.md): ownership, boot and recovery.
 
-- OpenTofu/Terraform provisions the FCOS VM and supplies its Ignition configuration.
-  Butane defines the host's users, networking, mounts and system services.
-- Applications run as systemd user services under `homelab`, using rootless Podman.
-  My [Quadlet provider](https://github.com/savely-krasovsky/terraform-provider-quadlet)
-  deploys rendered configuration over SSH and activates the affected applications.
-- Podman storage and application data live on a separate iSCSI-backed LVM disk.
-  Media, personal files and observability data use NFS shares. These persist
-  independently of the VM's system disk.
-- Applications use dedicated Podman networks and a shared reverse-proxy network.
-  MatrixRTC uses host networking. Traefik's network aliases let containers use
-  shared domain names while keeping their traffic on the host.
-- Traefik uses [systemd socket activation](https://github.com/eriksjolund/podman-networking-docs?tab=readme-ov-file#socket-activation-systemd-user-service)
-  to preserve source IP addresses. The host uses an nftables default-deny firewall
-  and SELinux, with explicit contexts for container data where needed.
-- Bitwarden Secrets Manager supplies credentials through ephemeral provider values
-  and write-only resource arguments. Application and backup secrets are installed
-  in Podman's secret store, keeping their values out of Ignition and Terraform state.
-- Grafana Alloy collects metrics, logs and traces. VictoriaMetrics, VictoriaLogs
-  and VictoriaTraces store them, and Grafana provides dashboards.
+Applications run as `homelab` through the [Quadlet provider](https://github.com/savely-krasovsky/terraform-provider-quadlet).
+Traefik uses socket activation; SELinux and a default-deny nftables firewall remain enabled.
+Alloy sends telemetry to VictoriaMetrics/VictoriaLogs/VictoriaTraces; Grafana displays it.
+Gatus monitors availability externally.
 
-## Services
+## Setup
 
-Each row corresponds to an application in [deployment.tf](deployment.tf), with
-its supporting containers grouped together. The Pod column identifies applications
-that share a Podman pod.
-
-| Application | Purpose | Pod |
-| --- | --- | --- |
-| Actual Budget (`actual-budget`) | Budgeting | |
-| Blog (`blog`) | Static personal blog | |
-| Bluesky PDS (`bluesky-pds`) | ATProto personal data server | |
-| CrowdSec (`crowdsec`) | Security engine and web UI | ☑️ |
-| DavMail (`davmail`) | Exchange gateway | |
-| Element Admin (`element-admin`) | Matrix administration UI | |
-| Element Call (`element-call`) | Matrix calling client | |
-| Element Web (`element-web`) | Matrix web client | |
-| Forward Info Bot (`forward-info-bot`) | Telegram utility bot | |
-| Glance (`glance`) | Homelab dashboard | |
-| Grafana (`grafana`) | Observability dashboards | |
-| Grafana Alloy (`grafana-alloy`) | Telemetry collection and routing | |
-| Hister (`hister`) | Private search with llama.cpp embeddings | ☑️ |
-| Immich (`immich`) | Photo and video management with machine learning | ☑️ |
-| Karakeep (`karakeep`) | Bookmarks, Chrome archiving and Meilisearch | ☑️ |
-| Masked Email Bot (`masked-email-bot`) | Telegram utility bot | |
-| Matrix (`matrix`) | Synapse and Matrix Authentication Service | ☑️ |
-| MatrixRTC (`matrix-rtc`) | LiveKit media server and JWT service | ☑️ |
-| Miniflux (`miniflux`) | RSS reader | ☑️ |
-| OAuth2 Proxy (`oauth2-proxy`) | Authentication proxy | ☑️ |
-| Open WebUI (`open-webui`) | Chat interface and Pipelines | ☑️ |
-| OpenCloud (`opencloud`) | File collaboration, Collabora and web extensions | ☑️ |
-| Opengist (`opengist`) | Git-backed pastebin | |
-| Outline (`outline`) | Knowledge base | ☑️ |
-| Plex (`plex`) | Media server | |
-| Pocket ID (`pocket-id`) | Single sign-on | |
-| Podman Exporter (`prometheus-podman-exporter`) | Container metrics | |
-| Prusa Exporter (`prusa-exporter`) | 3D printer metrics | |
-| qBittorrent (`qbittorrent`) | BitTorrent client | |
-| Remnawave (`remnawave`) | Proxy management panel and subscription page | ☑️ |
-| RMQTT (`rmqtt`) | MQTT broker | |
-| Static Web Server (`static-web-server`) | Static file hosting | |
-| Step CA (`step-ca`) | Internal certificate authority | |
-| Tangled Knot (`tangled`) | Git hosting on ATProto | |
-| Telegraf (`telegraf`) | MQTT to OTLP conversion | |
-| Traefik (`traefik`) | Application proxy | |
-| Victoria (`victoria`) | VictoriaMetrics, VictoriaLogs, VictoriaTraces and vmauth | ☑️ |
-
-Gatus monitors uptime from outside this homelab host.
-
-## Repository layout
-
-| Path | Contents |
-| --- | --- |
-| [main.tf](main.tf) | Provider requirements, connections and ephemeral secret reads. |
-| [variables.tf](variables.tf) | Infrastructure inputs, application settings and secret IDs. |
-| [fcos-stable-qcow2.tf](fcos-stable-qcow2.tf) | FCOS image download and Ignition upload. |
-| [proxmox-acme.tf](proxmox-acme.tf) | Proxmox certificates and Cloudflare DNS validation. |
-| [fcos.tf](fcos.tf) | VM, Podman secrets and application deployment resources. |
-| [deployment.tf](deployment.tf) | Application ownership, file rendering and activation settings. |
-| [butane/](butane) | Host configuration, firewall and backup wrapper. |
-| [configs/](configs) | Quadlets, native user units and application configuration. |
-| [renovate.json](renovate.json) | Image and provider update policy. |
-
-Related Quadlets live together under `configs/containers/systemd/<application>/`:
-
-```text
-configs/containers/systemd/miniflux/
-├── miniflux-server.container.tftpl
-├── miniflux-postgres.container.tftpl
-├── miniflux.pod
-└── miniflux.network
-```
-
-Most standalone containers live directly in `configs/containers/systemd/`.
-Native user units live in `configs/systemd/user/`; other directories under
-`configs/` hold application configuration. Rendered paths are relative to
-`homelab`'s `~/.config`, with the `.tftpl` suffix removed.
-
-## Prerequisites
-
-### Infrastructure
-
-- A Proxmox node with API and SSH access. Adapt the node name, datastores, network
-  bridge, VLAN and PCI passthrough settings in `fcos.tf` to the target hardware.
-- TrueNAS storage matching the mounts in `butane/fcos.yml.tftpl`: an iSCSI target
-  with an existing XFS logical volume at `/dev/vg0/lv0`, and the media, personal
-  and observability NFS exports. The host configuration mounts this storage;
-  prepare its layout, application data and permissions before deploying.
-- DNS records, a trusted CA and the external accounts used by the configuration,
-  including Bitwarden, Cloudflare and backup storage. Application settings also
-  contain deployment-specific OIDC client IDs and service endpoints.
-
-### Local setup
-
-Use OpenTofu/Terraform satisfying the version requirement in `main.tf`.
-Ephemeral secrets require [my Bitwarden provider fork](https://github.com/savely-krasovsky/terraform-provider-bitwarden).
-Build it with `go build -o bin/ .` in its checkout, using the Go version required
-by its `go.mod`. Configure a development override in a local `.terraformrc`
-pointing to that `bin/` directory. From this repository, set:
+1. Prepare Proxmox API/SSH access and the [existing storage](docs/storage.md).
+   Terraform does not create or format the application pool, zvol or filesystem.
+2. Configure all infrastructure addresses in `network_config`, then DNS, CA trust
+   and required Bitwarden, Cloudflare, OIDC and backup accounts.
+3. Use the OpenTofu version required by `main.tf`. Build the
+   [Bitwarden fork](https://github.com/savely-krasovsky/terraform-provider-bitwarden)
+   with `go build -o bin/ .` in its checkout and point a local `.terraformrc` development override at `bin/`.
+4. Copy `terraform.tfvars.example` to ignored `terraform.tfvars`, fill in the values
+   and restrict permissions with `chmod 600 terraform.tfvars`.
+5. Load the Proxmox SSH key into the agent. Set FCOS admin keys in
+   `fcos_config.ssh_authorized_keys.admin`, deployment public keys in
+   `fcos_config.ssh_authorized_keys.applications`, and the deployment private-key
+   path in `deployment_config.ssh_private_key_path`.
 
 ```sh
 export TF_CLI_CONFIG_FILE="$PWD/.terraformrc"
-```
-
-Copy `terraform.tfvars.example` to the ignored `terraform.tfvars` file and
-replace the example values.
-
-`terraform.tfvars` is intentionally untracked and may contain access tokens,
-private infrastructure details and Bitwarden secret IDs. Restrict it to the
-local user, for example with `chmod 600 terraform.tfvars`.
-
-Load a key authorized for Proxmox into the SSH agent. For FCOS, keep
-administrator public keys in `fcos_config.ssh_authorized_keys.admin`; connect as
-`core` for host maintenance with sudo. Set
-`deployment_config.ssh_private_key_path` to the application deployment key and
-put its public key in `fcos_config.ssh_authorized_keys.applications`; the
-Quadlet provider connects as `homelab`.
-Use separate keys for administration and application deployment.
-
-The `homelab` account runs applications without sudo, with UID/GID `1000:1000`
-and subordinate UID/GID range `524288:65536`. The administrator `core` uses
-`1001:1001`. The `homelab` account can read system journals through `systemd-journal`.
-Podman stores images, secrets and named volumes at `/mnt/docker/homelab`
-(also accessible as `/var/mnt/docker/homelab`).
-
-Blog uploads connect as `homelab` and write to `/var/mnt/docker/blog`, which
-is owned by `homelab`.
-
-## Deployment and updates
-
-### Initial provisioning
-
-After preparing the prerequisites, run from the repository root:
-
-```sh
 tofu init
 tofu validate
 tofu plan
 tofu apply
 ```
 
-The resources download the FCOS image, upload Ignition and create the VM.
-Ignition configures the host on first boot. Once SSH is available, the Quadlet
-provider installs application configuration and secrets, then starts the services.
+Ignition configures FCOS on first boot; the Quadlet provider then installs application
+files and secrets over SSH. Uploading new Ignition does not reconfigure a running host.
 
-This homelab sets `insecure_skip_host_key_check = true`, so a fresh or reinstalled
-FCOS host does not need a `known_hosts` entry. SSH encrypts traffic and authenticates
-the client, but does not verify the server's identity.
+The Quadlet connection currently disables SSH host-key verification: the server's
+identity is not checked. Use separate admin and deployment keys.
 
-### Replacing the VM
+## FCOS access and replacement
 
-Keep the existing Terraform state when replacing a managed VM. To review a
-planned replacement while the current host is reachable, run:
+- `core`: administrator with sudo, UID/GID `1001:1001`.
+- `homelab`: applications without sudo, UID/GID `1000:1000`, subuid/subgid `524288:65536`.
+- Podman storage: `/var/mnt/docker/homelab`; application data: `/var/mnt/docker/app_data`.
+- Blog uploads: user `homelab`, directory `/var/mnt/docker/blog`.
+
+Keep Terraform state and review the replacement while the current VM is reachable:
 
 ```sh
 tofu plan -replace=proxmox_virtual_environment_vm.fcos
 ```
 
-Use the same `-replace` argument with `tofu apply` to perform the replacement.
-The secret and deployment resources declare `replace_triggered_by` on the VM,
-so they are recreated with it. The replacement boots with Ignition and reattaches
-the separate data storage. Changes to the Butane configuration take effect at
-first boot; uploading a new Ignition file does not reconfigure a running host.
+Apply with the same `-replace` argument only after review. The new VM receives
+Ignition, reattaches the separate data storage and redeploys applications.
 
-### Application configuration
+## Application changes
 
-The `applications` map in `deployment.tf` defines each deployment:
+Each entry in `applications` in [deployment.tf](deployment.tf) owns its files and activation:
 
 | Field | Purpose |
 | --- | --- |
-| `paths` | Rendered files or directories under `configs`, including the selected units' drop-ins. |
-| `restart` | Services, pods or targets to start or restart. |
-| `try_restart` | Units to restart only when already active. |
-| `enable` | Native systemd units to enable at boot. Quadlets use their own `[Install]` section. |
-| `secrets` | Podman secrets whose rotation activates the deployment. List shared secrets for every consumer. |
+| `paths` | Files/directories under `configs`, including unit drop-ins. |
+| `restart` | Units to start or restart. |
+| `try_restart` | Restart only if already active. |
+| `enable` | Native units enabled at boot; Quadlets use `[Install]`. |
+| `secrets` | Secret names whose rotation activates this application. |
 
-Every deployed file and unit has one owner. To add an application, add its files
-under `configs`, declare its paths and activation settings in `applications`, and
-configure its boot dependencies. Review `tofu plan` and apply the changes.
-File changes, secret revisions and activation settings trigger the corresponding
-deployments.
+Add files under `configs`, declare their owner and activation, then review and apply.
+Rendered paths are relative to `homelab`'s `~/.config`; `.tftpl` is stripped.
 
-### Startup and activation
+- Pods normally restart `<name>-pod.service`; containers join with `Pod=<name>.pod`.
+  Pods and standalone containers use `[Install] WantedBy=default.target` for startup.
+- Shared proxy-network consumers use `systemd-reverse-proxy` and require/order after
+  `reverse-proxy-network.service`.
+- Traefik activates through sockets; OpenCloud uses a native target and extension-update timer.
+- [Shared container defaults](configs/containers/systemd/container.d/10-restart.conf)
+  are copied to each container. Editing them activates all applications with containers.
+- Restart completion is not a readiness check.
 
-Pod-based applications normally restart their `<name>-pod.service`. Containers
-join with `Pod=<name>.pod`, and the pod's `[Install] WantedBy=default.target`
-enables boot startup. Single-container applications restart their service and
-declare their own `[Install]` section. Networks and volumes start through unit
-dependencies.
+CrowdSec reads Traefik logs through `http://victoria:8427/vl/` using its dedicated token.
+See [acquisition](configs/crowdsec/acquis.yaml) and [vmauth access rules](configs/vmauth/auth.yml).
 
-Consumers of the shared reverse-proxy network use its Podman name,
-`systemd-reverse-proxy`, and declare `Requires=` and `After=` on
-`reverse-proxy-network.service`.
+## Secrets and updates
 
-Traefik restarts its sockets and uses `try_restart` for its socket-activated
-service. OpenCloud uses a native target to manage its application and extension
-update timer together. Restart completion does not guarantee application
-readiness; containers can still be waiting for health checks or external services.
+Application and restic secrets use ephemeral Bitwarden reads and write-only Podman
+resource arguments. After rotation, bump `secret_config.podman.<name>.revision`
+and apply. Names use hyphens; list shared secrets in every consumer's `secrets` field.
+For the ACME token, bump `secret_config.proxmox_acme_cloudflare_token.revision`.
 
-[Common container defaults](configs/containers/systemd/container.d/10-restart.conf)
-are copied into a drop-in for each container. Editing them activates every
-application with containers. Before startup, containers check the data mount and
-prepare their required directories under `/var/mnt/docker/app_data`.
-
-### Secrets and image updates
-
-After rotating a Bitwarden application or backup secret, bump its entry in
-`secret_config.podman.<name>.revision` and apply. Map keys are the final Podman
-secret names with hyphens, such as `miniflux-postgres-password`. Application
-consumers declare these names in `applications.<name>.secrets` so a changed
-revision activates them. Rotate the Proxmox ACME token by bumping
-`secret_config.proxmox_acme_cloudflare_token.revision`.
-
-[Renovate](renovate.json) proposes image and provider updates. Selected rolling
-tags use `AutoUpdate=registry`; some images are pinned by digest. OpenCloud's
-extension images are refreshed by its daily systemd timer. Review updates using
-the same plan/apply workflow.
+[Renovate](renovate.json) proposes image/provider updates. Selected images use
+`AutoUpdate=registry`; OpenCloud extensions have a daily update timer.
 
 ## Backups
 
-System restic jobs back up `/var/mnt/docker/app_data` from LVM snapshots to
-Backblaze B2 and Storj daily. [The exclusions](butane/fcos.yml.tftpl) are installed
-as `/etc/restic/excludes.txt`. Weekly prune jobs retain 14 daily, 8 weekly and
-12 monthly snapshots. These jobs cover application data on the LVM volume;
-media, personal files and observability data on NFS need their own backup policy.
+Restic backs up `/var/mnt/docker/app_data` from LVM snapshots to B2 and Storj daily.
+Weekly prune retains 14 daily, 8 weekly and 12 monthly snapshots.
+[Jobs and exclusions](butane/fcos.yml.tftpl); [secret-loading wrapper](butane/restic-with-secrets.sh).
+The wrapper reads current secrets on each run, without a service restart.
 
-The root backup and prune services use [the restic wrapper](butane/restic-with-secrets.sh)
-to read `restic-password`, `restic-b2-account-id`, `restic-b2-account-key`,
-`restic-aws-access-key-id` and `restic-aws-secret-access-key` from homelab's Podman
-secret store. These use the same `quadlet_podman_secret.containers` resources as
-application secrets.
+The application zvol has `backup=true`; VirtIO-FS shares are **not included** in VM
+backups and need separate jobs. Photo cloud-backup jobs and automated restore
+verification remain to be configured. See [backup boundaries](docs/storage.md).
 
-The wrapper reads values at each invocation, so rotation needs no service
-restart. Backup jobs check secret availability before creating an LVM snapshot.
+## Planned
 
-## Future plans
-
-- [ ] Consider switching to Flatcar Linux.
-- [ ] Harden network setup; some parts are still permissive.
-- [ ] Integrate `hashicorp/assert` support.
+- Consider Flatcar Linux.
+- Harden network configuration.
+- Add `hashicorp/assert` support.

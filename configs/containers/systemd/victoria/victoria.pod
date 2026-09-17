@@ -8,9 +8,6 @@ PodName=victoria
 UserNS=keep-id:uid=1000,gid=1000
 Network=victoria.network
 Network=systemd-reverse-proxy
-# Publish Graphite collector ports
-PublishPort=2003:2003/tcp
-PublishPort=2003:2003/udp
 
 [Install]
 WantedBy=default.target

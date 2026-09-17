@@ -1,0 +1,12 @@
+source: victorialogs
+mode: tail
+log_level: info
+url: http://victoria:8427/vl/
+headers:
+  Authorization: "Bearer $${VMAUTH_CROWDSEC_BEARER_TOKEN}"
+wait_for_ready: 60s
+limit: 10000
+query: |
+  {service.name=traefik} | unpack_json
+labels:
+  type: traefik

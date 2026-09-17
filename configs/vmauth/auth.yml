@@ -46,6 +46,14 @@ users:
           - "/vt/metrics"
         drop_src_path_prefix_parts: 1
         url_prefix: "http://127.0.0.1:10428/"
+  # CrowdSec: readiness and live log reading only, not ingestion or admin APIs.
+  - bearer_token: "%%{VMAUTH_CROWDSEC_BEARER_TOKEN}"
+    url_map:
+      - src_paths:
+          - "/vl/?"
+          - "/vl/select/logsql/tail"
+        drop_src_path_prefix_parts: 1
+        url_prefix: "http://127.0.0.1:9428/"
   # Grafana: authenticated access to the existing backend APIs.
   - bearer_token: "%%{VMAUTH_GRAFANA_BEARER_TOKEN}"
     url_map:

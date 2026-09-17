@@ -52,7 +52,7 @@ provider "proxmox" {
 }
 
 provider "quadlet" {
-  host                         = var.fcos_config.network.ip
+  host                         = var.network_config.fcos_ip
   user                         = "homelab"
   private_key_file             = pathexpand(var.deployment_config.ssh_private_key_path)
   insecure_skip_host_key_check = true

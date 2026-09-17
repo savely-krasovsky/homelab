@@ -56,12 +56,8 @@ table inet filter {
 		# allow Prusa printers to report metrics
 		udp dport 8514 accept
 
-		# allow truenas to report metrics using graphite
-		ip saddr 192.168.100.3 tcp dport 2003 accept
-		ip saddr 192.168.100.3 udp dport 2003 accept
-
 		# allow plugs to access mqtt broker
-		ip saddr 192.168.100.1 tcp dport 1883 accept
+		ip saddr ${gateway_ip} tcp dport 1883 accept
 	}
 
 	chain forward {

@@ -7,13 +7,24 @@ site_config = {
   email       = "admin@example.com"
   base_domain = "example.com"
   ews_domain  = "mail.example.com"
-  public_ip   = "203.0.113.10"
+}
+
+network_config = {
+  public_ip        = "203.0.113.10"
+  gateway_ip       = "192.0.2.1"
+  dns_ip           = "192.0.2.1"
+  pve_ip           = "192.0.2.10"
+  fcos_ip          = "192.0.2.20"
+  pbs_ip           = "192.0.2.40" # External PBS; no VM management.
+  fcos_mac_address = "02:00:00:00:00:10"
+  subnet_prefix    = 24
+  bridge           = "vmbr0"
+  vlan_id          = 100
 }
 
 proxmox_config = {
-  endpoint    = "https://pve.lan.example.com:8006"
-  node_name   = "pve"
-  upstream_ip = "192.0.2.10"
+  endpoint  = "https://pve.lan.example.com:8006"
+  node_name = "pve"
 }
 
 fcos_config = {
@@ -30,17 +41,14 @@ fcos_config = {
     ]
   }
 
-  network = {
-    mac_address = "02:00:00:00:00:10"
-    ip          = "192.0.2.20"
-    gateway     = "192.0.2.1"
-    netmask     = "255.255.255.0"
-    nameserver  = "192.0.2.1"
-  }
-
   storage = {
-    truenas_ip  = "192.0.2.30"
-    truenas_iqn = "iqn.2005-10.org.example:homelab"
+    data_device  = "/dev/zvol/spool/docker"
+    data_pv_uuid = "AAAAAA-BBBB-CCCC-DDDD-EEEE-FFFF-GGGGGG" # Existing PV, not a new UUID.
+    shares = {
+      media         = "/mnt/spool/media"
+      personal      = "/mnt/spool/personal"
+      observability = "/mnt/spool/observability"
+    }
   }
 }
 
@@ -133,6 +141,7 @@ secret_config = {
     "traefik-cf-dns-api-token" = { id = "replace-with-traefik-cf-dns-api-token-bitwarden-secret-id" }
     "traefik-crowdsec-lapi-key" = { id = "replace-with-traefik-crowdsec-lapi-key-bitwarden-secret-id" }
     "vmauth-alloy-bearer-token" = { id = "replace-with-vmauth-alloy-bearer-token-bitwarden-secret-id" }
+    "vmauth-crowdsec-bearer-token" = { id = "replace-with-vmauth-crowdsec-bearer-token-bitwarden-secret-id" }
     "vmauth-fedora-coreos-bearer-token" = { id = "replace-with-vmauth-fedora-coreos-bearer-token-bitwarden-secret-id" }
     "vmauth-grafana-bearer-token" = { id = "replace-with-vmauth-grafana-bearer-token-bitwarden-secret-id" }
     "vmauth-proxmox-bearer-token" = { id = "replace-with-vmauth-proxmox-bearer-token-bitwarden-secret-id" }

@@ -26,9 +26,9 @@ locals {
     }
 
     crowdsec = {
-      paths   = ["containers/systemd/crowdsec"]
+      paths   = ["containers/systemd/crowdsec", "crowdsec"]
       restart = ["crowdsec-pod.service"]
-      secrets = ["crowdsec-auth-oidc-client-secret", "crowdsec-lapi-password"]
+      secrets = ["crowdsec-auth-oidc-client-secret", "crowdsec-lapi-password", "vmauth-crowdsec-bearer-token"]
     }
 
     davmail = {
@@ -314,6 +314,7 @@ locals {
       restart = ["victoria-pod.service"]
       secrets = [
         "vmauth-alloy-bearer-token",
+        "vmauth-crowdsec-bearer-token",
         "vmauth-fedora-coreos-bearer-token",
         "vmauth-grafana-bearer-token",
         "vmauth-proxmox-bearer-token",

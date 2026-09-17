@@ -51,7 +51,7 @@
               hide-mountpoints-by-default: true
               mountpoints:
                 "/app/config":
-                  name: iSCSI
+                  name: Applications
                   hide: false
 
     - size: full
@@ -68,12 +68,12 @@
           cache: 1m
           title: TLS Passthrough
           sites:
-            - title: Proxmox
+            - title: Proxmox VE
               url: https://pve.${base_domain}/
               icon: di:proxmox-light
-            - title: TrueNAS
-              url: https://truenas.${base_domain}/
-              icon: di:truenas
+            - title: Proxmox Backup Server
+              url: https://pbs.${base_domain}/
+              icon: di:proxmox-light
 
         - type: bookmarks
           groups:

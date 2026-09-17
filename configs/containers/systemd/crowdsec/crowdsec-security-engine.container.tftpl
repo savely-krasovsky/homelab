@@ -9,6 +9,7 @@ User=1000:1000
 
 Environment=COLLECTIONS=crowdsecurity/traefik
 Environment=GID=1000
+Secret=vmauth-crowdsec-bearer-token,type=env,target=VMAUTH_CROWDSEC_BEARER_TOKEN
 
 Label="glance.name=Crowdsec"
 Label="glance.icon=di:crowdsec"
@@ -21,6 +22,8 @@ Label="alloy.metrics.port=6060"
 
 Volume=/var/mnt/docker/app_data/crowdsec/data:/var/lib/crowdsec/data:Z
 Volume=/var/mnt/docker/app_data/crowdsec/config:/etc/crowdsec:Z
+# Override only acquisition; keep the existing identity, credentials and hub config.
+Volume=%E/crowdsec/acquis.yaml:/etc/crowdsec/acquis.yaml:ro,Z
 Volume=/var/mnt/docker/app_data/crowdsec/staging:/staging:Z
 
 Pod=crowdsec.pod

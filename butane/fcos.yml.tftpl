@@ -16,7 +16,7 @@ passwd:
         - ${ssh_key}
 %{ endfor ~}
     - name: homelab
-      # Stable identity for application data and NFS ownership.
+      # Stable identity for application data and VirtIO-FS ownership.
       uid: 1000
       primary_group: homelab
       home_dir: /var/home/homelab
@@ -179,15 +179,6 @@ storage:
     - path: /etc/hostname
       contents:
         inline: ${hostname}
-
-    # Configure iSCSI target
-    - path: /etc/iscsi/iscsid.conf
-      overwrite: true
-      contents:
-        inline: |
-          node.startup = automatic
-          isns.address = ${truenas_ip}
-          isns.port = 3260
 
     # Import Step CA root certificate
     - path: /etc/pki/ca-trust/source/anchors/step-online-ca.pem
@@ -365,47 +356,56 @@ systemd:
         [Install]
         WantedBy=multi-user.target
 
-    - name: iscsi.service
-      enabled: true
-
-    - name: attach-iscsi-disk.service
+    - name: attach-local-disk.service
       enabled: true
       contents: |
         [Unit]
-        Description=Attach iSCSI disk
-        Wants=network-online.target
-        After=network-online.target iscsi.service
-        Before=var-mnt-docker.mount
+        Description=Activate existing homelab data disk via VirtIO SCSI
+        DefaultDependencies=no
+        After=systemd-udev-trigger.service
+        Before=var-mnt-docker.mount local-fs.target shutdown.target
+        Conflicts=shutdown.target
 
         [Service]
         Type=oneshot
         RemainAfterExit=yes
-        ExecStart=-/usr/sbin/iscsiadm -m discovery -t sendtargets -p ${truenas_ip}
-        ExecStart=-/usr/sbin/iscsiadm -m node -T ${truenas_iqn} -p ${truenas_ip} --login
-        # iscsiadm returns before udev has queued the new device, so settle can pass on an empty queue.
-        ExecStart=/usr/bin/udevadm wait --timeout=120 /dev/disk/by-path/ip-${truenas_ip}:3260-iscsi-${truenas_iqn}-lun-0
-        ExecStart=-/usr/sbin/lvmdevices --adddev /dev/disk/by-path/ip-${truenas_ip}:3260-iscsi-${truenas_iqn}-lun-0
-        ExecStart=/usr/sbin/vgchange -ay
+        ExecStart=/usr/bin/udevadm wait --timeout=60 /dev/disk/by-id/lvm-pv-uuid-${data_pv_uuid}
+        ExecStart=/usr/sbin/lvmdevices --adddev /dev/disk/by-id/lvm-pv-uuid-${data_pv_uuid}
+        ExecStart=/usr/sbin/vgchange -ay vg0
 
         [Install]
-        WantedBy=multi-user.target
+        WantedBy=local-fs.target
 
     - name: var-mnt-docker.mount
       enabled: true
       contents: |
         [Unit]
-        Description=Mount docker directory
-        Before=remote-fs.target
-        Wants=network-online.target iscsi.service
+        Description=Mount existing homelab data via VirtIO SCSI
+        Requires=attach-local-disk.service
+        After=attach-local-disk.service
+        Before=local-fs.target
 
         [Mount]
         What=/dev/vg0/lv0
         Where=/var/mnt/docker
         Type=xfs
-        Options=_netdev
+        Options=defaults
 
         [Install]
-        WantedBy=remote-fs.target
+        WantedBy=local-fs.target
+
+    - name: user@1000.service
+      dropins:
+        - name: 90-storage.conf
+          contents: |
+            [Unit]
+            RequiresMountsFor=/var/mnt/docker /var/mnt/personal /var/mnt/media /var/mnt/observability
+
+            [Service]
+            ExecStartPre=/usr/bin/mountpoint -q /var/mnt/docker
+            ExecStartPre=/usr/bin/mountpoint -q /var/mnt/personal
+            ExecStartPre=/usr/bin/mountpoint -q /var/mnt/media
+            ExecStartPre=/usr/bin/mountpoint -q /var/mnt/observability
 
     - name: podman-fix-selinux-context.service
       enabled: true
@@ -429,46 +429,49 @@ systemd:
       enabled: true
       contents: |
         [Unit]
-        Description=Mount observability directory
-        Before=remote-fs.target
+        Description=Mount observability dataset from PVE via VirtIO-FS
+        Before=local-fs.target
 
         [Mount]
-        What=${truenas_ip}:/mnt/spool/observability
+        What=homelab-observability
         Where=/var/mnt/observability
-        Type=nfs
+        Type=virtiofs
+        Options=rw,relatime,context=system_u:object_r:container_file_t:s0
 
         [Install]
-        WantedBy=remote-fs.target
+        WantedBy=local-fs.target
 
     - name: var-mnt-media.mount
       enabled: true
       contents: |
         [Unit]
-        Description=Mount media directory
-        Before=remote-fs.target
+        Description=Mount media dataset from PVE via VirtIO-FS
+        Before=local-fs.target
 
         [Mount]
-        What=${truenas_ip}:/mnt/spool/media
+        What=homelab-media
         Where=/var/mnt/media
-        Type=nfs
+        Type=virtiofs
+        Options=rw,relatime,context=system_u:object_r:container_file_t:s0
 
         [Install]
-        WantedBy=remote-fs.target
+        WantedBy=local-fs.target
 
     - name: var-mnt-personal.mount
       enabled: true
       contents: |
         [Unit]
-        Description=Mount personal directory
-        Before=remote-fs.target
+        Description=Mount personal dataset from PVE via VirtIO-FS
+        Before=local-fs.target
 
         [Mount]
-        What=${truenas_ip}:/mnt/spool/personal
+        What=homelab-personal
         Where=/var/mnt/personal
-        Type=nfs
+        Type=virtiofs
+        Options=rw,relatime,context=system_u:object_r:container_file_t:s0
 
         [Install]
-        WantedBy=remote-fs.target
+        WantedBy=local-fs.target
 
     - name: nftables.service
       enabled: true
@@ -498,12 +501,13 @@ systemd:
         [Unit]
         Description=Backup Docker data to Backblaze
         Wants=network-online.target
-        After=network-online.target iscsi.service
+        After=network-online.target
         RequiresMountsFor=/var/mnt/docker
 
         [Service]
         Type=oneshot
         Environment=RESTIC_CACHE_DIR=/var/mnt/docker/restic-cache
+        ExecStartPre=/usr/bin/mountpoint -q /var/mnt/docker
         # Fail on missing secrets before creating a snapshot.
         ExecStartPre=/etc/restic/run backblaze version
         # Create LVM snapshot and do backup
@@ -536,12 +540,13 @@ systemd:
         [Unit]
         Description=Backup Docker data to Storj
         Wants=network-online.target
-        After=network-online.target iscsi.service
+        After=network-online.target
         RequiresMountsFor=/var/mnt/docker
 
         [Service]
         Type=oneshot
         Environment=RESTIC_CACHE_DIR=/var/mnt/docker/restic-cache
+        ExecStartPre=/usr/bin/mountpoint -q /var/mnt/docker
         # Fail on missing secrets before creating a snapshot.
         ExecStartPre=/etc/restic/run storj version
         # Create LVM snapshot and do backup
@@ -631,4 +636,4 @@ systemd:
 
 kernel_arguments:
   should_exist:
-    - pcie_aspm.policy=powersupersave ifname=infra:${mac_address} ip=${ip}::${gateway}:${mask}:${hostname}:infra:none:${nameserver}
+    - pcie_aspm.policy=powersupersave ifname=infra:${fcos_mac_address} ip=${fcos_ip}::${gateway_ip}:${subnet_mask}:${hostname}:infra:none:${dns_ip}

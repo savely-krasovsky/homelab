@@ -1,5 +1,5 @@
 {{ $baseDomain := ".${base_domain}" }}
-{{ $rules := dict "pve.${base_domain}" "${proxmox_ip}:8006" "truenas.${base_domain}" "${truenas_ip}:443" }}
+{{ $rules := dict "pve.${base_domain}" "${pve_ip}:8006" "pbs.${base_domain}" "${pbs_ip}:8007" }}
 tcp:
   routers:
     {{ range $key, $value := $rules }}{{ $name := trimSuffix $baseDomain $key }}{{ $name }}:

@@ -6,40 +6,76 @@ variable "bws_access_token" {
 }
 
 variable "site_config" {
-  description = "Site-wide identity and public addressing shared by applications."
+  description = "Site-wide identity shared by applications."
   type = object({
     email       = string
     base_domain = string
     ews_domain  = string
-    public_ip   = string
   })
 
   validation {
     condition = (
       length(trimspace(var.site_config.email)) > 0 &&
       length(trimspace(var.site_config.base_domain)) > 0 &&
-      length(trimspace(var.site_config.ews_domain)) > 0 &&
-      can(cidrhost("${var.site_config.public_ip}/32", 0))
+      length(trimspace(var.site_config.ews_domain)) > 0
     )
-    error_message = "site_config requires non-empty email and domain values plus an IPv4 public_ip."
+    error_message = "site_config requires non-empty email and domain values."
+  }
+}
+
+variable "network_config" {
+  description = "Network topology and infrastructure addresses."
+  type = object({
+    public_ip        = string
+    gateway_ip       = string
+    dns_ip           = string
+    pve_ip           = string
+    pbs_ip           = string
+    fcos_ip          = string
+    fcos_mac_address = string
+    subnet_prefix    = number
+    bridge           = optional(string, "vmbr0")
+    vlan_id          = optional(number, 100)
+  })
+
+  validation {
+    condition = (
+      alltrue([
+        for ip in [
+          var.network_config.public_ip,
+          var.network_config.gateway_ip,
+          var.network_config.dns_ip,
+          var.network_config.pve_ip,
+          var.network_config.fcos_ip,
+          var.network_config.pbs_ip,
+        ] : can(cidrnetmask("${ip}/32"))
+      ]) &&
+      can(regex("^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$", var.network_config.fcos_mac_address)) &&
+      var.network_config.subnet_prefix >= 0 &&
+      var.network_config.subnet_prefix <= 32 &&
+      var.network_config.subnet_prefix == floor(var.network_config.subnet_prefix) &&
+      length(trimspace(var.network_config.bridge)) > 0 &&
+      var.network_config.vlan_id >= 1 &&
+      var.network_config.vlan_id <= 4094 &&
+      var.network_config.vlan_id == floor(var.network_config.vlan_id)
+    )
+    error_message = "network_config requires valid IPv4 addresses, FCOS MAC address, subnet prefix, bridge and VLAN ID."
   }
 }
 
 variable "proxmox_config" {
-  description = "Proxmox API connection and the node address exposed through Traefik."
+  description = "Proxmox API connection."
   type = object({
-    endpoint    = string
-    node_name   = optional(string, "pve")
-    upstream_ip = string
+    endpoint  = string
+    node_name = optional(string, "pve")
   })
 
   validation {
     condition = (
       startswith(var.proxmox_config.endpoint, "https://") &&
-      length(trimspace(var.proxmox_config.node_name)) > 0 &&
-      can(cidrhost("${var.proxmox_config.upstream_ip}/32", 0))
+      length(trimspace(var.proxmox_config.node_name)) > 0
     )
-    error_message = "proxmox_config.endpoint must use HTTPS, node_name must be non-empty, and upstream_ip must be IPv4."
+    error_message = "proxmox_config.endpoint must use HTTPS and node_name must be non-empty."
   }
 }
 
@@ -55,17 +91,14 @@ variable "fcos_config" {
       applications = set(string)
     })
 
-    network = object({
-      mac_address = string
-      ip          = string
-      gateway     = string
-      netmask     = string
-      nameserver  = string
-    })
-
     storage = object({
-      truenas_ip  = string
-      truenas_iqn = string
+      data_device  = string
+      data_pv_uuid = string
+      shares = object({
+        media         = string
+        personal      = string
+        observability = string
+      })
     })
   })
 
@@ -73,14 +106,18 @@ variable "fcos_config" {
     condition = (
       length(trimspace(var.fcos_config.hostname)) > 0 &&
       length(var.fcos_config.ssh_authorized_keys.admin) > 0 &&
-      length(var.fcos_config.ssh_authorized_keys.applications) > 0 &&
-      can(regex("^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$", var.fcos_config.network.mac_address)) &&
-      can(cidrhost("${var.fcos_config.network.ip}/32", 0)) &&
-      can(cidrhost("${var.fcos_config.network.gateway}/32", 0)) &&
-      can(cidrhost("${var.fcos_config.network.nameserver}/32", 0)) &&
-      can(cidrhost("${var.fcos_config.storage.truenas_ip}/32", 0))
+      length(var.fcos_config.ssh_authorized_keys.applications) > 0
     )
-    error_message = "fcos_config requires a hostname, both SSH key sets, a valid MAC address, and IPv4 host, gateway, DNS, and TrueNAS addresses."
+    error_message = "fcos_config requires a hostname and both SSH key sets."
+  }
+
+  validation {
+    condition = (
+      can(regex("^/dev/zvol/[A-Za-z0-9_./-]+$", var.fcos_config.storage.data_device)) &&
+      can(regex("^[A-Za-z0-9]{6}(-[A-Za-z0-9]{4}){5}-[A-Za-z0-9]{6}$", var.fcos_config.storage.data_pv_uuid)) &&
+      alltrue([for path in values(var.fcos_config.storage.shares) : startswith(path, "/") && path != "/"])
+    )
+    error_message = "Storage requires an existing /dev/zvol/... device, its LVM PV UUID, and absolute dataset mount paths. No disks or filesystems are created by this configuration."
   }
 }
 

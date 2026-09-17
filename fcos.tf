@@ -94,6 +94,8 @@ resource "proxmox_virtual_environment_vm" "fcos" {
     datastore_id = "local-zfs"
     file_id      = proxmox_download_file.fcos_qcow2.id
     size         = 32
+    discard      = "on"
+    backup       = false
   }
 
   # Attach the existing zvol; never allocate/import/copy it into a VM-owned disk.
@@ -105,6 +107,7 @@ resource "proxmox_virtual_environment_vm" "fcos" {
     file_format       = "raw"
     aio               = "io_uring"
     cache             = "none"
+    discard           = "on"
     backup            = true
     replicate         = false
     iothread          = true

@@ -63,6 +63,11 @@ locals {
       secrets = ["glance-github-token"]
     }
 
+    gopeed = {
+      paths   = ["containers/systemd/gopeed.container"]
+      restart = ["gopeed.service"]
+    }
+
     grafana = {
       paths   = ["containers/systemd/grafana.container", "grafana"]
       restart = ["grafana.service"]

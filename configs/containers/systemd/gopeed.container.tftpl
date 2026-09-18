@@ -1,0 +1,30 @@
+[Unit]
+Description=Gopeed
+Requires=reverse-proxy-network.service
+After=reverse-proxy-network.service
+
+[Container]
+Image=docker.io/liwei2633/gopeed:latest
+ContainerName=gopeed
+Network=systemd-reverse-proxy
+
+Label="traefik.enable=true"
+Label="traefik.http.routers.gopeed.rule=Host(`gopeed.${base_domain}`)"
+Label="traefik.http.routers.gopeed.middlewares=oauth2-proxy@file"
+Label="traefik.http.services.gopeed.loadbalancer.server.port=9999"
+Label="traefik.http.routers.gopeed-auth.rule=Host(`gopeed.${base_domain}`) && PathPrefix(`/oauth2/`)"
+Label="traefik.http.routers.gopeed-auth.service=oauth2-proxy"
+
+Volume=/var/mnt/docker/app_data/gopeed:/app/storage:Z
+Volume=/var/mnt/media/downloads:/app/Downloads
+
+[Service]
+ExecStartPre=/usr/bin/mountpoint -q /var/mnt/docker
+ExecStartPre=/usr/bin/mountpoint -q /var/mnt/media
+ExecStartPre=/usr/bin/test -d /var/mnt/docker/app_data
+ExecStartPre=/usr/bin/mkdir -p /var/mnt/docker/app_data/gopeed /var/mnt/media/downloads
+Restart=on-failure
+TimeoutStartSec=900
+
+[Install]
+WantedBy=default.target

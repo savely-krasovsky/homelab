@@ -18,24 +18,11 @@ locals {
     data_pv_uuid : var.fcos_config.storage.data_pv_uuid,
     base_domain : var.site_config.base_domain,
     firewall_config : local.firewall_config,
-    restic_runner : file("${path.module}/butane/restic-with-secrets.sh"),
   }
 
-  # Host services outside the application deployments also consume Podman secrets.
-  host_podman_secret_names = toset([
-    "restic-aws-access-key-id",
-    "restic-aws-secret-access-key",
-    "restic-b2-account-id",
-    "restic-b2-account-key",
-    "restic-password",
-  ])
-
-  required_podman_secret_names = setunion(
-    local.host_podman_secret_names,
-    toset(flatten([
-      for _, application in local.applications : try(application.secrets, [])
-    ])),
-  )
+  required_podman_secret_names = toset(flatten([
+    for _, application in local.applications : try(application.secrets, [])
+  ]))
 
   # The indexed map makes a missing required tfvars entry fail during planning.
   # Merging it back preserves additional secrets without changing their resource addresses.

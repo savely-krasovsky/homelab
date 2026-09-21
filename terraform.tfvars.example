@@ -130,11 +130,6 @@ secret_config = {
     "remnawave-node-vless-xhttp-secret-key" = { id = "replace-with-remnawave-node-vless-xhttp-secret-key-bitwarden-secret-id" }
     "remnawave-postgres-password" = { id = "replace-with-remnawave-postgres-password-bitwarden-secret-id" }
     "remnawave-xhttp-path" = { id = "replace-with-remnawave-xhttp-path-bitwarden-secret-id" }
-    "restic-aws-access-key-id" = { id = "replace-with-restic-aws-access-key-id-bitwarden-secret-id" }
-    "restic-aws-secret-access-key" = { id = "replace-with-restic-aws-secret-access-key-bitwarden-secret-id" }
-    "restic-b2-account-id" = { id = "replace-with-restic-b2-account-id-bitwarden-secret-id" }
-    "restic-b2-account-key" = { id = "replace-with-restic-b2-account-key-bitwarden-secret-id" }
-    "restic-password" = { id = "replace-with-restic-password-bitwarden-secret-id" }
     "synapse-form-secret" = { id = "replace-with-synapse-form-secret-bitwarden-secret-id" }
     "synapse-macaroon-secret-key" = { id = "replace-with-synapse-macaroon-secret-key-bitwarden-secret-id" }
     "synapse-postgres-password" = { id = "replace-with-synapse-postgres-password-bitwarden-secret-id" }

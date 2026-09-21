@@ -95,9 +95,6 @@ storage:
         name: homelab
       group:
         name: homelab
-    # Backup snapshot mounting points
-    - path: /var/mnt/snapshots/backblaze
-    - path: /var/mnt/snapshots/storj
 
   links:
     # Enable Podman socket for Traefik
@@ -291,50 +288,6 @@ storage:
           [Service]
           Environment=LOGGING="--log-level=warn"
 
-    # Root restic processes obtain current secrets from homelab's Podman store.
-    - path: /etc/restic/run
-      mode: 0755
-      contents:
-        inline: |
-          ${indent(10, restic_runner)}
-
-    # restic excludes; the wildcard covers both snapshot mounts
-    - path: /etc/restic/excludes.txt
-      overwrite: true
-      mode: 0644
-      contents:
-        inline: |
-          # Caches and indexes that the application rebuilds on its own
-          /mnt/snapshots/*/app_data/alloy
-          /mnt/snapshots/*/app_data/crowdsec/data
-          /mnt/snapshots/*/app_data/crowdsec/staging
-          /mnt/snapshots/*/app_data/grafana/data/plugins
-          /mnt/snapshots/*/app_data/hister/llamacpp
-          /mnt/snapshots/*/app_data/karakeep/meilisearch
-          /mnt/snapshots/*/app_data/open-webui/cache
-          /mnt/snapshots/*/app_data/traefik/plugins
-
-          # Media Synapse re-fetches from the originating homeserver
-          /mnt/snapshots/*/app_data/matrix/synapse/media_store/remote_content
-          /mnt/snapshots/*/app_data/matrix/synapse/media_store/remote_thumbnail
-          /mnt/snapshots/*/app_data/matrix/synapse/media_store/local_thumbnails
-
-          # Plex rebuilds everything here from the library on disk
-          /mnt/snapshots/*/app_data/plex/Library/Application Support/Plex Media Server/Cache
-          /mnt/snapshots/*/app_data/plex/Library/Application Support/Plex Media Server/Codecs
-          /mnt/snapshots/*/app_data/plex/Library/Application Support/Plex Media Server/Crash Reports
-          /mnt/snapshots/*/app_data/plex/Library/Application Support/Plex Media Server/Drivers
-          /mnt/snapshots/*/app_data/plex/Library/Application Support/Plex Media Server/Logs
-          /mnt/snapshots/*/app_data/plex/Library/Application Support/Plex Media Server/Media
-          /mnt/snapshots/*/app_data/plex/Library/Application Support/Plex Media Server/Metadata
-          /mnt/snapshots/*/app_data/plex/Library/Application Support/Plex Media Server/Scanners
-
-          # Volatile stores: sessions and queues, worthless once restored
-          /mnt/snapshots/*/app_data/*/valkey
-          /mnt/snapshots/*/app_data/immich/redis
-          /mnt/snapshots/*/app_data/rmqtt/logs
-          /mnt/snapshots/*/app_data/*/*.log
-
 systemd:
   units:
     - name: install-additional-software.service
@@ -350,7 +303,7 @@ systemd:
         [Service]
         Type=oneshot
         RemainAfterExit=yes
-        ExecStart=/usr/bin/rpm-ostree install --allow-inactive --assumeyes --reboot qemu-guest-agent restic btop nvtop
+        ExecStart=/usr/bin/rpm-ostree install --allow-inactive --assumeyes --reboot qemu-guest-agent btop nvtop
         ExecStart=/bin/touch /var/lib/%N.stamp
 
         [Install]
@@ -512,144 +465,6 @@ systemd:
 
         [Install]
         WantedBy=multi-user.target
-
-    - name: restic-backblaze.service
-      contents: |
-        [Unit]
-        Description=Backup Docker data to Backblaze
-        Wants=network-online.target
-        After=network-online.target
-        RequiresMountsFor=/var/mnt/docker
-
-        [Service]
-        Type=oneshot
-        Environment=RESTIC_CACHE_DIR=/var/mnt/docker/restic-cache
-        ExecStartPre=/usr/bin/mountpoint -q /var/mnt/docker
-        # Fail on missing secrets before creating a snapshot.
-        ExecStartPre=/etc/restic/run backblaze version
-        # Create LVM snapshot and do backup
-        ExecStart=/bin/bash -c "lvremove -y vg0/restic-backblaze || true"
-        ExecStart=/usr/sbin/lvcreate --size 15G --snapshot --name restic-backblaze vg0/lv0
-        ExecStart=/usr/bin/mount -o nouuid /dev/vg0/restic-backblaze /mnt/snapshots/backblaze
-        ExecStart=/etc/restic/run backblaze -r b2:krasovsky-homelab:app-data --verbose --exclude-file=/etc/restic/excludes.txt backup /mnt/snapshots/backblaze/app_data
-        ExecStart=/bin/bash -c "umount /mnt/snapshots/backblaze || true"
-        ExecStart=/usr/sbin/lvremove -y vg0/restic-backblaze
-
-        [Install]
-        WantedBy=multi-user.target
-
-    - name: restic-backblaze.timer
-      enabled: true
-      contents: |
-        [Unit]
-        Description=Daily backup to Backblaze
-
-        [Timer]
-        OnCalendar=daily
-        RandomizedDelaySec=3600
-        Unit=restic-backblaze.service
-
-        [Install]
-        WantedBy=timers.target
-
-    - name: restic-storj.service
-      contents: |
-        [Unit]
-        Description=Backup Docker data to Storj
-        Wants=network-online.target
-        After=network-online.target
-        RequiresMountsFor=/var/mnt/docker
-
-        [Service]
-        Type=oneshot
-        Environment=RESTIC_CACHE_DIR=/var/mnt/docker/restic-cache
-        ExecStartPre=/usr/bin/mountpoint -q /var/mnt/docker
-        # Fail on missing secrets before creating a snapshot.
-        ExecStartPre=/etc/restic/run storj version
-        # Create LVM snapshot and do backup
-        ExecStart=/bin/bash -c "lvremove -y vg0/restic-storj || true"
-        ExecStart=/usr/sbin/lvcreate --size 15G --snapshot --name restic-storj vg0/lv0
-        ExecStart=/usr/bin/mount -o nouuid /dev/vg0/restic-storj /mnt/snapshots/storj
-        ExecStart=/etc/restic/run storj -r s3:https://gateway.eu1.storjshare.io/homelab-backup/app-data --verbose --exclude-file=/etc/restic/excludes.txt backup /mnt/snapshots/storj/app_data
-        ExecStart=/bin/bash -c "umount /mnt/snapshots/storj || true"
-        ExecStart=/usr/sbin/lvremove -y vg0/restic-storj
-
-        [Install]
-        WantedBy=multi-user.target
-
-    - name: restic-storj.timer
-      enabled: true
-      contents: |
-        [Unit]
-        Description=Daily backup to Storj
-
-        [Timer]
-        OnCalendar=daily
-        RandomizedDelaySec=3600
-        Unit=restic-storj.service
-
-        [Install]
-        WantedBy=timers.target
-
-    - name: restic-backblaze-prune.service
-      contents: |
-        [Unit]
-        Description=Apply retention policy to the Backblaze repository
-        Wants=network-online.target
-        After=network-online.target restic-backblaze.service
-        RequiresMountsFor=/var/mnt/docker
-
-        [Service]
-        Type=oneshot
-        Environment=RESTIC_CACHE_DIR=/var/mnt/docker/restic-cache
-        ExecStart=/etc/restic/run backblaze -r b2:krasovsky-homelab:app-data --verbose forget --keep-daily 14 --keep-weekly 8 --keep-monthly 12 --prune
-
-        [Install]
-        WantedBy=multi-user.target
-
-    - name: restic-backblaze-prune.timer
-      enabled: true
-      contents: |
-        [Unit]
-        Description=Weekly retention pass on Backblaze
-
-        [Timer]
-        OnCalendar=Sun *-*-* 03:00:00
-        RandomizedDelaySec=900
-        Unit=restic-backblaze-prune.service
-
-        [Install]
-        WantedBy=timers.target
-
-    - name: restic-storj-prune.service
-      contents: |
-        [Unit]
-        Description=Apply retention policy to the Storj repository
-        Wants=network-online.target
-        After=network-online.target restic-storj.service
-        RequiresMountsFor=/var/mnt/docker
-
-        [Service]
-        Type=oneshot
-        Environment=RESTIC_CACHE_DIR=/var/mnt/docker/restic-cache
-        ExecStart=/etc/restic/run storj -r s3:https://gateway.eu1.storjshare.io/homelab-backup/app-data --verbose forget --keep-daily 14 --keep-weekly 8 --keep-monthly 12 --prune
-
-        [Install]
-        WantedBy=multi-user.target
-
-    - name: restic-storj-prune.timer
-      enabled: true
-      contents: |
-        [Unit]
-        Description=Weekly retention pass on Storj
-
-        [Timer]
-        OnCalendar=Sun *-*-* 05:00:00
-        RandomizedDelaySec=900
-        Unit=restic-storj-prune.service
-
-        [Install]
-        WantedBy=timers.target
 
 kernel_arguments:
   should_exist:

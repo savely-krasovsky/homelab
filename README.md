@@ -92,7 +92,7 @@ See [acquisition](configs/crowdsec/acquis.yaml) and [vmauth access rules](config
 
 ## Secrets and updates
 
-Application and restic secrets use ephemeral Bitwarden reads and write-only Podman
+Application secrets use ephemeral Bitwarden reads and write-only Podman
 resource arguments. After rotation, bump `secret_config.podman.<name>.revision`
 and apply. Names use hyphens; list shared secrets in every consumer's `secrets` field.
 For the ACME token, bump `secret_config.proxmox_acme_cloudflare_token.revision`.
@@ -102,14 +102,13 @@ For the ACME token, bump `secret_config.proxmox_acme_cloudflare_token.revision`.
 
 ## Backups
 
-Restic backs up `/var/mnt/docker/app_data` from LVM snapshots to B2 and Storj daily.
-Weekly prune retains 14 daily, 8 weekly and 12 monthly snapshots.
-[Jobs and exclusions](butane/fcos.yml.tftpl); [secret-loading wrapper](butane/restic-with-secrets.sh).
-The wrapper reads current secrets on each run, without a service restart.
+The application zvol has `backup=true` and is backed up to PBS through PVE VM backups.
+VirtIO-FS shares are **not included** in VM backups; [PVE file-backup jobs](pve/file-backup.sh)
+send `personal` and `observability` to PBS separately. Restic jobs are no longer
+provisioned by Butane. Existing FCOS hosts need their old backup and prune timers
+disabled separately because Ignition only runs on first boot.
 
-The application zvol has `backup=true`; VirtIO-FS shares are **not included** in VM
-backups and need separate jobs. Photo cloud-backup jobs and automated restore
-verification remain to be configured. See [backup boundaries](docs/storage.md).
+Automated restore verification remains to be configured. See [backup boundaries](docs/storage.md).
 
 ## Planned
 

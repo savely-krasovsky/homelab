@@ -1,0 +1,30 @@
+[Unit]
+Description=GoatCounter Postgres Quadlet
+
+[Container]
+Image=docker.io/library/postgres:18-trixie
+ContainerName=goatcounter-postgres
+User=1000:1000
+
+Environment=POSTGRES_USER=goatcounter
+Environment=POSTGRES_DB=goatcounter
+Environment=POSTGRES_INITDB_ARGS="--data-checksums"
+Secret=goatcounter-postgres-password,type=env,target=POSTGRES_PASSWORD
+
+Label="glance.parent=goatcounter"
+Label="glance.name=Postgres"
+Label="glance.hide=false"
+
+HealthCmd=pg_isready --host=127.0.0.1 --dbname=goatcounter --username=goatcounter
+HealthInterval=5s
+Notify=healthy
+
+Volume=/var/mnt/docker/app_data/goatcounter/postgres:/var/lib/postgresql:Z
+Pod=goatcounter.pod
+
+[Service]
+ExecStartPre=/usr/bin/mountpoint -q /var/mnt/docker
+ExecStartPre=/usr/bin/test -d /var/mnt/docker/app_data
+ExecStartPre=/usr/bin/mkdir -p -m 0755 -- /var/mnt/docker/app_data/goatcounter/postgres
+TimeoutStartSec=900
+Restart=always

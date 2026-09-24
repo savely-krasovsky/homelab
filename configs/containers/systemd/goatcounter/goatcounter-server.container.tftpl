@@ -1,0 +1,37 @@
+[Unit]
+Description=GoatCounter Server Quadlet
+Requires=goatcounter-postgres.service
+After=goatcounter-postgres.service
+
+[Container]
+Image=docker.io/arp242/goatcounter:2.7
+ContainerName=goatcounter-server
+User=1000:1000
+
+Environment=PGHOST=127.0.0.1
+Environment=PGDATABASE=goatcounter
+Environment=PGUSER=goatcounter
+Environment=PGSSLMODE=disable
+Secret=goatcounter-postgres-password,type=env,target=PGPASSWORD
+Exec=serve -automigrate -db postgresql
+
+Label="glance.id=goatcounter"
+Label="glance.name=GoatCounter"
+Label="glance.icon=di:goatcounter"
+Label="glance.url=https://goatcounter.${base_domain}"
+Label="glance.description=Website analytics"
+Label="glance.hide=false"
+
+Label="traefik.enable=true"
+Label="traefik.http.routers.goatcounter.rule=Host(`goatcounter.${base_domain}`)"
+Label="traefik.http.services.goatcounter.loadbalancer.server.port=8080"
+
+Volume=/var/mnt/docker/app_data/goatcounter/data:/home/goatcounter/goatcounter-data:Z
+Pod=goatcounter.pod
+
+[Service]
+ExecStartPre=/usr/bin/mountpoint -q /var/mnt/docker
+ExecStartPre=/usr/bin/test -d /var/mnt/docker/app_data
+ExecStartPre=/usr/bin/mkdir -p -m 0755 -- /var/mnt/docker/app_data/goatcounter/data
+TimeoutStartSec=900
+Restart=always

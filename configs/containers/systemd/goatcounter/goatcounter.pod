@@ -1,0 +1,13 @@
+[Unit]
+Requires=reverse-proxy-network.service
+After=reverse-proxy-network.service
+Description=GoatCounter Pod
+
+[Pod]
+PodName=goatcounter
+UserNS=keep-id:uid=1000,gid=1000
+ExitPolicy=continue
+Network=systemd-reverse-proxy
+
+[Install]
+WantedBy=default.target

@@ -63,6 +63,12 @@ locals {
       secrets = ["glance-github-token"]
     }
 
+    goatcounter = {
+      paths   = ["containers/systemd/goatcounter"]
+      restart = ["goatcounter-pod.service"]
+      secrets = ["goatcounter-postgres-password"]
+    }
+
     gopeed = {
       paths   = ["containers/systemd/gopeed.container"]
       restart = ["gopeed.service"]
@@ -240,6 +246,20 @@ locals {
     qbittorrent = {
       paths   = ["containers/systemd/qbittorrent.container"]
       restart = ["qbittorrent.service"]
+    }
+
+    remark42 = {
+      paths   = ["containers/systemd/remark42.container"]
+      restart = ["remark42.service"]
+      secrets = [
+        "remark42-secret",
+        "remark42-auth-google-csec",
+        "remark42-auth-github-csec",
+        "remark42-auth-yandex-csec",
+        "remark42-auth-microsoft-csec",
+        "remark42-telegram-token",
+        "remark42-smtp-password",
+      ]
     }
 
     remnawave = {

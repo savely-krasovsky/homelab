@@ -1,0 +1,63 @@
+[Unit]
+Requires=reverse-proxy-network.service
+After=reverse-proxy-network.service
+Description=Remark42 Quadlet
+
+[Container]
+Image=ghcr.io/umputun/remark42:v1.17.1
+ContainerName=remark42
+
+User=0
+UserNS=keep-id:uid=1000,gid=1000
+
+Environment=APP_UID=1000
+Environment=TIME_ZONE=Europe/Belgrade
+Environment=TRUSTED_PROXY=10.89.0.0/24
+Environment=REMARK_URL=https://remark42.${base_domain}/
+Environment=ADMIN_SHARED_ID=email_7135bdba3e7fe155750be3890d5f463766a4c120,google_8a2b7f3986541e07c8b973c44b090e2c61ba70df,github_9c87c8c9bc11fc9869663f39ff082e5fdaad389d,microsoft_c89e9be9aa5e71cf3c8470fd3c743360c1a8b9c4,yandex_e59c83445ea0e3a97723b5f8e3657e2873ae4ee0,telegram_a9df4677012301dbd79b454f298eb691e007bbb1
+Environment=AUTH_GOOGLE_CID=633581232428-kdpl3r0juo5m8lqa9d6e8q65i8m074e3.apps.googleusercontent.com
+Environment=AUTH_GITHUB_CID=35f31c928bdc3ef17514
+Environment=AUTH_YANDEX_CID=daec90a0a44744388f22bc67a6136579
+Environment=AUTH_MICROSOFT_CID=ba6c2d2f-f2dc-4937-acb5-57d4c7050ad4
+Environment=AUTH_TELEGRAM=true
+Environment=AUTH_EMAIL_ENABLE=true
+Environment=AUTH_EMAIL_FROM=savely@${base_domain}
+Environment=SMTP_HOST=smtps-proxy.fastmail.com
+Environment=SMTP_PORT=443
+Environment=SMTP_USERNAME=savely@${base_domain}
+Environment=SMTP_TLS=true
+Environment=NOTIFY_ADMINS=telegram
+Environment=NOTIFY_TELEGRAM_CHAN=-1001590008650
+Environment=NOTIFY_USERS=telegram
+Environment=ADMIN_EDIT=true
+Environment=EMOJI=true
+Secret=remark42-secret,type=env,target=SECRET
+Secret=remark42-auth-google-csec,type=env,target=AUTH_GOOGLE_CSEC
+Secret=remark42-auth-github-csec,type=env,target=AUTH_GITHUB_CSEC
+Secret=remark42-auth-yandex-csec,type=env,target=AUTH_YANDEX_CSEC
+Secret=remark42-auth-microsoft-csec,type=env,target=AUTH_MICROSOFT_CSEC
+Secret=remark42-telegram-token,type=env,target=TELEGRAM_TOKEN
+Secret=remark42-smtp-password,type=env,target=SMTP_PASSWORD
+
+Label="glance.name=Remark42"
+Label="glance.icon=di:remark42"
+Label="glance.url=https://remark42.${base_domain}/web/"
+Label="glance.description=Blog comments"
+Label="glance.hide=false"
+
+Label="traefik.enable=true"
+Label="traefik.http.routers.remark42.rule=Host(`remark42.${base_domain}`)"
+Label="traefik.http.services.remark42.loadbalancer.server.port=8080"
+
+Volume=/var/mnt/docker/app_data/remark42:/srv/var:Z
+Network=systemd-reverse-proxy
+
+[Service]
+ExecStartPre=/usr/bin/mountpoint -q /var/mnt/docker
+ExecStartPre=/usr/bin/test -d /var/mnt/docker/app_data
+ExecStartPre=/usr/bin/mkdir -p -m 0755 -- /var/mnt/docker/app_data/remark42
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=default.target

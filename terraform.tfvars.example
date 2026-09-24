@@ -72,6 +72,7 @@ secret_config = {
     "crowdsec-lapi-password" = { id = "replace-with-crowdsec-lapi-password-bitwarden-secret-id" }
     "forward-info-bot-telegram-token" = { id = "replace-with-forward-info-bot-telegram-token-bitwarden-secret-id" }
     "glance-github-token" = { id = "replace-with-glance-github-token-bitwarden-secret-id" }
+    "goatcounter-postgres-password" = { id = "replace-with-goatcounter-postgres-password-bitwarden-secret-id" }
     "grafana-oauth2-client-secret" = { id = "replace-with-grafana-oauth2-client-secret-bitwarden-secret-id" }
     "hister-oidc-client-secret" = { id = "replace-with-hister-oidc-client-secret-bitwarden-secret-id" }
     "immich-map-key" = { id = "replace-with-immich-map-key-bitwarden-secret-id" }
@@ -121,10 +122,17 @@ secret_config = {
     "pds-plc-rotation-key-k256-private-key-hex" = { id = "replace-with-pds-plc-rotation-key-k256-private-key-hex-bitwarden-secret-id" }
     "pocket-id-encryption-key" = { id = "replace-with-pocket-id-encryption-key-bitwarden-secret-id" }
     "pocket-id-maxmind-license-key" = { id = "replace-with-pocket-id-maxmind-license-key-bitwarden-secret-id" }
+    "remark42-auth-github-csec" = { id = "replace-with-remark42-auth-github-csec-bitwarden-secret-id" }
+    "remark42-auth-google-csec" = { id = "replace-with-remark42-auth-google-csec-bitwarden-secret-id" }
+    "remark42-auth-microsoft-csec" = { id = "replace-with-remark42-auth-microsoft-csec-bitwarden-secret-id" }
+    "remark42-auth-yandex-csec" = { id = "replace-with-remark42-auth-yandex-csec-bitwarden-secret-id" }
+    "remark42-secret" = { id = "replace-with-remark42-secret-bitwarden-secret-id" }
+    "remark42-smtp-password" = { id = "replace-with-remark42-smtp-password-bitwarden-secret-id" }
+    "remark42-telegram-token" = { id = "replace-with-remark42-telegram-token-bitwarden-secret-id" }
     "remnawave-api-token" = { id = "replace-with-remnawave-api-token-bitwarden-secret-id" }
     "remnawave-database-url" = { id = "replace-with-remnawave-database-url-bitwarden-secret-id" }
-    "remnawave-jwt-auth-secret" = { id = "replace-with-remnawave-jwt-auth-secret-bitwarden-secret-id" }
     "remnawave-jwt-api-tokens-secret" = { id = "replace-with-remnawave-jwt-api-tokens-secret-bitwarden-secret-id" }
+    "remnawave-jwt-auth-secret" = { id = "replace-with-remnawave-jwt-auth-secret-bitwarden-secret-id" }
     "remnawave-metrics-pass" = { id = "replace-with-remnawave-metrics-pass-bitwarden-secret-id" }
     "remnawave-node-vless-reality-secret-key" = { id = "replace-with-remnawave-node-vless-reality-secret-key-bitwarden-secret-id" }
     "remnawave-node-vless-xhttp-secret-key" = { id = "replace-with-remnawave-node-vless-xhttp-secret-key-bitwarden-secret-id" }

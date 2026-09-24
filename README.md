@@ -9,6 +9,7 @@ This configuration is specific to this homelab; adapt storage, networking and ac
 - [fcos.tf](fcos.tf), [butane/](butane/): FCOS VM, first-boot configuration and system services.
 - [deployment.tf](deployment.tf), [configs/](configs/): application list, Quadlets and configuration.
 - [storage.tf](storage.tf): existing ZFS datasets exposed through Proxmox Directory Mappings.
+- [backups.tf](backups.tf): per-cloud PVE backup jobs and file-backup hooks.
 - [proxmox-acme.tf](proxmox-acme.tf): Proxmox certificates through Cloudflare DNS validation.
 - [Storage guide](docs/storage.md): ownership, boot and recovery.
 
@@ -102,11 +103,9 @@ For the ACME token, bump `secret_config.proxmox_acme_cloudflare_token.revision`.
 
 ## Backups
 
-The application zvol has `backup=true` and is backed up to PBS through PVE VM backups.
-VirtIO-FS shares are **not included** in VM backups; [PVE file-backup jobs](pve/file-backup.sh)
-send `personal` and `observability` to PBS separately. Restic jobs are no longer
-provisioned by Butane. Existing FCOS hosts need their old backup and prune timers
-disabled separately because Ignition only runs on first boot.
+Two [PVE jobs](backups.tf) back up FCOS and then `personal`/`observability`:
+Storj at 06:00 and Backblaze at 07:00, PVE local time. OpenTofu manages the jobs
+and their [file-backup hooks](pve/file-backup.sh.tftpl). Logs and results are in PVE Tasks.
 
 Automated restore verification remains to be configured. See [backup boundaries](docs/storage.md).
 

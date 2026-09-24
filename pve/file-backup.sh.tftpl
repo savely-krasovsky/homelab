@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# PVE invokes the hook at every phase; run once after the VM backup job.
+[[ $${1:-} == job-end ]] || exit 0
+
+# Each rendered hook has one destination and reuses that PVE storage's credentials.
+store='${store}'
+exec 9>/run/lock/homelab-file-backup.lock
+flock -n 9
+
+datasets=(spool/personal spool/observability)
+snapshot="pbs-files-$store-$(date -u +%Y%m%dT%H%M%SZ)"
+snapshots=()
+archives=()
+
+for dataset in "$${datasets[@]}"; do
+    [[ $(zfs get -H -o value mounted "$dataset") == yes ]]
+    mountpoint=$(zfs get -H -o value mountpoint "$dataset")
+    snapshots+=("$dataset@$snapshot")
+    archives+=("$${dataset##*/}.pxar:$mountpoint/.zfs/snapshot/$snapshot")
+done
+
+zfs snapshot "$${snapshots[@]}"
+cleanup() {
+    local result=$?
+    for saved_snapshot in "$${snapshots[@]}"; do
+        zfs destroy "$saved_snapshot" || result=1
+    done
+    exit "$result"
+}
+trap cleanup EXIT
+trap 'exit 143' TERM
+trap 'exit 130' INT
+
+echo "Backing up $snapshot to $store"
+PBS_PASSWORD_FILE="/etc/pve/priv/storage/pbs-$store.pw" \
+    proxmox-backup-client backup "$${archives[@]}" \
+        --repository "pve@pbs!pve@pbs.lan.krasovs.ky:$store" \
+        --keyfile "/etc/pve/priv/storage/pbs-$store.enc" \
+        --crypt-mode encrypt \
+        --backup-type host --backup-id homelab-files \
+        --exclude '/immich/thumbs/*' \
+        --exclude '!/immich/thumbs/.immich' \
+        --exclude '/immich/encoded-video/*' \
+        --exclude '!/immich/encoded-video/.immich' \
+        --exclude '/opencloud/thumbnails/' \
+        --exclude '/opencloud/search/' \
+        --exclude '/metrics/cache/' \
+        --exclude '/metrics/tmp/' \
+        --change-detection-mode metadata

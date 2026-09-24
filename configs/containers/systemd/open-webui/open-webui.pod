@@ -5,7 +5,6 @@ Description=Open WebUI Pod
 
 [Pod]
 PodName=open-webui
-Network=open-webui.network
 Network=systemd-reverse-proxy
 
 [Install]

@@ -1,4 +1,0 @@
-[Unit]
-PartOf=opencloud.target
-
-[Network]

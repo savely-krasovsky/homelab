@@ -6,7 +6,6 @@ Description=Victoria Pod
 [Pod]
 PodName=victoria
 UserNS=keep-id:uid=1000,gid=1000
-Network=victoria.network
 Network=systemd-reverse-proxy
 
 [Install]

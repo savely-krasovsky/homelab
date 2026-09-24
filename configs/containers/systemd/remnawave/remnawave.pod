@@ -6,7 +6,6 @@ Description=Remnawave Pod
 [Pod]
 PodName=remnawave
 UserNS=keep-id:uid=1000,gid=1000
-Network=remnawave.network
 Network=systemd-reverse-proxy
 
 [Install]

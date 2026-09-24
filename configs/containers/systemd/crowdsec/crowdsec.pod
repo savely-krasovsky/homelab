@@ -6,7 +6,6 @@ Description=Crowdsec Pod
 [Pod]
 PodName=crowdsec
 UserNS=keep-id:uid=1000,gid=1000
-Network=crowdsec.network
 Network=systemd-reverse-proxy
 
 [Install]

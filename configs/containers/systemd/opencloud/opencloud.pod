@@ -9,5 +9,4 @@ PodName=opencloud
 # Keep the pod alive while extension setup finishes before the server starts.
 ExitPolicy=continue
 UserNS=keep-id:uid=1000,gid=1000
-Network=opencloud.network
 Network=systemd-reverse-proxy

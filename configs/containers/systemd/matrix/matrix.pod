@@ -6,7 +6,6 @@ Description=Matrix Pod
 [Pod]
 PodName=matrix
 UserNS=keep-id:uid=1000,gid=1000
-Network=matrix.network
 Network=systemd-reverse-proxy
 
 [Install]

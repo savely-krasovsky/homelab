@@ -1,9 +1,9 @@
 # Storage
 
-PVE owns the encrypted `spool` pool; FCOS receives its zvol and VirtIO-FS shares.
+PVE owns the encrypted `spool` pool; Fedora CoreOS receives its zvol and VirtIO-FS shares.
 Host storage configuration is managed outside OpenTofu.
 
-| Data | PVE attachment | FCOS mount | VM backup |
+| Data | PVE attachment | Fedora CoreOS mount | VM backup |
 | --- | --- | --- | --- |
 | `spool/docker`, 200 GiB zvol | `scsi1`, `/dev/zvol/spool/docker` | `vg0/lv0`, 100 GiB XFS, `/var/mnt/docker` | `backup=1` |
 | `spool/media` | `homelab-media`, `virtiofs0` | `/var/mnt/media` | No |
@@ -43,7 +43,7 @@ This is a homelab policy using [OpenZFS systemd properties](https://openzfs.gith
 A mount failure blocks the common `pve-guests.service` autostart. Manual VM starts bypass this dependency.
 After changing properties, let ZED update the cache, then run `systemctl daemon-reload`.
 
-## FCOS
+## Fedora CoreOS
 
 [Butane](../butane/fcos.yml.tftpl) activates the existing `vg0` by PV UUID and
 requires all five mounts before starting `user@1000.service`; it creates no PV/VG/LV.
@@ -68,7 +68,7 @@ After fixing an unlock or mount error:
 systemctl start mnt-spool-media.mount mnt-spool-personal.mount mnt-spool-observability.mount mnt-spool-random.mount
 ```
 
-Before manually starting FCOS, verify the four host mounts with `findmnt -M`
+Before manually starting Fedora CoreOS, verify the four host mounts with `findmnt -M`
 and check that `/dev/zvol/spool/docker` exists.
 
 ## Backups
@@ -80,7 +80,7 @@ and check that `/dev/zvol/spool/docker` exists.
 | `fcos-storj` | 06:00 | `pbs-storj` |
 | `fcos-backblaze` | 07:00 | `pbs-backblaze` |
 
-Each job backs up the FCOS application disk, then its `job-end` hook snapshots
+Each job backs up the Fedora CoreOS application disk, then its `job-end` hook snapshots
 `personal` and `observability`, uploads them to the same PBS destination and removes
 the snapshots. OpenTofu renders one executable [snippet](../pve/file-backup.sh.tftpl)
 per cloud under `/var/lib/vz/snippets/`. PVE Tasks includes the hook output and failures.

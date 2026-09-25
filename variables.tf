@@ -59,7 +59,7 @@ variable "network_config" {
       var.network_config.vlan_id <= 4094 &&
       var.network_config.vlan_id == floor(var.network_config.vlan_id)
     )
-    error_message = "network_config requires valid IPv4 addresses, FCOS MAC address, subnet prefix, bridge and VLAN ID."
+    error_message = "network_config requires valid IPv4 addresses, Fedora CoreOS MAC address, subnet prefix, bridge and VLAN ID."
   }
 }
 
@@ -134,8 +134,18 @@ variable "deployment_config" {
   }
 }
 
+variable "gatus_config" {
+  description = "External Gatus checks and the local render directory."
+  type = object({
+    interval         = optional(string, "1m")
+    output_directory = optional(string, ".build/ch-vps01/gatus")
+    telegram_chat_id = string
+    oauth2_client_id = string
+  })
+}
+
 variable "secret_config" {
-  description = "Bitwarden secret references. Podman map keys are the final hyphenated secret names."
+  description = "Bitwarden secret references. Map keys use hyphenated secret names; Podman keys are also the installed names."
   type = object({
     proxmox_password = object({
       id = string
@@ -148,6 +158,10 @@ variable "secret_config" {
       id       = string
       revision = optional(number, 1)
     }))
+    gatus = map(object({
+      id       = string
+      revision = optional(number, 1)
+    }))
   })
 
   validation {
@@ -156,13 +170,13 @@ variable "secret_config" {
       length(trimspace(var.secret_config.proxmox_acme_cloudflare_token.id)) > 0 &&
       var.secret_config.proxmox_acme_cloudflare_token.revision >= 1 &&
       alltrue([
-        for name, secret in var.secret_config.podman :
+        for name, secret in merge(var.secret_config.podman, var.secret_config.gatus) :
         can(regex("^[a-z0-9]+(-[a-z0-9]+)*$", name)) &&
         length(trimspace(secret.id)) > 0 &&
         secret.revision >= 1
       ])
     )
-    error_message = "Secret IDs must be non-empty, revisions must be at least 1, and Podman secret names must use lowercase kebab-case."
+    error_message = "Secret IDs must be non-empty, revisions must be at least 1, and secret names must use lowercase kebab-case."
   }
 
   validation {
@@ -172,7 +186,8 @@ variable "secret_config" {
         var.secret_config.proxmox_acme_cloudflare_token.id,
       ],
       [for secret in values(var.secret_config.podman) : secret.id],
-    ))) == length(var.secret_config.podman) + 2
+      [for secret in values(var.secret_config.gatus) : secret.id],
+    ))) == length(var.secret_config.podman) + length(var.secret_config.gatus) + 2
     error_message = "Every Bitwarden secret reference must use a distinct ID."
   }
 }

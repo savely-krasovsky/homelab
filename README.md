@@ -6,10 +6,11 @@ This configuration is specific to this homelab; adapt storage, networking and ac
 ## Layout
 
 - [main.tf](main.tf), [variables.tf](variables.tf): providers, connections and inputs.
-- [fcos.tf](fcos.tf), [butane/](butane/): FCOS VM, first-boot configuration and system services.
+- [fcos.tf](fcos.tf), [butane/](butane/): Fedora CoreOS VM, first-boot configuration and system services.
 - [deployment.tf](deployment.tf), [configs/](configs/): application list, Quadlets and configuration.
 - [storage.tf](storage.tf): existing ZFS datasets exposed through Proxmox Directory Mappings.
 - [backups.tf](backups.tf): per-cloud PVE backup jobs and file-backup hooks.
+- [Gatus guide](docs/gatus.md): external monitoring, configuration upload and coverage.
 - [proxmox-acme.tf](proxmox-acme.tf): Proxmox certificates through Cloudflare DNS validation.
 - [Storage guide](docs/storage.md): ownership, boot and recovery.
 
@@ -29,7 +30,7 @@ Gatus monitors availability externally.
    with `go build -o bin/ .` in its checkout and point a local `.terraformrc` development override at `bin/`.
 4. Copy `terraform.tfvars.example` to ignored `terraform.tfvars`, fill in the values
    and restrict permissions with `chmod 600 terraform.tfvars`.
-5. Load the Proxmox SSH key into the agent. Set FCOS admin keys in
+5. Load the Proxmox SSH key into the agent. Set Fedora CoreOS admin keys in
    `fcos_config.ssh_authorized_keys.admin`, deployment public keys in
    `fcos_config.ssh_authorized_keys.applications`, and the deployment private-key
    path in `deployment_config.ssh_private_key_path`.
@@ -42,13 +43,13 @@ tofu plan
 tofu apply
 ```
 
-Ignition configures FCOS on first boot; the Quadlet provider then installs application
+Ignition configures Fedora CoreOS on first boot; the Quadlet provider then installs application
 files and secrets over SSH. Uploading new Ignition does not reconfigure a running host.
 
 The Quadlet connection currently disables SSH host-key verification: the server's
 identity is not checked. Use separate admin and deployment keys.
 
-## FCOS access and replacement
+## Fedora CoreOS access and replacement
 
 - `core`: administrator with sudo, UID/GID `1001:1001`.
 - `homelab`: applications without sudo, UID/GID `1000:1000`, subuid/subgid `524288:65536`.
@@ -91,6 +92,34 @@ Rendered paths are relative to `homelab`'s `~/.config`; `.tftpl` is stripped.
 CrowdSec reads Traefik logs through `http://victoria:8427/vl/` using its dedicated token.
 See [acquisition](configs/crowdsec/acquis.yaml) and [vmauth access rules](configs/vmauth/auth.yml).
 
+## External Gatus
+
+[Gatus](docs/gatus.md) runs on a separate VPS with its
+configuration at `/home/docker-user/gatus/config/config.yml`. Service URLs use
+`site_config.base_domain`; `gatus_config` supplies the interval, output directory,
+Telegram chat ID and OAuth2 client ID. Check definitions and announcements live
+in the template. `secret_config.gatus` contains the Bitwarden IDs and revisions
+for the Telegram token, OAuth2 client secret, Remnawave API token, subscription path
+and Healthchecks ping URL. The Bitwarden provider reads these secrets as one ephemeral batch.
+
+Render locally using OpenTofu:
+
+```sh
+tofu apply -target=terraform_data.gatus_config
+# Force a fresh render, for example after deleting the local file:
+tofu apply -target=terraform_data.gatus_config -replace=terraform_data.gatus_config
+```
+
+The default output directory is ignored by Git; the rendered file has mode `0600`.
+`gatus_config_path` outputs its absolute path. A native `terraform_data` provisioner
+writes the file atomically with `printf`, receiving ephemeral content through its
+environment. Secret values and rendered content are absent from plan and state.
+Normal applies render when the template, settings or secret references/revisions
+change. After rotating a Gatus secret, bump its `secret_config.gatus.<name>.revision`.
+This does not upload or restart Gatus on the VPS.
+See [upload commands](docs/gatus.md#upload-to-the-monitoring-host) and
+[Gatus coverage](docs/gatus.md#coverage) for monitored applications and remaining gaps.
+
 ## Secrets and updates
 
 Application secrets use ephemeral Bitwarden reads and write-only Podman
@@ -103,7 +132,7 @@ For the ACME token, bump `secret_config.proxmox_acme_cloudflare_token.revision`.
 
 ## Backups
 
-Two [PVE jobs](backups.tf) back up FCOS and then `personal`/`observability`:
+Two [PVE jobs](backups.tf) back up Fedora CoreOS and then `personal`/`observability`:
 Storj at 06:00 and Backblaze at 07:00, PVE local time. OpenTofu manages the jobs
 and their [file-backup hooks](pve/file-backup.sh.tftpl). Logs and results are in PVE Tasks.
 

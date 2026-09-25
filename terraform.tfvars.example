@@ -57,7 +57,21 @@ deployment_config = {
   ssh_private_key_path = "/home/user/.ssh/homelab-deployment"
 }
 
+gatus_config = {
+  interval         = "1m"
+  output_directory = ".build/gatus"
+  telegram_chat_id  = "replace-with-telegram-chat-id"
+  oauth2_client_id  = "replace-with-gatus-oauth2-client-id"
+}
+
 secret_config = {
+  gatus = {
+    "gatus-telegram-token"              = { id = "replace-with-gatus-telegram-token-bitwarden-secret-id" }
+    "gatus-oauth2-client-secret"        = { id = "replace-with-gatus-oauth2-client-secret-bitwarden-secret-id" }
+    "gatus-remnawave-api-token"         = { id = "replace-with-gatus-remnawave-api-token-bitwarden-secret-id" }
+    "gatus-remnawave-subscription-path" = { id = "replace-with-gatus-remnawave-subscription-path-bitwarden-secret-id" }
+    "gatus-healthchecks-ping-url"       = { id = "replace-with-gatus-healthchecks-ping-url-bitwarden-secret-id" }
+  }
   proxmox_password = {
     id = "replace-with-proxmox-password-bitwarden-secret-id"
   }

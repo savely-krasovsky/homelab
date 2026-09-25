@@ -1,0 +1,394 @@
+ui:
+  description: "Homelab Health"
+  buttons:
+    - name: "Owner"
+      link: "https://${base_domain}"
+  default-sort-by: "group"
+
+announcements:
+  - timestamp: "2025-12-05T00:52:23.000Z"
+    type: outage
+    message: "Все сервисы недоступны, проблемы у провайдера интернета"
+    archived: true
+  - timestamp: "2025-12-30T09:13:32.000Z"
+    type: outage
+    message: "Все сервисы недоступны, проблемы с сервером"
+    archived: true
+
+storage:
+  type: "sqlite"
+  path: "/data/data.db"
+  maximum-number-of-results: 2000
+  maximum-number-of-events: 1000
+
+alerting:
+  telegram:
+    token: ${jsonencode(telegram_token)}
+    id: ${jsonencode(telegram_chat_id)}
+
+_default: &default
+  interval: ${jsonencode(interval)}
+  alerts:
+    - type: "telegram"
+      send-on-resolved: true
+
+_auth: &auth
+  <<: *default
+  client:
+    oauth2:
+      token-url: "https://id.${base_domain}/api/oidc/token"
+      client-id: ${jsonencode(oauth2_client_id)}
+      client-secret: ${jsonencode(oauth2_client_secret)}
+      scopes: [""]
+
+endpoints:
+  - name: "Healthchecks.io"
+    url: ${jsonencode(healthchecks_ping_url)}
+    <<: *default
+    group: "Observability"
+    ui:
+      hide-url: true
+    conditions:
+      - "[STATUS] == 200"
+      - "[BODY] == OK"
+  - name: "Actual Budget"
+    url: "https://actual.${base_domain}"
+    <<: *default
+    conditions:
+      - "[STATUS] == 200"
+  - name: "Bluesky PDS"
+    url: "https://pds.${base_domain}/xrpc/_health"
+    <<: *default
+    group: "AT Protocol"
+    conditions:
+      - "[STATUS] == 200"
+      - "has([BODY].version) == true"
+  - name: "Glance"
+    url: "https://glance.${base_domain}/api/healthz"
+    <<: *auth
+    conditions:
+      - "[STATUS] == 200"
+  # Run from outside the LAN: Traefik allows private networks to bypass OAuth2.
+  - name: "Glance (External)"
+    url: "https://glance.${base_domain}/api/healthz"
+    <<: *default
+    conditions:
+      - "[STATUS] == 403"
+  - name: "Gopeed"
+    url: "https://gopeed.${base_domain}/api/v1/info"
+    <<: *auth
+    conditions:
+      - "[STATUS] == 200"
+      - "[BODY].code == 0"
+      - "has([BODY].data.version) == true"
+  - name: "Gopeed (External)"
+    url: "https://gopeed.${base_domain}/api/v1/info"
+    <<: *default
+    conditions:
+      - "[STATUS] == 403"
+  - name: "Grafana"
+    url: "https://grafana.${base_domain}/api/health"
+    <<: *default
+    group: "Observability"
+    conditions:
+      - "[STATUS] == 200"
+      - "[BODY].database == ok"
+  - name: "GoatCounter"
+    url: "https://goatcounter.${base_domain}/status"
+    <<: *default
+    group: "Observability"
+    conditions:
+      - "[STATUS] == 200"
+      - "has([BODY].version) == true"
+      - "has([BODY].database) == true"
+  - name: "Immich"
+    url: "https://immich.${base_domain}/api/server/ping"
+    <<: *default
+    conditions:
+      - "[STATUS] == 200"
+      - "[BODY].res == pong"
+  - name: "Karakeep"
+    url: "https://karakeep.${base_domain}/api/health"
+    <<: *default
+    conditions:
+      - "[STATUS] == 200"
+      - "[BODY].status == ok"
+  - name: "Miniflux"
+    url: "https://miniflux.${base_domain}/healthcheck"
+    <<: *default
+    conditions:
+      - "[STATUS] == 200"
+      - "[BODY] == OK"
+  - name: "Open WebUI"
+    url: "https://ai.${base_domain}/health"
+    <<: *default
+    conditions:
+      - "[STATUS] == 200"
+      - "[BODY].status == true"
+  - name: "Collabora"
+    url: "https://collabora.${base_domain}/hosting/discovery"
+    <<: *default
+    group: "OpenCloud"
+    conditions:
+      - "[STATUS] == 200"
+      - "[BODY] == pat(*<wopi-discovery>*)"
+  - name: "WOPI Server"
+    url: "https://wopiserver.${base_domain}/wopi"
+    <<: *default
+    group: "OpenCloud"
+    conditions:
+      - "[STATUS] == 418"
+      - "[BODY] == I'm a teapot"
+  - name: "OpenCloud"
+    # /debug/healthz on the public port falls back to the web UI (HTTP 200 HTML).
+    # The debug health endpoint lives on a separate, internal listener.
+    url: "https://cloud.${base_domain}/status.php"
+    <<: *default
+    group: "OpenCloud"
+    conditions:
+      - "[STATUS] == 200"
+      - "[BODY].productname == OpenCloud"
+      - "[BODY].installed == true"
+      - "[BODY].maintenance == false"
+      - "[BODY].needsDbUpgrade == false"
+  - name: "Outline"
+    url: "https://outline.${base_domain}/_health"
+    <<: *default
+    conditions:
+      - "[STATUS] == 200"
+      - "[BODY] == OK"
+  - name: "Plex"
+    url: "https://plex.${base_domain}/identity"
+    <<: *default
+    conditions:
+      - "[STATUS] == 200"
+  - name: "Stash"
+    url: "https://stash.${base_domain}/healthz"
+    <<: *auth
+    conditions:
+      - "[STATUS] == 200"
+      - "[BODY] == ."
+  - name: "Stash (External)"
+    url: "https://stash.${base_domain}/healthz"
+    <<: *default
+    conditions:
+      - "[STATUS] == 403"
+  - name: "Pocket ID"
+    url: "https://id.${base_domain}/healthz"
+    <<: *default
+    conditions:
+      - "[STATUS] == 204"
+  - name: "Remnawave"
+    url: "https://rw.${base_domain}/api/system/health"
+    <<: *default
+    headers:
+      Authorization: ${jsonencode("Bearer ${remnawave_api_token}")}
+    conditions:
+      - "[STATUS] == 200"
+      - "has([BODY].response) == true"
+  - name: "Remnawave Subscription"
+    url: ${jsonencode("https://sub.${base_domain}${remnawave_subscription_path}")}
+    <<: *default
+    headers:
+      Accept: "text/html"
+      User-Agent: "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/140.0.0.0 Safari/537.36"
+    ui:
+      hide-url: true
+      hide-errors: true
+      dont-resolve-failed-conditions: true
+    conditions:
+      - "[STATUS] == 200"
+      - '[BODY] == pat(*<div id="root"*)'
+  - name: "Remark42"
+    url: "https://remark42.${base_domain}/ping"
+    <<: *default
+    conditions:
+      - "[STATUS] == 200"
+      - "[BODY] == pong"
+  - name: "qBittorrent"
+    url: "https://qb.${base_domain}/api/v2/app/version"
+    <<: *auth
+    conditions:
+      - "[STATUS] == 200"
+  - name: "qBittorrent (External)"
+    url: "https://qb.${base_domain}/api/v2/app/version"
+    <<: *default
+    conditions:
+      - "[STATUS] == 403"
+  - name: "Tangled Knot"
+    url: "https://knot.${base_domain}/xrpc/sh.tangled.knot.version"
+    <<: *default
+    group: "AT Protocol"
+    conditions:
+      - "[STATUS] == 200"
+      - "has([BODY].version) == true"
+  - name: "Traefik Dashboard"
+    url: "https://traefik.${base_domain}/api/version"
+    <<: *auth
+    conditions:
+      - "[STATUS] == 200"
+      - "has([BODY].Version) == true"
+  - name: "Traefik Dashboard (External)"
+    url: "https://traefik.${base_domain}/api/version"
+    <<: *default
+    conditions:
+      - "[STATUS] == 403"
+  - name: "VictoriaLogs"
+    url: "https://logs.${base_domain}/health"
+    <<: *auth
+    group: "Observability"
+    conditions:
+      - "[STATUS] == 200"
+      - "[BODY] == OK"
+  - name: "VictoriaLogs (External)"
+    url: "https://logs.${base_domain}/health"
+    <<: *default
+    group: "Observability"
+    conditions:
+      - "[STATUS] == 403"
+  - name: "VictoriaMetrics"
+    url: "https://metrics.${base_domain}/health"
+    <<: *auth
+    group: "Observability"
+    conditions:
+      - "[STATUS] == 200"
+      - "[BODY] == OK"
+  - name: "VictoriaMetrics (External)"
+    url: "https://metrics.${base_domain}/health"
+    <<: *default
+    group: "Observability"
+    conditions:
+      - "[STATUS] == 403"
+  - name: "Grafana Alloy"
+    url: "https://alloy.grafana.${base_domain}/-/healthy"
+    <<: *auth
+    group: "Observability"
+    conditions:
+      - "[STATUS] == 200"
+      - "[BODY] == All Alloy components are healthy."
+  - name: "Grafana Alloy (External)"
+    url: "https://alloy.grafana.${base_domain}/"
+    <<: *default
+    group: "Observability"
+    conditions:
+      - "[STATUS] == 403"
+  - name: "Synapse"
+    url: "https://matrix.${base_domain}/health"
+    <<: *default
+    group: "Matrix"
+    conditions:
+      - "[STATUS] == 200"
+      - "[BODY] == OK"
+  - name: "Element"
+    url: "https://element.${base_domain}/config.json"
+    <<: *default
+    group: "Matrix"
+    conditions:
+      - "[STATUS] == 200"
+  - name: "Element Call"
+    url: "https://call.element.${base_domain}/config.json"
+    <<: *default
+    group: "Matrix"
+    conditions:
+      - "[STATUS] == 200"
+  - name: "Matrix Authentication Service"
+    url: "https://matrix-account.${base_domain}/health"
+    <<: *default
+    group: "Matrix"
+    conditions:
+      - "[STATUS] == 200"
+      - "[BODY] == ok"
+  - name: "MatrixRTC LiveKit"
+    url: "https://matrix-rtc.${base_domain}/livekit/sfu"
+    <<: *default
+    group: "Matrix"
+    conditions:
+      - "[STATUS] == 200"
+      - "[BODY] == OK"
+  - name: "MatrixRTC Authorization Service"
+    url: "https://matrix-rtc.${base_domain}/livekit/jwt/healthz"
+    <<: *default
+    group: "Matrix"
+    conditions:
+      - "[STATUS] == 200"
+  - name: "Opengist"
+    url: "https://gist.${base_domain}/healthcheck"
+    <<: *default
+    conditions:
+      - "[STATUS] == 200"
+      - "[BODY].opengist == ok"
+      - "[BODY].database == ok"
+  - name: "Static Web Server (HTTPS)"
+    url: "https://static.${base_domain}/homelab-root-ca.crt"
+    <<: *default
+    conditions:
+      - "[STATUS] == 200"
+  - name: "Static Web Server (HTTP)"
+    url: "http://static.${base_domain}/homelab-root-ca.crt"
+    <<: *default
+    conditions:
+      - "[STATUS] == 200"
+  - name: "Hister"
+    url: "https://hister.${base_domain}/health"
+    <<: *default
+    conditions:
+      - "[STATUS] == 200"
+      - "len([BODY]) == 0"
+  - name: "Element Admin"
+    url: "https://admin.element.${base_domain}/"
+    <<: *default
+    group: "Matrix"
+    conditions:
+      - "[STATUS] == 200"
+      - "[BODY] == pat(*Element Admin*)"
+  - name: "CrowdSec Web UI"
+    url: "https://crowdsec.${base_domain}/api/health"
+    <<: *default
+    conditions:
+      - "[STATUS] == 200"
+      - "[BODY].status == ok"
+  - name: "OAuth2 Proxy"
+    url: "https://oauth2-proxy.${base_domain}/ready"
+    <<: *default
+    conditions:
+      - "[STATUS] == 200"
+      - "[BODY] == OK"
+  - name: "VictoriaTraces"
+    url: "https://traces.${base_domain}/health"
+    <<: *auth
+    group: "Observability"
+    conditions:
+      - "[STATUS] == 200"
+      - "[BODY] == OK"
+  - name: "VictoriaTraces (External)"
+    url: "https://traces.${base_domain}/health"
+    <<: *default
+    group: "Observability"
+    conditions:
+      - "[STATUS] == 403"
+  - name: "Blog"
+    url: "https://${base_domain}/"
+    <<: *default
+    conditions:
+      - "[STATUS] == 200"
+      - "[BODY] == pat(*<title>*</title>*)"
+  - name: "DavMail"
+    # Unauthenticated CalDAV requests must reach DavMail and request credentials.
+    url: "https://workmail.${base_domain}/"
+    <<: *default
+    conditions:
+      - "[STATUS] == 401"
+  - name: "Proxmox VE"
+    url: "https://pve.${base_domain}/"
+    <<: *default
+    group: "Infrastructure"
+    conditions:
+      - "[STATUS] == 200"
+      - "[BODY] == pat(*Proxmox Virtual Environment*)"
+  - name: "Proxmox Backup Server"
+    url: "https://pbs.${base_domain}/"
+    <<: *default
+    group: "Infrastructure"
+    conditions:
+      - "[STATUS] == 200"
+      - "[BODY] == pat(*Proxmox Backup Server*)"

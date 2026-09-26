@@ -16,13 +16,13 @@ Label="traefik.http.routers.gopeed-auth.rule=Host(`gopeed.${base_domain}`) && Pa
 Label="traefik.http.routers.gopeed-auth.service=oauth2-proxy"
 
 Volume=/var/mnt/docker/app_data/gopeed:/app/storage:Z
-Volume=/var/mnt/media/downloads:/app/Downloads
+Volume=/var/mnt/random:/app/Downloads
 
 [Service]
 ExecStartPre=/usr/bin/mountpoint -q /var/mnt/docker
-ExecStartPre=/usr/bin/mountpoint -q /var/mnt/media
+ExecStartPre=/usr/bin/mountpoint -q /var/mnt/random
 ExecStartPre=/usr/bin/test -d /var/mnt/docker/app_data
-ExecStartPre=/usr/bin/mkdir -p /var/mnt/docker/app_data/gopeed /var/mnt/media/downloads
+ExecStartPre=/usr/bin/mkdir -p /var/mnt/docker/app_data/gopeed
 Restart=on-failure
 TimeoutStartSec=900
 

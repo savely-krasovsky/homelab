@@ -9,7 +9,7 @@ terraform {
     bitwarden = {
       source = "maxlaverse/bitwarden"
       # Ephemeral secrets use the Bitwarden fork configured in .terraformrc.
-      version = "0.20.0"
+      version = "0.21.0"
     }
     ct = {
       source  = "poseidon/ct"

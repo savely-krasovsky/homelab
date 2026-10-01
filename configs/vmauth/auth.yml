@@ -11,8 +11,17 @@ users:
       - src_hosts:
           - "traces\\.${replace(base_domain, ".", "\\\\.")}"
         url_prefix: "http://127.0.0.1:10428/"
-  # Proxmox
-  - bearer_token: "%%{VMAUTH_PROXMOX_BEARER_TOKEN}"
+  # Proxmox VE
+  - bearer_token: "%%{VMAUTH_PVE_BEARER_TOKEN}"
+    url_map:
+      - src_hosts:
+          - "metrics\\.${replace(base_domain, ".", "\\\\.")}:443"
+        url_prefix: "http://127.0.0.1:8428/"
+      - src_hosts:
+          - "logs\\.${replace(base_domain, ".", "\\\\.")}"
+        url_prefix: "http://127.0.0.1:9428/"
+  # Proxmox Backup Server
+  - bearer_token: "%%{VMAUTH_PBS_BEARER_TOKEN}"
     url_map:
       - src_hosts:
           - "metrics\\.${replace(base_domain, ".", "\\\\.")}:443"

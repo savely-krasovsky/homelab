@@ -347,7 +347,8 @@ locals {
         "vmauth-crowdsec-bearer-token",
         "vmauth-fedora-coreos-bearer-token",
         "vmauth-grafana-bearer-token",
-        "vmauth-proxmox-bearer-token",
+        "vmauth-pbs-bearer-token",
+        "vmauth-pve-bearer-token",
         "vmauth-traefik-bearer-token",
       ]
     }

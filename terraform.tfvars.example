@@ -162,7 +162,8 @@ secret_config = {
     "vmauth-crowdsec-bearer-token" = { id = "replace-with-vmauth-crowdsec-bearer-token-bitwarden-secret-id" }
     "vmauth-fedora-coreos-bearer-token" = { id = "replace-with-vmauth-fedora-coreos-bearer-token-bitwarden-secret-id" }
     "vmauth-grafana-bearer-token" = { id = "replace-with-vmauth-grafana-bearer-token-bitwarden-secret-id" }
-    "vmauth-proxmox-bearer-token" = { id = "replace-with-vmauth-proxmox-bearer-token-bitwarden-secret-id" }
+    "vmauth-pbs-bearer-token" = { id = "replace-with-vmauth-pbs-bearer-token-bitwarden-secret-id" }
+    "vmauth-pve-bearer-token" = { id = "replace-with-vmauth-pve-bearer-token-bitwarden-secret-id" }
     "vmauth-traefik-bearer-token" = { id = "replace-with-vmauth-traefik-bearer-token-bitwarden-secret-id" }
   }
 }

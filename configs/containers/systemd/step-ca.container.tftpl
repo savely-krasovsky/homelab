@@ -2,6 +2,9 @@
 Requires=reverse-proxy-network.service
 After=reverse-proxy-network.service
 Description=Smallstep step-ca Server Quadlet
+# step-ca does not retry a failed OIDC provisioner initialization after startup.
+Wants=traefik.service pocket-id.service
+After=traefik.service pocket-id.service
 
 [Container]
 Image=docker.io/smallstep/step-ca:0.30.2

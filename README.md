@@ -44,7 +44,8 @@ tofu apply
 ```
 
 Ignition configures Fedora CoreOS on first boot; the Quadlet provider then installs application
-files and secrets over SSH. Uploading new Ignition does not reconfigure a running host.
+files and secrets over SSH. Changes to the Ignition snippet trigger VM replacement on apply,
+recreating the OS disk while retaining the external data zvol and VirtIO-FS shares.
 
 The Quadlet connection currently disables SSH host-key verification: the server's
 identity is not checked. Use separate admin and deployment keys.

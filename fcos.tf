@@ -46,6 +46,9 @@ resource "proxmox_virtual_environment_vm" "fcos" {
   on_boot = true
 
   lifecycle {
+    # Ignition runs only on first boot; a changed snippet needs a fresh OS disk.
+    replace_triggered_by = [proxmox_virtual_environment_file.fcos_ignition]
+
     ignore_changes = [
       disk["file_id"]
     ]

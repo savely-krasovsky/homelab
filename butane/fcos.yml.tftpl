@@ -113,6 +113,14 @@ storage:
       group:
         name: homelab
 
+    # Enable weekly cleanup of unused Podman images.
+    - path: /var/home/homelab/.config/systemd/user/timers.target.wants/podman-image-prune.timer
+      target: /var/home/homelab/.config/systemd/user/podman-image-prune.timer
+      user:
+        name: homelab
+      group:
+        name: homelab
+
     # Hometown timezone
     - path: /etc/localtime
       target: ../usr/share/zoneinfo/Europe/Belgrade
@@ -280,6 +288,43 @@ storage:
 
           [Install]
           WantedBy=default.target
+
+    # Prune images only; preserve containers, pods, networks and volumes.
+    - path: /var/home/homelab/.config/systemd/user/podman-image-prune.service
+      mode: 0644
+      user:
+        name: homelab
+      group:
+        name: homelab
+      contents:
+        inline: |
+          [Unit]
+          Description=Remove unused Podman images older than one week
+          After=podman-auto-update.service
+
+          [Service]
+          Type=oneshot
+          # The filter uses image creation time, not time since last use.
+          ExecStart=/usr/bin/podman image prune --all --force --filter until=168h
+
+    - path: /var/home/homelab/.config/systemd/user/podman-image-prune.timer
+      mode: 0644
+      user:
+        name: homelab
+      group:
+        name: homelab
+      contents:
+        inline: |
+          [Unit]
+          Description=Weekly cleanup of unused Podman images
+
+          [Timer]
+          OnCalendar=Sun *-*-* 06:00:00
+          RandomizedDelaySec=1h
+          Persistent=false
+
+          [Install]
+          WantedBy=timers.target
 
     # Disable Podman access logs
     - path: /var/home/homelab/.config/systemd/user/podman.service.d/override.conf

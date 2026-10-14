@@ -45,6 +45,9 @@ resource "proxmox_virtual_environment_vm" "fcos" {
   # Generated dataset mount units gate pve-guests.service on successful unlock.
   on_boot = true
 
+  # Backup jobs are managed separately and must survive VM replacement.
+  purge_on_destroy = false
+
   lifecycle {
     # Ignition runs only on first boot; a changed snippet needs a fresh OS disk.
     replace_triggered_by = [proxmox_virtual_environment_file.fcos_ignition]

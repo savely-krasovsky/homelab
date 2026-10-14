@@ -44,9 +44,3 @@ resource "proxmox_backup_job" "fcos" {
     keep-monthly = "12"
   }
 }
-
-import {
-  for_each = local.backup_jobs
-  to       = proxmox_backup_job.fcos[each.key]
-  id       = "fcos-${each.key}"
-}

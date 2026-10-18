@@ -8,6 +8,7 @@ ContainerName=crowdsec-security-engine
 User=1000:1000
 
 Environment=COLLECTIONS=crowdsecurity/traefik
+Environment=DISABLE_ONLINE_API=true
 Environment=GID=1000
 Secret=vmauth-crowdsec-bearer-token,type=env,target=VMAUTH_CROWDSEC_BEARER_TOKEN
 

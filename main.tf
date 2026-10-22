@@ -17,7 +17,7 @@ terraform {
     }
     http = {
       source  = "hashicorp/http"
-      version = "3.6.2"
+      version = "3.6.3"
     }
     quadlet = {
       source  = "registry.terraform.io/savely-krasovsky/quadlet"

@@ -4,7 +4,7 @@ Requires=podman.socket
 After=podman.socket
 
 [Container]
-Image=ghcr.io/wollomatic/socket-proxy:1.13.1
+Image=ghcr.io/wollomatic/socket-proxy:1.13.2
 ContainerName=socket-proxy
 UserNS=keep-id:uid=65534,gid=65534
 

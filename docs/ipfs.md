@@ -19,10 +19,10 @@ the existing ephemeral batch and delivered through the Podman secret's write-onl
 argument, without storing it in Terraform configuration, plan or state.
 
 Podman mounts it at `/run/secrets/blog-ipns-key.pem`, owned by container UID/GID
-1000 with mode 0400. On every startup, Kubo imports it as `blog`, checks the
-expected IPNS name and then replaces the previous imported copy. A missing or
-different key fails startup. The node's separate peer identity is generated
-locally. Recreating the repository therefore preserves this ENS contenthash:
+1000 with mode 0400. On every startup, Kubo imports it as `blog` and replaces
+the previous imported copy. The scripts use that alias without fixing its
+public IPNS name or ENS domain. The node's separate peer identity is generated
+locally. The currently stored publishing key corresponds to this ENS contenthash:
 
 ```text
 ipns://k51qzi5uqu5diegtfawpiepxpn0no0dazqcw6g9hzyroydphjx8i2oumhac49n

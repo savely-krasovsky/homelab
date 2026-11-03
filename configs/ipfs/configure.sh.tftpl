@@ -6,13 +6,7 @@ if ipfs key list | grep -qx blog-from-bitwarden; then
     ipfs key rm blog-from-bitwarden > /dev/null
 fi
 
-imported_name=$(ipfs key import --format=pem-pkcs8-cleartext blog-from-bitwarden /run/secrets/blog-ipns-key.pem)
-if [ "$imported_name" != k51qzi5uqu5diegtfawpiepxpn0no0dazqcw6g9hzyroydphjx8i2oumhac49n ]; then
-    ipfs key rm blog-from-bitwarden > /dev/null
-    echo 'Bitwarden supplied an unexpected krasovsky.eth IPNS key.' >&2
-    exit 1
-fi
-
+ipfs key import --format=pem-pkcs8-cleartext blog-from-bitwarden /run/secrets/blog-ipns-key.pem > /dev/null
 ipfs key rename --force blog-from-bitwarden blog > /dev/null
 
 # CLI commands run through podman exec. Neither RPC nor the gateway is public.

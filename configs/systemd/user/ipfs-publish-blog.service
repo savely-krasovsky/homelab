@@ -1,5 +1,5 @@
 [Unit]
-Description=Pin the deployed blog and publish krasovsky.eth over IPNS
+Description=Pin the deployed blog and publish over IPNS
 Requires=ipfs.service
 After=ipfs.service
 

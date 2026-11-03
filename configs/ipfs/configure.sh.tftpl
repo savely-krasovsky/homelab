@@ -2,12 +2,12 @@
 set -eu
 
 # Restore the publishing identity independently of this node's peer identity.
-if ipfs key list | grep -qx blog-from-bitwarden; then
-    ipfs key rm blog-from-bitwarden > /dev/null
+if ipfs key list | grep -qx blog-import; then
+    ipfs key rm blog-import > /dev/null
 fi
 
-ipfs key import --format=pem-pkcs8-cleartext blog-from-bitwarden /run/secrets/blog-ipns-key.pem > /dev/null
-ipfs key rename --force blog-from-bitwarden blog > /dev/null
+ipfs key import --format=pem-pkcs8-cleartext blog-import /run/secrets/blog-ipns-key.pem > /dev/null
+ipfs key rename --force blog-import blog > /dev/null
 
 # CLI commands run through podman exec. Neither RPC nor the gateway is public.
 ipfs config Addresses.API /ip4/127.0.0.1/tcp/5001

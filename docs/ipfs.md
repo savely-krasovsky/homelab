@@ -9,6 +9,9 @@ Only WebSocket upgrades at `/` reach the swarm listener on container port 8081;
 ordinary HTTPS requests continue to serve the blog. No additional DNS records,
 router port forwards or first-boot firewall changes are required. The RPC API and
 gateway listen on container loopback and have no published host ports.
+The startup script overrides only networking needed for this reverse proxy and
+imports the publishing key. Routing, IPNS timing and storage settings use Kubo's
+defaults.
 
 ## Publishing key
 
@@ -52,7 +55,9 @@ Bitwarden value and bump the secret reference's `revision`, as for other apps.
 The blog's GitHub Actions workflow uploads the Hugo output over SSH and starts
 `ipfs-publish-blog.service` on the same host as `homelab`. The oneshot serializes
 publication and returns failure to CI when pinning or IPNS publication fails.
-Kubo republishes the seven-day IPNS record every hour, including between deploys.
+Kubo republishes IPNS records every four hours by default, including between
+deploys. The publishing command explicitly sets a seven-day lifetime and a
+five-minute cache TTL for each deployment.
 
 The workflow requires these repository settings:
 

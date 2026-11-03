@@ -9,7 +9,7 @@ fi
 ipfs key import --format=pem-pkcs8-cleartext blog-import /run/secrets/blog-ipns-key.pem > /dev/null
 ipfs key rename --force blog-import blog > /dev/null
 
-# CLI commands run through podman exec. Neither RPC nor the gateway is public.
+# The image binds these to 0.0.0.0 at init; keep them on container loopback.
 ipfs config Addresses.API /ip4/127.0.0.1/tcp/5001
 ipfs config Addresses.Gateway /ip4/127.0.0.1/tcp/8080
 ipfs config --json Addresses.Swarm '["/ip4/0.0.0.0/tcp/4001", "/ip4/0.0.0.0/udp/4001/quic-v1", "/ip4/0.0.0.0/tcp/8081/ws"]'
@@ -17,9 +17,6 @@ ipfs config --json Addresses.Swarm '["/ip4/0.0.0.0/tcp/4001", "/ip4/0.0.0.0/udp/
 # Traefik terminates TLS on the existing public HTTPS port, including behind NAT.
 ipfs config --json Addresses.Announce '["/dns4/${base_domain}/tcp/443/tls/ws"]'
 ipfs config --json AutoTLS.Enabled false
+
 # The server profile blocks private peers, including our reverse proxy's address.
 ipfs config --json Swarm.AddrFilters '[]'
-ipfs config Routing.Type dhtserver
-ipfs config Ipns.RepublishPeriod 1h
-ipfs config Ipns.RecordLifetime 168h
-ipfs config Datastore.StorageMax 10GB

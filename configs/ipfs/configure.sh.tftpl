@@ -1,0 +1,31 @@
+#!/bin/sh
+set -eu
+
+# Restore the publishing identity independently of this node's peer identity.
+if ipfs key list | grep -qx blog-from-bitwarden; then
+    ipfs key rm blog-from-bitwarden > /dev/null
+fi
+
+imported_name=$(ipfs key import --format=pem-pkcs8-cleartext blog-from-bitwarden /run/secrets/blog-ipns-key.pem)
+if [ "$imported_name" != k51qzi5uqu5diegtfawpiepxpn0no0dazqcw6g9hzyroydphjx8i2oumhac49n ]; then
+    ipfs key rm blog-from-bitwarden > /dev/null
+    echo 'Bitwarden supplied an unexpected krasovsky.eth IPNS key.' >&2
+    exit 1
+fi
+
+ipfs key rename --force blog-from-bitwarden blog > /dev/null
+
+# CLI commands run through podman exec. Neither RPC nor the gateway is public.
+ipfs config Addresses.API /ip4/127.0.0.1/tcp/5001
+ipfs config Addresses.Gateway /ip4/127.0.0.1/tcp/8080
+ipfs config --json Addresses.Swarm '["/ip4/0.0.0.0/tcp/4001", "/ip4/0.0.0.0/udp/4001/quic-v1", "/ip4/0.0.0.0/tcp/8081/ws"]'
+
+# Traefik terminates TLS on the existing public HTTPS port, including behind NAT.
+ipfs config --json Addresses.Announce '["/dns4/${base_domain}/tcp/443/tls/ws"]'
+ipfs config --json AutoTLS.Enabled false
+# The server profile blocks private peers, including our reverse proxy's address.
+ipfs config --json Swarm.AddrFilters '[]'
+ipfs config Routing.Type dhtserver
+ipfs config Ipns.RepublishPeriod 1h
+ipfs config Ipns.RecordLifetime 168h
+ipfs config Datastore.StorageMax 10GB

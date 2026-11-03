@@ -109,6 +109,16 @@ locals {
       secrets = ["immich-postgres-password"]
     }
 
+    ipfs = {
+      paths = [
+        "containers/systemd/ipfs.container",
+        "ipfs",
+        "systemd/user/ipfs-publish-blog.service",
+      ]
+      restart = ["ipfs.service"]
+      secrets = ["ipfs-blog-ipns-private-key"]
+    }
+
     karakeep = {
       paths   = ["containers/systemd/karakeep"]
       restart = ["karakeep-pod.service"]

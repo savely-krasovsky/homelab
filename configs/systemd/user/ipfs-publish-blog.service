@@ -1,0 +1,9 @@
+[Unit]
+Description=Pin the deployed blog and publish krasovsky.eth over IPNS
+Requires=ipfs.service
+After=ipfs.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/podman exec ipfs sh /usr/local/bin/publish-blog.sh
+TimeoutStartSec=600

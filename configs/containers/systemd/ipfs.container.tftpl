@@ -1,0 +1,47 @@
+[Unit]
+Requires=reverse-proxy-network.service
+After=reverse-proxy-network.service
+Description=IPFS blog hosting
+
+[Container]
+Image=docker.io/ipfs/kubo:v0.43.1
+ContainerName=ipfs
+
+User=1000:1000
+UserNS=keep-id:uid=1000,gid=1000
+
+Environment=IPFS_PROFILE=server
+
+Secret=ipfs-blog-ipns-private-key,target=/run/secrets/blog-ipns-key.pem,uid=1000,gid=1000,mode=0400
+
+# Only peer WebSocket upgrades reach Kubo; ordinary requests still reach the blog.
+Label="traefik.enable=true"
+Label="traefik.http.routers.ipfs-swarm.rule=Host(`${base_domain}`) && Path(`/`) && Header(`Upgrade`, `websocket`)"
+Label="traefik.http.routers.ipfs-swarm.priority=100"
+Label="traefik.http.services.ipfs-swarm.loadbalancer.server.port=8081"
+
+Volume=/var/mnt/docker/app_data/ipfs:/data/ipfs:Z
+Volume=/var/mnt/docker/blog:/blog:ro
+Volume=%E/ipfs/configure.sh:/container-init.d/001-configure.sh:ro,Z
+Volume=%E/ipfs/publish-blog.sh:/usr/local/bin/publish-blog.sh:ro,Z
+
+Network=systemd-reverse-proxy
+
+Exec=daemon --migrate=true --enable-gc
+
+ReadOnly=true
+NoNewPrivileges=true
+DropCapability=all
+
+[Service]
+ExecStartPre=/usr/bin/mountpoint -q /var/mnt/docker
+ExecStartPre=/usr/bin/test -d /var/mnt/docker/blog
+ExecStartPre=/usr/bin/test -d /var/mnt/docker/app_data
+ExecStartPre=/usr/bin/mkdir -p -m 0700 -- /var/mnt/docker/app_data/ipfs
+TimeoutStartSec=900
+Restart=always
+MemoryHigh=1G
+MemoryMax=2G
+
+[Install]
+WantedBy=multi-user.target default.target

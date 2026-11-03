@@ -91,6 +91,7 @@ secret_config = {
     "hister-oidc-client-secret" = { id = "replace-with-hister-oidc-client-secret-bitwarden-secret-id" }
     "immich-map-key" = { id = "replace-with-immich-map-key-bitwarden-secret-id" }
     "immich-postgres-password" = { id = "replace-with-immich-postgres-password-bitwarden-secret-id" }
+    "ipfs-blog-ipns-private-key" = { id = "replace-with-ipfs-blog-ipns-private-key-bitwarden-secret-id" }
     "karakeep-oauth-client-secret" = { id = "replace-with-karakeep-oauth-client-secret-bitwarden-secret-id" }
     "karakeep-openai-api-key" = { id = "replace-with-karakeep-openai-api-key-bitwarden-secret-id" }
     "knot-master-key" = { id = "replace-with-knot-master-key-bitwarden-secret-id" }

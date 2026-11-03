@@ -14,10 +14,9 @@ Environment=IPFS_PROFILE=server
 
 Secret=ipfs-blog-ipns-private-key,target=/run/secrets/blog-ipns-key.pem,uid=1000,gid=1000,mode=0400
 
-# Only peer WebSocket upgrades reach Kubo; ordinary requests still reach the blog.
+# The dedicated host forwards peer WebSocket connections to Kubo.
 Label="traefik.enable=true"
-Label="traefik.http.routers.ipfs-swarm.rule=Host(`${base_domain}`) && Path(`/`) && Header(`Upgrade`, `websocket`)"
-Label="traefik.http.routers.ipfs-swarm.priority=100"
+Label="traefik.http.routers.ipfs-swarm.rule=Host(`ipfs.${base_domain}`)"
 Label="traefik.http.services.ipfs-swarm.loadbalancer.server.port=8081"
 
 Volume=/var/mnt/docker/app_data/ipfs:/data/ipfs:Z

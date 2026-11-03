@@ -56,7 +56,7 @@ identity is not checked. Use separate admin and deployment keys.
 - `homelab`: applications without sudo, UID/GID `1000:1000`, subuid/subgid `524288:65536`.
 - Podman storage: `/var/mnt/docker/homelab`; application data: `/var/mnt/docker/app_data`.
 - Blog uploads: user `homelab`, directory `/var/mnt/docker/blog`.
-- [IPFS mirror](docs/ipfs.md): Kubo storage, IPNS key migration and blog publishing.
+- [IPFS mirror](docs/ipfs.md): Kubo hosting and IPNS publishing.
 
 Keep Terraform state and review the replacement while the current VM is reachable:
 

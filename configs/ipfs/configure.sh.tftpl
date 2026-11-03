@@ -15,7 +15,7 @@ ipfs config Addresses.Gateway /ip4/127.0.0.1/tcp/8080
 ipfs config --json Addresses.Swarm '["/ip4/0.0.0.0/tcp/4001", "/ip4/0.0.0.0/udp/4001/quic-v1", "/ip4/0.0.0.0/tcp/8081/ws"]'
 
 # Traefik terminates TLS on the existing public HTTPS port, including behind NAT.
-ipfs config --json Addresses.Announce '["/dns4/${base_domain}/tcp/443/tls/ws"]'
+ipfs config --json Addresses.Announce '["/dns4/ipfs.${base_domain}/tcp/443/tls/ws"]'
 ipfs config --json AutoTLS.Enabled false
 
 # The server profile blocks private peers, including our reverse proxy's address.

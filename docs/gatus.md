@@ -1,5 +1,27 @@
 # Gatus
 
+## Rootless Docker network on ch-vps01
+
+Install the standard Debian `passt` package. Copy
+[`10-pasta.conf`](../ch-vps01/docker/10-pasta.conf) to
+`/home/docker-user/.config/systemd/user/docker.service.d/10-pasta.conf`.
+The drop-in selects `pasta`; Docker uses its default `implicit` port driver.
+IPv6 is enabled to preserve the existing IPv4 and IPv6 listeners on ports
+8080 and 8443. MTU, DNS and other network settings use Docker defaults.
+
+Run `systemctl --user daemon-reload` and restart `docker.service` as
+`docker-user`. Start the existing containers after the daemon restart:
+their `on-failure` restart policy does not start them after a daemon restart.
+Check both address families and outbound HTTPS from the container network.
+
+This replaces the `gvisor-tap-vsock` backend whose pending TCP connection
+limit can stall Healthchecks.io heartbeats when home endpoints are unreachable.
+
+To return to the previous backend, set
+`DOCKERD_ROOTLESS_ROOTLESSKIT_NET=gvisor-tap-vsock` in the drop-in, remove the
+IPv6 flag, and restart Docker and the existing containers. Removing the drop-in
+alone would still select the installed `pasta` automatically.
+
 ## Upload to the monitoring host
 
 From the repository root, upload the rendered config and restart Gatus as

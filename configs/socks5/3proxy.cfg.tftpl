@@ -1,0 +1,7 @@
+users $/run/secrets/socks5-users
+auth strong
+
+# Block access to private networks and the gateway's public address.
+deny * * ${public_ip},0.0.0.0/8,10.0.0.0/8,100.64.0.0/10,127.0.0.0/8,169.254.0.0/16,172.16.0.0/12,192.168.0.0/16,224.0.0.0/3,::/128,::1,::ffff:0:0/96,fc00::/7,fe80::/10,ff00::/8
+allow * * * * CONNECT
+socks -p1080

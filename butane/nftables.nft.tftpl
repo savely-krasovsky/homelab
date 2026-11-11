@@ -56,6 +56,9 @@ table inet filter {
 		# allow Prusa printers to report metrics
 		udp dport 8514 accept
 
+		# allow socks5
+		tcp dport 1080 accept
+
 		# allow plugs to access mqtt broker
 		ip saddr ${gateway_ip} tcp dport 1883 accept
 	}

@@ -1,0 +1,23 @@
+[Unit]
+Description=SOCKS5 proxy
+
+[Container]
+Image=ghcr.io/3proxy/3proxy:1.0.3@sha256:db6712d3566c52b04b9fec3d2a263580dcbef04f1943b5bf3fb86c7fce0da7f4
+ContainerName=socks5
+
+# Restrict forwarded traffic at the gateway to the client's public IP.
+PublishPort=${fcos_ip}:1080:1080/tcp
+Volume=%E/socks5/3proxy.cfg:/etc/3proxy/3proxy.cfg:ro,Z
+Secret=socks5-users,target=/run/secrets/socks5-users,uid=1000,gid=1000,mode=0400
+
+User=1000:1000
+UserNS=keep-id:uid=1000,gid=1000
+ReadOnly=true
+NoNewPrivileges=true
+DropCapability=all
+
+[Service]
+Restart=always
+
+[Install]
+WantedBy=default.target

@@ -289,6 +289,12 @@ locals {
       restart = ["rmqtt.service"]
     }
 
+    socks5 = {
+      paths   = ["containers/systemd/socks5.container", "socks5/3proxy.cfg"]
+      restart = ["socks5.service"]
+      secrets = ["socks5-users"]
+    }
+
     stash = {
       paths   = ["containers/systemd/stash.container"]
       restart = ["stash.service"]

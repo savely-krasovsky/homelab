@@ -153,6 +153,7 @@ secret_config = {
     "remnawave-node-vless-xhttp-secret-key" = { id = "replace-with-remnawave-node-vless-xhttp-secret-key-bitwarden-secret-id" }
     "remnawave-postgres-password" = { id = "replace-with-remnawave-postgres-password-bitwarden-secret-id" }
     "remnawave-xhttp-path" = { id = "replace-with-remnawave-xhttp-path-bitwarden-secret-id" }
+    "socks5-users" = { id = "replace-with-socks5-users-bitwarden-secret-id" }
     "synapse-form-secret" = { id = "replace-with-synapse-form-secret-bitwarden-secret-id" }
     "synapse-macaroon-secret-key" = { id = "replace-with-synapse-macaroon-secret-key-bitwarden-secret-id" }
     "synapse-postgres-password" = { id = "replace-with-synapse-postgres-password-bitwarden-secret-id" }

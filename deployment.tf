@@ -405,14 +405,3 @@ locals {
     )
   }
 }
-
-# Replace the old deployment before starting the renamed pod on the same data.
-moved {
-  from = quadlet_deployment.applications["hister"]
-  to   = quadlet_deployment.applications["nogon"]
-}
-
-moved {
-  from = quadlet_podman_secret.containers["hister-oidc-client-secret"]
-  to   = quadlet_podman_secret.containers["nogon-oidc-client-secret"]
-}

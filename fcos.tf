@@ -129,7 +129,6 @@ resource "proxmox_virtual_environment_vm" "fcos" {
     mac_address = var.network_config.fcos_mac_address
   }
 
-  # Linux 6.x
   operating_system {
     type = "l26"
   }

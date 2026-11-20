@@ -31,6 +31,7 @@ provider "registry.opentofu.org/bpg/proxmox" {
     "zh:b56ba73f6af2d784efca40d877f26407fd1c085f03c93e1f05fc339fc8fd1c96",
     "zh:d1a136278b50915dd122710355d0a17406fee62286a645f9414a6ebfecd6cccc",
     "zh:da299008135425f1c6f5ae83dc5c45ceab475d7e24bee8dae40a3aa7edcd475f",
+    "zh:f26e0763dbe6a6b2195c94b44696f2110f7f55433dc142839be16b9697fa5597",
   ]
 }
 
@@ -100,6 +101,7 @@ provider "registry.opentofu.org/maxlaverse/bitwarden" {
     "zh:a63e6c56918011bf1340ac4ddb89dc6a5fad29202beb235f0c9c546f3dc7427b",
     "zh:d70d868ed09999fde1f11ac78f60b674a5d787dbaaa3e539a5dfb3192a3cedc5",
     "zh:df794e4eb1bfc7c7e752ff59f61e95784526f84e0341694b38d54b2ea7c83b16",
+    "zh:f809ab383cca0a5f83072981c64208cbd7fa67e986a86ee02dd2c82333221e32",
     "zh:ff919bc4dda39d8879bf9d659d61ec02ed65908781cf220cfb9a7265d360aea4",
   ]
 }

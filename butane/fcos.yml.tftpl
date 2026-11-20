@@ -175,7 +175,6 @@ storage:
         inline: |
           [storage]
           driver = "overlay"
-          rootless_storage_path = "/var/mnt/docker/$USER"
 
     # Enable linger so containers can continue to run even after homelab user logouts
     - path: /var/lib/systemd/linger/homelab

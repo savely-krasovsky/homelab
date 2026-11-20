@@ -1,0 +1,18 @@
+[Unit]
+Requires=reverse-proxy-network.service
+After=reverse-proxy-network.service
+Description=Nogon Pod
+
+[Pod]
+PodName=nogon
+UserNS=keep-id:uid=1000,gid=1000
+Network=systemd-reverse-proxy
+
+[Service]
+ExecStartPre=/usr/bin/mountpoint -q /var/mnt/docker
+ExecStartPre=/usr/bin/test -d /var/mnt/docker/app_data
+# Move the index and model cache together before either container starts.
+ExecStartPre=/bin/sh -ec 'if [ -d /var/mnt/docker/app_data/hister ]; then exec /usr/bin/mv --no-copy --no-target-directory --update=none-fail -- /var/mnt/docker/app_data/hister /var/mnt/docker/app_data/nogon; fi'
+
+[Install]
+WantedBy=default.target

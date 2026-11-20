@@ -56,7 +56,7 @@ those checks do not verify backup jobs or restores.
 
 `actual-budget`, `blog`, `bluesky-pds`, `crowdsec`, `davmail`, `element-admin`,
 `element-call`, `element-web`, `glance`, `goatcounter`, `gopeed`, `grafana`,
-`grafana-alloy`, `hister`, `immich`, `karakeep`, `matrix`, `matrix-rtc`, `miniflux`,
+`grafana-alloy`, `immich`, `karakeep`, `matrix`, `matrix-rtc`, `miniflux`, `nogon`,
 `oauth2-proxy`, `open-webui`, `opencloud`, `opengist`, `outline`, `plex`, `pocket-id`,
 `qbittorrent`, `remark42`, `remnawave`, `stash`, `static-web-server`, `tangled`,
 `traefik` and `victoria`.

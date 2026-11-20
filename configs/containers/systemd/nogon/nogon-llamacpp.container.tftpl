@@ -1,34 +1,34 @@
 [Unit]
-Description=Hister llama.cpp Embeddings Quadlet
+Description=Nogon llama.cpp Embeddings Quadlet
 
 [Container]
 Image=ghcr.io/ggml-org/llama.cpp:server-intel-v1.0.0-b12359-b1b770d
-ContainerName=hister-llamacpp
+ContainerName=nogon-llamacpp
 
 User=1000:1000
 GroupAdd=keep-groups
 
 Environment=LLAMA_CACHE=/models
 
-Label="glance.parent=hister"
+Label="glance.parent=nogon"
 Label="glance.name=Embeddings"
 Label="glance.description=Qwen3 Embedding 0.6B on Intel Arc"
 
 Label="alloy.metrics.enable=true"
 Label="alloy.metrics.port=8080"
 
-Volume=/var/mnt/docker/app_data/hister/llamacpp:/models:Z
+Volume=/var/mnt/docker/app_data/nogon/llamacpp:/models:Z
 
 AddDevice=/dev/dri
 
-Pod=hister.pod
+Pod=nogon.pod
 
 Exec=--hf-repo Qwen/Qwen3-Embedding-0.6B-GGUF:F16 --embedding --pooling last --port 8080 --ctx-size 512 --parallel 2 --cache-ram 0 --metrics --log-jsonl
 
 [Service]
 ExecStartPre=/usr/bin/mountpoint -q /var/mnt/docker
 ExecStartPre=/usr/bin/test -d /var/mnt/docker/app_data
-ExecStartPre=/usr/bin/mkdir -p -m 0755 -- /var/mnt/docker/app_data/hister/llamacpp
+ExecStartPre=/usr/bin/mkdir -p -m 0755 -- /var/mnt/docker/app_data/nogon/llamacpp
 TimeoutStartSec=900
 Restart=always
 MemoryHigh=3G

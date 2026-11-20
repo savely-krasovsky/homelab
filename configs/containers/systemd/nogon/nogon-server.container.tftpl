@@ -1,0 +1,52 @@
+[Unit]
+Description=Nogon Quadlet
+
+[Container]
+Image=ghcr.io/asciimoo/nogon:v0.22.0
+ContainerName=nogon-server
+
+User=1000:1000
+WorkingDir=/nogon/data
+
+Environment=TZ=Europe/Belgrade
+Environment=NOGON_DATA_DIR=/nogon/data
+Environment=NOGON__APP__LOG_FORMAT=json
+Environment=NOGON__APP__SEARCH_URL=https://kagi.com/search?q={query}
+Environment=NOGON__APP__USER_HANDLING=true
+Environment=NOGON__SERVER__ADDRESS=0.0.0.0:4433
+Environment=NOGON__SERVER__BASE_URL=https://nogon.${base_domain}
+Environment=NOGON__SERVER__OAUTH_ONLY=true
+Environment=NOGON__SERVER__OAUTH__OIDC__CLIENT_ID=5a0131c6-67a0-4cf3-aa0a-c9a64ab0c792
+Environment=NOGON__SERVER__OAUTH__OIDC__CONFIGURATION_URL=https://id.${base_domain}/.well-known/openid-configuration
+Environment=NOGON__SERVER__OAUTH__OIDC__SCOPES=groups
+Environment=NOGON__SERVER__OAUTH__OIDC__GROUPS_CLAIM=groups
+Environment=NOGON__SERVER__OAUTH__OIDC__ADMIN_GROUPS=homelab_admins
+Environment=NOGON__SEMANTIC_SEARCH__ENABLE=true
+Environment=NOGON__SEMANTIC_SEARCH__EMBEDDING_ENDPOINT=http://127.0.0.1:8080/v1/embeddings
+Environment=NOGON__SEMANTIC_SEARCH__EMBEDDING_MODEL=Qwen/Qwen3-Embedding-0.6B-GGUF:F16
+Environment=NOGON__SEMANTIC_SEARCH__DIMENSIONS=1024
+Environment="NOGON__SEMANTIC_SEARCH__QUERY_PREFIX=Instruct: Given a web search query, retrieve relevant passages that answer the query\nQuery:"
+Secret=nogon-oidc-client-secret,type=env,target=NOGON__SERVER__OAUTH__OIDC__CLIENT_SECRET
+
+Label="glance.id=nogon"
+Label="glance.name=Nogon"
+Label="glance.icon=https://nogon.eu/logo.png"
+Label="glance.url=https://nogon.${base_domain}"
+Label="glance.description=Private full-text search engine"
+
+Label="traefik.enable=true"
+Label="traefik.http.routers.nogon.rule=Host(`nogon.${base_domain}`)"
+Label="traefik.http.services.nogon.loadbalancer.server.port=4433"
+
+Volume=/var/mnt/docker/app_data/nogon/server:/nogon/data:Z
+
+Pod=nogon.pod
+
+[Service]
+ExecStartPre=/usr/bin/mountpoint -q /var/mnt/docker
+ExecStartPre=/usr/bin/test -d /var/mnt/docker/app_data
+ExecStartPre=/usr/bin/mkdir -p -m 0755 -- /var/mnt/docker/app_data/nogon/server
+TimeoutStartSec=900
+Restart=always
+MemoryHigh=2G
+MemoryMax=3G

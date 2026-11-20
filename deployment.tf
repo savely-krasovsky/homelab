@@ -97,12 +97,6 @@ locals {
       ]
     }
 
-    hister = {
-      paths   = ["containers/systemd/hister"]
-      restart = ["hister-pod.service"]
-      secrets = ["hister-oidc-client-secret"]
-    }
-
     immich = {
       paths   = ["containers/systemd/immich"]
       restart = ["immich-pod.service"]
@@ -175,6 +169,12 @@ locals {
         "miniflux-oauth2-client-secret",
         "miniflux-postgres-password",
       ]
+    }
+
+    nogon = {
+      paths   = ["containers/systemd/nogon"]
+      restart = ["nogon-pod.service"]
+      secrets = ["nogon-oidc-client-secret"]
     }
 
     oauth2-proxy = {
@@ -404,4 +404,15 @@ locals {
       },
     )
   }
+}
+
+# Replace the old deployment before starting the renamed pod on the same data.
+moved {
+  from = quadlet_deployment.applications["hister"]
+  to   = quadlet_deployment.applications["nogon"]
+}
+
+moved {
+  from = quadlet_podman_secret.containers["hister-oidc-client-secret"]
+  to   = quadlet_podman_secret.containers["nogon-oidc-client-secret"]
 }

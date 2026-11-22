@@ -21,7 +21,7 @@ terraform {
     }
     quadlet = {
       source  = "registry.terraform.io/savely-krasovsky/quadlet"
-      version = "0.4.2"
+      version = "0.4.3"
     }
   }
 }

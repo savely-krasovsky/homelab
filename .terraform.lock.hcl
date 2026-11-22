@@ -121,16 +121,16 @@ provider "registry.opentofu.org/poseidon/ct" {
 }
 
 provider "registry.terraform.io/savely-krasovsky/quadlet" {
-  version     = "0.4.2"
-  constraints = "0.4.2"
+  version     = "0.4.3"
+  constraints = "0.4.3"
   hashes = [
-    "h1:k64izpHkB9XNCVehfgeCqUg4BL9y+01w2gxSRQHilQo=",
-    "zh:327b3cd38f5db64eb792b3c9f878f0196df3c4f8c136d42b3c95f72c320bb37c",
-    "zh:824834e2db0fb4f03e80403eb87d6f87132aa649214537c97e9d390d2593f82a",
-    "zh:92832f3e7c69aad8026d5f1be84316f3bc8082b44aab59453a3bbd44e03c39dc",
-    "zh:a235f7720728abd80444c17223fbef0f3f7ae9452ea8abab84a271823bf53b3c",
-    "zh:cbc5f7addca8bd7803d571a92d36f11444ab712595f21d0df1b498599a49cbd0",
-    "zh:dee0ca27024bdb905225a38e14554f5216f98ee20865dc8493d137c7f7a03803",
+    "h1:Y+8iPBYoXRh8CSUUvBYnxHPVPQr2kh/GouEzWyrYUKA=",
+    "zh:30774828732216c8742684333c4b0c54b6efdfc84e951b443d16c013e676a93f",
+    "zh:666a4f70a71eb0e4840fcbda8ad897e1c294c71f11416008a5d2975b381801e5",
+    "zh:85777057c39f01614044b8284875ccaf5052747337e2aad6651ed3bb59356db7",
+    "zh:9a80dd0632a43b473b224ac67fffccae6e2008dc5d4e9ada68b7b72436a89237",
+    "zh:bedfb3edb978de7fa1d6a1c680b62f6540959bed4dda4e0951cc573f7e56fe01",
+    "zh:ea9f02dd16b705d148e4f6f17ff6d79528b7c6c0431a264c7db2b5c2f79ce5b9",
     "zh:f809ab383cca0a5f83072981c64208cbd7fa67e986a86ee02dd2c82333221e32",
   ]
 }

@@ -23,7 +23,8 @@ AddDevice=/dev/dri
 
 Pod=nogon.pod
 
-Exec=--hf-repo Qwen/Qwen3-Embedding-0.6B-GGUF:F16 --embedding --pooling last --port 8080 --ctx-size 512 --parallel 2 --cache-ram 0 --metrics --log-jsonl
+# The context is shared by two slots. Allow up to 1024 tokens per embedding.
+Exec=--hf-repo Qwen/Qwen3-Embedding-0.6B-GGUF:F16 --embedding --pooling last --port 8080 --ctx-size 2048 --ubatch-size 1024 --parallel 2 --cache-ram 0 --metrics --log-jsonl
 
 [Service]
 ExecStartPre=/usr/bin/mountpoint -q /var/mnt/docker

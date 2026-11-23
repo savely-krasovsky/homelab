@@ -4,8 +4,10 @@ After=reverse-proxy-network.service
 Description=Tangled Knot Quadlet
 
 [Container]
-Image=atcr.io/tangled.org/knot:2
+Image=atcr.io/tangled.org/knot:v1.20.1
 AutoUpdate=registry
+PodmanArgs=--authfile=%t/tangled/registry-auth.json
+Label=io.containers.autoupdate.authfile=%t/tangled/registry-auth.json
 ContainerName=tangled
 
 User=1000:1000
@@ -13,12 +15,14 @@ UserNS=keep-id:uid=1000,gid=1000
 
 Environment=KNOT_HOSTNAME=knot.${base_domain}
 Environment=KNOT_ADMINS="did:web:${base_domain}"
+Environment=KNOT_CONTACT_EMAIL=savely@${base_domain}
 Environment=KNOT_PLC_DIRECTORY=https://plc.directory
 # Existing repositories use SHA-1; use the same object format for new repositories
 Environment=KNOT_GIT_OBJECT_FORMAT=sha1
 Environment=KNOT_LISTEN_ADDR=[::]:5555
 Environment=KNOT_SSH_LISTEN_ADDR=[::]:2222
 Environment=KNOT_SCAN_PATH=/data/repos
+Environment=KNOT_LFS_STORE_PATH=/data/lfs
 Environment=KNOT_SEALED_KEY_FILE=/data/sealed-keys
 Environment=KNOT_SSH_HOST_KEY_FILE=/data/ssh_host_key
 Environment=KNOT_MASTER_KEY_ENV=KNOT_MASTER_KEY
@@ -45,7 +49,10 @@ PublishPort=2222:2222/tcp
 [Service]
 ExecStartPre=/usr/bin/mountpoint -q /var/mnt/docker
 ExecStartPre=/usr/bin/test -d /var/mnt/docker/app_data
-ExecStartPre=/usr/bin/mkdir -p -m 0755 -- /var/mnt/docker/app_data/tangled/knot2
+ExecStartPre=/usr/bin/mkdir -p -m 0755 -- /var/mnt/docker/app_data/tangled/knot2/repos /var/mnt/docker/app_data/tangled/knot2/lfs
+RuntimeDirectory=tangled
+RuntimeDirectoryMode=0700
+ExecStartPre=:/bin/sh -ec 'umask 077; exec /usr/bin/podman secret inspect --showsecret --format={{.SecretData}} atcr-registry-auth > "$RUNTIME_DIRECTORY/registry-auth.json"'
 TimeoutStartSec=900
 Restart=always
 MemoryMax=2G

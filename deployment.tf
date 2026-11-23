@@ -313,7 +313,7 @@ locals {
     tangled = {
       paths   = ["containers/systemd/tangled.container"]
       restart = ["tangled.service"]
-      secrets = ["knot-master-key"]
+      secrets = ["atcr-registry-auth", "knot-master-key"]
     }
 
     telegraf = {

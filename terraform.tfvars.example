@@ -81,6 +81,7 @@ secret_config = {
   }
   podman = {
     "actual-openid-client-secret" = { id = "replace-with-actual-openid-client-secret-bitwarden-secret-id" }
+    "atcr-registry-auth" = { id = "replace-with-atcr-registry-auth-bitwarden-secret-id" }
     "coturn-turn-shared-secret" = { id = "replace-with-coturn-turn-shared-secret-bitwarden-secret-id" }
     "crowdsec-auth-oidc-client-secret" = { id = "replace-with-crowdsec-auth-oidc-client-secret-bitwarden-secret-id" }
     "crowdsec-lapi-password" = { id = "replace-with-crowdsec-lapi-password-bitwarden-secret-id" }

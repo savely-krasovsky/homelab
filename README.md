@@ -129,6 +129,12 @@ resource arguments. After rotation, bump `secret_config.podman.<name>.revision`
 and apply. Names use hyphens; list shared secrets in every consumer's `secrets` field.
 For the ACME token, bump `secret_config.proxmox_acme_cloudflare_token.revision`.
 
+For authenticated Tangled image pulls, store a Podman `auth.json` containing
+only the `atcr.io` entry in Bitwarden and set `secret_config.podman.atcr-registry-auth`.
+Generate the JSON with `podman login --authfile <private-path> atcr.io` using
+an ATCR device credential or an ATProto app password. The Knot service reads
+the Podman secret into a private runtime file for startup and auto-updates.
+
 [Renovate](renovate.json) proposes image/provider updates. Selected images use
 `AutoUpdate=registry`; OpenCloud extensions have a daily update timer.
 

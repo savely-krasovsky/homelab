@@ -216,7 +216,7 @@ endpoints:
     conditions:
       - "[STATUS] == 403"
   - name: "Tangled Knot"
-    url: "https://knot.${base_domain}/xrpc/sh.tangled.knot.version"
+    url: "https://knot.${base_domain}/xrpc/_health"
     <<: *default
     group: "AT Protocol"
     conditions:

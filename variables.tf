@@ -12,15 +12,6 @@ variable "site_config" {
     base_domain = string
     ews_domain  = string
   })
-
-  validation {
-    condition = (
-      length(trimspace(var.site_config.email)) > 0 &&
-      length(trimspace(var.site_config.base_domain)) > 0 &&
-      length(trimspace(var.site_config.ews_domain)) > 0
-    )
-    error_message = "site_config requires non-empty email and domain values."
-  }
 }
 
 variable "network_config" {
@@ -39,27 +30,14 @@ variable "network_config" {
   })
 
   validation {
-    condition = (
-      alltrue([
-        for ip in [
-          var.network_config.public_ip,
-          var.network_config.gateway_ip,
-          var.network_config.dns_ip,
-          var.network_config.pve_ip,
-          var.network_config.fcos_ip,
-          var.network_config.pbs_ip,
-        ] : can(cidrnetmask("${ip}/32"))
-      ]) &&
-      can(regex("^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$", var.network_config.fcos_mac_address)) &&
-      var.network_config.subnet_prefix >= 0 &&
-      var.network_config.subnet_prefix <= 32 &&
-      var.network_config.subnet_prefix == floor(var.network_config.subnet_prefix) &&
-      length(trimspace(var.network_config.bridge)) > 0 &&
-      var.network_config.vlan_id >= 1 &&
-      var.network_config.vlan_id <= 4094 &&
-      var.network_config.vlan_id == floor(var.network_config.vlan_id)
-    )
-    error_message = "network_config requires valid IPv4 addresses, Fedora CoreOS MAC address, subnet prefix, bridge and VLAN ID."
+    condition = alltrue([
+      for ip in [
+        var.network_config.fcos_ip,
+        var.network_config.gateway_ip,
+        var.network_config.dns_ip,
+      ] : can(cidrnetmask("${ip}/32"))
+    ])
+    error_message = "Fedora CoreOS requires IPv4 addresses for fcos_ip, gateway_ip, and dns_ip at boot."
   }
 }
 
@@ -71,11 +49,8 @@ variable "proxmox_config" {
   })
 
   validation {
-    condition = (
-      startswith(var.proxmox_config.endpoint, "https://") &&
-      length(trimspace(var.proxmox_config.node_name)) > 0
-    )
-    error_message = "proxmox_config.endpoint must use HTTPS and node_name must be non-empty."
+    condition     = startswith(var.proxmox_config.endpoint, "https://")
+    error_message = "proxmox_config.endpoint must use HTTPS."
   }
 }
 
@@ -105,11 +80,10 @@ variable "fcos_config" {
 
   validation {
     condition = (
-      length(trimspace(var.fcos_config.hostname)) > 0 &&
       length(var.fcos_config.ssh_authorized_keys.admin) > 0 &&
       length(var.fcos_config.ssh_authorized_keys.applications) > 0
     )
-    error_message = "fcos_config requires a hostname and both SSH key sets."
+    error_message = "Configure at least one SSH key for each of the core and homelab users."
   }
 
   validation {
@@ -118,7 +92,7 @@ variable "fcos_config" {
       can(regex("^[A-Za-z0-9]{6}(-[A-Za-z0-9]{4}){5}-[A-Za-z0-9]{6}$", var.fcos_config.storage.data_pv_uuid)) &&
       alltrue([for path in values(var.fcos_config.storage.shares) : startswith(path, "/") && path != "/"])
     )
-    error_message = "Storage requires an existing /dev/zvol/... device, its LVM PV UUID, and absolute dataset mount paths. No disks or filesystems are created by this configuration."
+    error_message = "Use a /dev/zvol/... device path, an LVM PV UUID, and absolute dataset mount paths below the root directory."
   }
 }
 
@@ -127,11 +101,6 @@ variable "deployment_config" {
   type = object({
     ssh_private_key_path = string
   })
-
-  validation {
-    condition     = length(trimspace(var.deployment_config.ssh_private_key_path)) > 0
-    error_message = "deployment_config.ssh_private_key_path must be non-empty."
-  }
 }
 
 variable "gatus_config" {
@@ -163,21 +132,6 @@ variable "secret_config" {
       revision = optional(number, 1)
     }))
   })
-
-  validation {
-    condition = (
-      length(trimspace(var.secret_config.proxmox_password.id)) > 0 &&
-      length(trimspace(var.secret_config.proxmox_acme_cloudflare_token.id)) > 0 &&
-      var.secret_config.proxmox_acme_cloudflare_token.revision >= 1 &&
-      alltrue([
-        for name, secret in merge(var.secret_config.podman, var.secret_config.gatus) :
-        can(regex("^[a-z0-9]+(-[a-z0-9]+)*$", name)) &&
-        length(trimspace(secret.id)) > 0 &&
-        secret.revision >= 1
-      ])
-    )
-    error_message = "Secret IDs must be non-empty, revisions must be at least 1, and secret names must use lowercase kebab-case."
-  }
 
   validation {
     condition = length(toset(concat(

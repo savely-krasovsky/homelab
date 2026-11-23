@@ -94,15 +94,15 @@
       "allowedVersions": "!/lt2/"
     },
     {
-      "description": "Ignition verifies these tarballs by sha256 and Renovate cannot recompute it. A merged bump leaves the hash stale and the next rebuild dies in the initramfs, so these never open a PR on their own.",
+      "description": "Update Ignition exporter URLs and SHA-256 hashes together in butane/fcos.yml.tftpl.",
       "matchManagers": [
         "custom.regex"
       ],
-      "prBodyNotes": [
-        "Update the `sha256-` hash next to this URL in `butane/fcos.yml.tftpl` in this PR.",
-        "`curl -sL <url> | sha256sum` gives the value. Without it ignition fails at first boot, not at apply."
+      "matchPackageNames": [
+        "prometheus-community/systemd_exporter",
+        "prometheus/node_exporter"
       ],
-      "dependencyDashboardApproval": true
+      "enabled": false
     }
   ],
   "customManagers": [

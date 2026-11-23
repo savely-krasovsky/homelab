@@ -185,7 +185,7 @@ resource "quadlet_podman_secret" "containers" {
   depends_on = [terraform_data.fcos_ready]
 
   name     = each.key
-  value_wo = ephemeral.bitwarden_secrets.containers.values[lower(each.value.id)]
+  value_wo = ephemeral.bitwarden_secret.containers[each.key].value
   version  = tostring(each.value.revision)
 }
 

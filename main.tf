@@ -35,8 +35,9 @@ ephemeral "bitwarden_secret" "proxmox_password" {
   id = var.secret_config.proxmox_password.id
 }
 
-ephemeral "bitwarden_secrets" "containers" {
-  ids = toset([for secret in values(local.podman_secrets) : secret.id])
+ephemeral "bitwarden_secret" "containers" {
+  for_each = local.podman_secrets
+  id       = each.value.id
 }
 
 provider "proxmox" {

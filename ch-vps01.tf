@@ -12,16 +12,17 @@ locals {
   gatus_config_path = abspath("${var.gatus_config.output_directory}/config.yml")
   gatus_config = templatefile("${path.module}/ch-vps01/gatus/config.yml.tftpl", merge(var.gatus_config, {
     base_domain                 = var.site_config.base_domain
-    telegram_token              = ephemeral.bitwarden_secrets.gatus.values[lower(local.gatus_secrets["gatus-telegram-token"].id)]
-    oauth2_client_secret        = ephemeral.bitwarden_secrets.gatus.values[lower(local.gatus_secrets["gatus-oauth2-client-secret"].id)]
-    remnawave_api_token         = ephemeral.bitwarden_secrets.gatus.values[lower(local.gatus_secrets["gatus-remnawave-api-token"].id)]
-    remnawave_subscription_path = ephemeral.bitwarden_secrets.gatus.values[lower(local.gatus_secrets["gatus-remnawave-subscription-path"].id)]
-    healthchecks_ping_url       = ephemeral.bitwarden_secrets.gatus.values[lower(local.gatus_secrets["gatus-healthchecks-ping-url"].id)]
+    telegram_token              = ephemeral.bitwarden_secret.gatus["gatus-telegram-token"].value
+    oauth2_client_secret        = ephemeral.bitwarden_secret.gatus["gatus-oauth2-client-secret"].value
+    remnawave_api_token         = ephemeral.bitwarden_secret.gatus["gatus-remnawave-api-token"].value
+    remnawave_subscription_path = ephemeral.bitwarden_secret.gatus["gatus-remnawave-subscription-path"].value
+    healthchecks_ping_url       = ephemeral.bitwarden_secret.gatus["gatus-healthchecks-ping-url"].value
   }))
 }
 
-ephemeral "bitwarden_secrets" "gatus" {
-  ids = toset([for secret in values(local.gatus_secrets) : secret.id])
+ephemeral "bitwarden_secret" "gatus" {
+  for_each = local.gatus_secrets
+  id       = each.value.id
 }
 
 # Provisioner environments accept ephemeral values; local_sensitive_file does not.

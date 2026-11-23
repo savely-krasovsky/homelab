@@ -145,9 +145,3 @@ Storj at 06:00 and Backblaze at 07:00, PVE local time. OpenTofu manages the jobs
 and their [file-backup hooks](pve/file-backup.sh.tftpl). Logs and results are in PVE Tasks.
 
 Automated restore verification remains to be configured. See [backup boundaries](docs/storage.md).
-
-## Planned
-
-- Consider Flatcar Linux.
-- Harden network configuration.
-- Add `hashicorp/assert` support.

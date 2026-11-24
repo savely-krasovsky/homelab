@@ -46,7 +46,7 @@ and public Traefik routes. HTTP/TLS/TCP probes originated on the external Gatus
 host. An HTTP health response does not establish that a complete
 user workflow or every dependency works.
 
-The Gatus template contains 54 endpoints, including
+The Gatus template contains 51 endpoints, including
 Healthchecks.io, authenticated checks and external authentication-denial checks.
 34 of the 41 applications in `deployment.tf` have at least one direct HTTP check.
 Proxmox VE and Proxmox Backup Server are covered separately by their login pages;

@@ -1,6 +1,0 @@
-http:
-  middlewares:
-    add-victoria-bearer:
-      headers:
-        customRequestHeaders:
-          Authorization: 'Bearer {{ env "VMAUTH_TRAEFIK_BEARER_TOKEN" }}'

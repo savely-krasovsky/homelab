@@ -1,60 +1,96 @@
+sso:
+  - src_host: &logs_host 'logs\.${replace(base_domain, ".", "\\.")}'
+    oidc:
+      <<: &pocket_id_sso
+        issuer: &pocket_id_issuer "https://id.${base_domain}"
+        scopes: [groups]
+        cookie_secret: "%%{VMAUTH_SSO_COOKIE_SECRET}"
+        session_duration: 1h
+      client_id: &logs_client_id "47428bd2-07c1-4f43-85ab-dd1a50f4e1cb"
+      client_secret: "%%{VMAUTH_LOGS_OIDC_CLIENT_SECRET}"
+  - src_host: &metrics_host 'metrics\.${replace(base_domain, ".", "\\.")}'
+    oidc:
+      <<: *pocket_id_sso
+      client_id: &metrics_client_id "6eecc930-a3ce-48a9-8943-372e25bbebc9"
+      client_secret: "%%{VMAUTH_METRICS_OIDC_CLIENT_SECRET}"
+  - src_host: &traces_host 'traces\.${replace(base_domain, ".", "\\.")}'
+    oidc:
+      <<: *pocket_id_sso
+      client_id: &traces_client_id "ad91783b-4225-47ed-9572-19cbe36a293b"
+      client_secret: "%%{VMAUTH_TRACES_OIDC_CLIENT_SECRET}"
+
 users:
-  # Traefik
-  - bearer_token: "%%{VMAUTH_TRAEFIK_BEARER_TOKEN}"
+  - name: logs-sso
+    jwt:
+      oidc:
+        issuer: *pocket_id_issuer
+      match_claims:
+        aud: *logs_client_id
+        groups: homelab_admins
+      default_vm_access_claim: {}
     url_map:
-      - src_hosts:
-          - "metrics\\.${replace(base_domain, ".", "\\\\.")}"
-        url_prefix: "http://127.0.0.1:8428/"
-      - src_hosts:
-          - "logs\\.${replace(base_domain, ".", "\\\\.")}"
+      - src_hosts: [*logs_host]
         url_prefix: "http://127.0.0.1:9428/"
-      - src_hosts:
-          - "traces\\.${replace(base_domain, ".", "\\\\.")}"
+
+  - name: metrics-sso
+    jwt:
+      oidc:
+        issuer: *pocket_id_issuer
+      match_claims:
+        aud: *metrics_client_id
+        groups: homelab_admins
+      default_vm_access_claim: {}
+    url_map:
+      - src_hosts: [*metrics_host]
+        url_prefix: "http://127.0.0.1:8428/"
+
+  - name: traces-sso
+    jwt:
+      oidc:
+        issuer: *pocket_id_issuer
+      match_claims:
+        aud: *traces_client_id
+        groups: homelab_admins
+      default_vm_access_claim: {}
+    url_map:
+      - src_hosts: [*traces_host]
         url_prefix: "http://127.0.0.1:10428/"
-  # Proxmox VE
+
+  # Proxmox VE and Backup Server use the same routes with separate tokens.
   - bearer_token: "%%{VMAUTH_PVE_BEARER_TOKEN}"
-    url_map:
-      - src_hosts:
-          - "metrics\\.${replace(base_domain, ".", "\\\\.")}:443"
+    url_map: &proxmox_routes
+      - src_hosts: ['metrics\.${replace(base_domain, ".", "\\.")}:443']
         url_prefix: "http://127.0.0.1:8428/"
-      - src_hosts:
-          - "logs\\.${replace(base_domain, ".", "\\\\.")}"
+      - src_hosts: ['logs\.${replace(base_domain, ".", "\\.")}']
         url_prefix: "http://127.0.0.1:9428/"
-  # Proxmox Backup Server
   - bearer_token: "%%{VMAUTH_PBS_BEARER_TOKEN}"
-    url_map:
-      - src_hosts:
-          - "metrics\\.${replace(base_domain, ".", "\\\\.")}:443"
-        url_prefix: "http://127.0.0.1:8428/"
-      - src_hosts:
-          - "logs\\.${replace(base_domain, ".", "\\\\.")}"
-        url_prefix: "http://127.0.0.1:9428/"
+    url_map: *proxmox_routes
+
   # Fedora CoreOS
   - bearer_token: "%%{VMAUTH_FEDORA_COREOS_BEARER_TOKEN}"
     url_map:
-      - src_hosts:
-          - "logs\\.${replace(base_domain, ".", "\\\\.")}"
+      - src_hosts: ['logs\.${replace(base_domain, ".", "\\.")}']
         url_prefix: "http://127.0.0.1:9428/"
+
   # Alloy: ingestion and backend self-metrics.
   - bearer_token: "%%{VMAUTH_ALLOY_BEARER_TOKEN}"
+    drop_src_path_prefix_parts: 1
     url_map:
       - src_paths:
           - "/vm/prometheus/api/v1/write"
           - "/vm/opentelemetry/v1/metrics"
           - "/vm/metrics"
-        drop_src_path_prefix_parts: 1
         url_prefix: "http://127.0.0.1:8428/"
       - src_paths:
           - "/vl/insert/loki/api/v1/push"
           - "/vl/insert/opentelemetry/v1/logs"
           - "/vl/metrics"
-        drop_src_path_prefix_parts: 1
         url_prefix: "http://127.0.0.1:9428/"
       - src_paths:
           - "/vt/insert/opentelemetry/v1/traces"
           - "/vt/metrics"
-        drop_src_path_prefix_parts: 1
         url_prefix: "http://127.0.0.1:10428/"
+
   # CrowdSec: readiness and live log reading only, not ingestion or admin APIs.
   - bearer_token: "%%{VMAUTH_CROWDSEC_BEARER_TOKEN}"
     url_map:
@@ -63,15 +99,14 @@ users:
           - "/vl/select/logsql/tail"
         drop_src_path_prefix_parts: 1
         url_prefix: "http://127.0.0.1:9428/"
+
   # Grafana: authenticated access to the existing backend APIs.
   - bearer_token: "%%{VMAUTH_GRAFANA_BEARER_TOKEN}"
+    drop_src_path_prefix_parts: 1
     url_map:
       - src_paths: ["/vm/.*"]
-        drop_src_path_prefix_parts: 1
         url_prefix: "http://127.0.0.1:8428/"
       - src_paths: ["/vl/.*"]
-        drop_src_path_prefix_parts: 1
         url_prefix: "http://127.0.0.1:9428/"
       - src_paths: ["/vt/.*"]
-        drop_src_path_prefix_parts: 1
         url_prefix: "http://127.0.0.1:10428/"

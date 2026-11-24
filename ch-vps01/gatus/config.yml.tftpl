@@ -233,32 +233,24 @@ endpoints:
     <<: *default
     conditions:
       - "[STATUS] == 403"
-  - name: "VictoriaLogs"
-    url: "https://logs.${base_domain}/health"
-    <<: *auth
-    group: "Observability"
-    conditions:
-      - "[STATUS] == 200"
-      - "[BODY] == OK"
-  - name: "VictoriaLogs (External)"
-    url: "https://logs.${base_domain}/health"
-    <<: *default
-    group: "Observability"
-    conditions:
-      - "[STATUS] == 403"
   - name: "VictoriaMetrics"
-    url: "https://metrics.${base_domain}/health"
-    <<: *auth
-    group: "Observability"
-    conditions:
-      - "[STATUS] == 200"
-      - "[BODY] == OK"
-  - name: "VictoriaMetrics (External)"
-    url: "https://metrics.${base_domain}/health"
+    url: "https://metrics.${base_domain}/vmui/"
     <<: *default
     group: "Observability"
     conditions:
-      - "[STATUS] == 403"
+      - "[STATUS] == 401"
+  - name: "VictoriaLogs"
+    url: "https://logs.${base_domain}/select/vmui"
+    <<: *default
+    group: "Observability"
+    conditions:
+      - "[STATUS] == 401"
+  - name: "VictoriaTraces"
+    url: "https://traces.${base_domain}/select/vmui"
+    <<: *default
+    group: "Observability"
+    conditions:
+      - "[STATUS] == 401"
   - name: "Grafana Alloy"
     url: "https://alloy.grafana.${base_domain}/-/healthy"
     <<: *auth
@@ -353,19 +345,6 @@ endpoints:
     conditions:
       - "[STATUS] == 200"
       - "[BODY] == OK"
-  - name: "VictoriaTraces"
-    url: "https://traces.${base_domain}/health"
-    <<: *auth
-    group: "Observability"
-    conditions:
-      - "[STATUS] == 200"
-      - "[BODY] == OK"
-  - name: "VictoriaTraces (External)"
-    url: "https://traces.${base_domain}/health"
-    <<: *default
-    group: "Observability"
-    conditions:
-      - "[STATUS] == 403"
   - name: "Blog"
     url: "https://${base_domain}/"
     <<: *default

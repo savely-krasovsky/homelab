@@ -7,7 +7,11 @@ ContainerName=victoria-vmauth
 
 User=1000:1000
 
-Secret=vmauth-traefik-bearer-token,type=env,target=VMAUTH_TRAEFIK_BEARER_TOKEN
+Secret=vmauth-logs-oidc-client-secret,type=env,target=VMAUTH_LOGS_OIDC_CLIENT_SECRET
+Secret=vmauth-oidc-client-secret,type=env,target=VMAUTH_METRICS_OIDC_CLIENT_SECRET
+Secret=vmauth-traces-oidc-client-secret,type=env,target=VMAUTH_TRACES_OIDC_CLIENT_SECRET
+Secret=vmauth-sso-cookie-secret,type=env,target=VMAUTH_SSO_COOKIE_SECRET
+
 Secret=vmauth-pve-bearer-token,type=env,target=VMAUTH_PVE_BEARER_TOKEN
 Secret=vmauth-pbs-bearer-token,type=env,target=VMAUTH_PBS_BEARER_TOKEN
 Secret=vmauth-fedora-coreos-bearer-token,type=env,target=VMAUTH_FEDORA_COREOS_BEARER_TOKEN
@@ -22,16 +26,13 @@ Label="glance.hide=false"
 
 Label="traefik.enable=true"
 Label="traefik.http.routers.vm.rule=Host(`metrics.${base_domain}`) || Host(`logs.${base_domain}`) || Host(`traces.${base_domain}`)"
-Label="traefik.http.routers.vm.middlewares=oauth2-proxy@file,add-victoria-bearer@file"
-Label="traefik.http.routers.vm.priority=1"
+Label="traefik.http.routers.vm.service=vm"
 Label="traefik.http.services.vm.loadbalancer.server.port=8427"
-Label="traefik.http.routers.vm-api.rule=(Host(`metrics.${base_domain}`) || Host(`logs.${base_domain}`) || Host(`traces.${base_domain}`)) && (HeaderRegexp(`Authorization`, `^Bearer .*$`) || HeaderRegexp(`Authorization`, `^Token .*$`))"
-Label="traefik.http.routers.vm-api.priority=2"
 
 Label="alloy.metrics.enable=true"
-Label="alloy.metrics.port=8427"
+Label="alloy.metrics.port=8426"
 
-Exec=--loggerFormat=json "--auth.config=/etc/auth.yml"
+Exec=--loggerFormat=json --auth.config=/etc/auth.yml --httpInternalListenAddr=:8426
 
 Volume=%E/vmauth/auth.yml:/etc/auth.yml:Z
 

@@ -168,8 +168,11 @@ secret_config = {
     "vmauth-crowdsec-bearer-token" = { id = "replace-with-vmauth-crowdsec-bearer-token-bitwarden-secret-id" }
     "vmauth-fedora-coreos-bearer-token" = { id = "replace-with-vmauth-fedora-coreos-bearer-token-bitwarden-secret-id" }
     "vmauth-grafana-bearer-token" = { id = "replace-with-vmauth-grafana-bearer-token-bitwarden-secret-id" }
+    "vmauth-logs-oidc-client-secret" = { id = "replace-with-vmauth-logs-oidc-client-secret-bitwarden-secret-id" }
+    "vmauth-oidc-client-secret" = { id = "replace-with-vmauth-oidc-client-secret-bitwarden-secret-id" }
     "vmauth-pbs-bearer-token" = { id = "replace-with-vmauth-pbs-bearer-token-bitwarden-secret-id" }
     "vmauth-pve-bearer-token" = { id = "replace-with-vmauth-pve-bearer-token-bitwarden-secret-id" }
-    "vmauth-traefik-bearer-token" = { id = "replace-with-vmauth-traefik-bearer-token-bitwarden-secret-id" }
+    "vmauth-sso-cookie-secret" = { id = "replace-with-vmauth-sso-cookie-secret-bitwarden-secret-id" }
+    "vmauth-traces-oidc-client-secret" = { id = "replace-with-vmauth-traces-oidc-client-secret-bitwarden-secret-id" }
   }
 }

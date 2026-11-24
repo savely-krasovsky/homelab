@@ -340,7 +340,6 @@ locals {
         "remnawave-xhttp-path",
         "traefik-cf-dns-api-token",
         "traefik-crowdsec-lapi-key",
-        "vmauth-traefik-bearer-token",
       ]
     }
 
@@ -367,9 +366,12 @@ locals {
         "vmauth-crowdsec-bearer-token",
         "vmauth-fedora-coreos-bearer-token",
         "vmauth-grafana-bearer-token",
+        "vmauth-logs-oidc-client-secret",
+        "vmauth-oidc-client-secret",
         "vmauth-pbs-bearer-token",
         "vmauth-pve-bearer-token",
-        "vmauth-traefik-bearer-token",
+        "vmauth-sso-cookie-secret",
+        "vmauth-traces-oidc-client-secret",
       ]
     }
 

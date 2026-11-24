@@ -14,7 +14,24 @@ Environment=PDS_HOSTNAME=pds.${base_domain}
 Environment=CRAWLERS=https://bsky.network
 Environment=REPORT_SERVICE_URL=https://mod.bsky.app
 Environment=REPORT_SERVICE_DID=did:plc:ar7c4by46qjdydhdevvrndac
-Secret=tranquil-pds-config,type=mount,target=/etc/tranquil-pds/config.toml,uid=1000,gid=1000,mode=0400
+
+Environment=MAIL_FROM_ADDRESS=noreply+pds@${base_domain}
+Environment=MAIL_SMARTHOST_HOST=smtps-proxy.fastmail.com
+Environment=MAIL_SMARTHOST_PORT=443
+Environment=MAIL_SMARTHOST_TLS=implicit
+Environment=MAIL_SMARTHOST_USERNAME=savely@${base_domain}
+
+Environment=SSO_OIDC_ENABLED=true
+Environment=SSO_OIDC_ISSUER=https://id.${base_domain}
+Environment=SSO_OIDC_CLIENT_ID=cc9b9e9d-0cf9-4704-84e2-e66e88267e56
+Environment=SSO_OIDC_DISPLAY_NAME="Pocket ID"
+
+Secret=tranquil-pds-database-url,type=env,target=DATABASE_URL
+Secret=tranquil-pds-dpop-secret,type=env,target=DPOP_SECRET
+Secret=tranquil-pds-jwt-secret,type=env,target=JWT_SECRET
+Secret=tranquil-pds-master-key,type=env,target=MASTER_KEY
+Secret=tranquil-pds-oauth2-client-secret,type=env,target=SSO_OIDC_CLIENT_SECRET
+Secret=tranquil-pds-smtp-password,type=env,target=MAIL_SMARTHOST_PASSWORD
 
 Label="glance.name=Tranquil PDS"
 Label="glance.url=https://pds.${base_domain}"
@@ -28,6 +45,9 @@ Label="traefik.http.routers.pds.tls.domains[0].main=pds.${base_domain}"
 Label="traefik.http.routers.pds.tls.domains[0].sans=*.pds.${base_domain}"
 Label="traefik.http.routers.pds.tls.certresolver=leresolver"
 Label="traefik.http.services.pds.loadbalancer.server.port=3000"
+
+Label="alloy.metrics.enable=true"
+Label="alloy.metrics.port=3000"
 
 HealthCmd=["/usr/local/bin/tranquil-pds", "healthcheck"]
 HealthInterval=10s

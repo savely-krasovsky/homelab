@@ -157,8 +157,13 @@ secret_config = {
     "synapse-registration-shared-secret" = { id = "replace-with-synapse-registration-shared-secret-bitwarden-secret-id" }
     "traefik-cf-dns-api-token" = { id = "replace-with-traefik-cf-dns-api-token-bitwarden-secret-id" }
     "traefik-crowdsec-lapi-key" = { id = "replace-with-traefik-crowdsec-lapi-key-bitwarden-secret-id" }
-    "tranquil-pds-config" = { id = "replace-with-tranquil-pds-config-bitwarden-secret-id" }
+    "tranquil-pds-database-url" = { id = "replace-with-tranquil-pds-database-url-bitwarden-secret-id" }
+    "tranquil-pds-dpop-secret" = { id = "replace-with-tranquil-pds-dpop-secret-bitwarden-secret-id" }
+    "tranquil-pds-jwt-secret" = { id = "replace-with-tranquil-pds-jwt-secret-bitwarden-secret-id" }
+    "tranquil-pds-master-key" = { id = "replace-with-tranquil-pds-master-key-bitwarden-secret-id" }
+    "tranquil-pds-oauth2-client-secret" = { id = "replace-with-tranquil-pds-oauth2-client-secret-bitwarden-secret-id" }
     "tranquil-pds-postgres-password" = { id = "replace-with-tranquil-pds-postgres-password-bitwarden-secret-id" }
+    "tranquil-pds-smtp-password" = { id = "replace-with-tranquil-pds-smtp-password-bitwarden-secret-id" }
     "vmauth-alloy-bearer-token" = { id = "replace-with-vmauth-alloy-bearer-token-bitwarden-secret-id" }
     "vmauth-crowdsec-bearer-token" = { id = "replace-with-vmauth-crowdsec-bearer-token-bitwarden-secret-id" }
     "vmauth-fedora-coreos-bearer-token" = { id = "replace-with-vmauth-fedora-coreos-bearer-token-bitwarden-secret-id" }

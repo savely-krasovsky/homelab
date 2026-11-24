@@ -349,8 +349,13 @@ locals {
       restart = ["tranquil-pds-pod.service"]
       secrets = [
         "atcr-registry-auth",
-        "tranquil-pds-config",
+        "tranquil-pds-database-url",
+        "tranquil-pds-dpop-secret",
+        "tranquil-pds-jwt-secret",
+        "tranquil-pds-master-key",
+        "tranquil-pds-oauth2-client-secret",
         "tranquil-pds-postgres-password",
+        "tranquil-pds-smtp-password",
       ]
     }
 

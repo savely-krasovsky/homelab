@@ -1,0 +1,28 @@
+[Unit]
+Description=Tranquil PDS PostgreSQL Quadlet
+
+[Container]
+Image=docker.io/library/postgres:19-trixie
+ContainerName=tranquil-pds-postgres
+
+User=1000:1000
+Exec=postgres -c listen_addresses=127.0.0.1
+
+Environment=POSTGRES_USER=tranquil_pds
+Environment=POSTGRES_DB=pds
+Secret=tranquil-pds-postgres-password,type=env,target=POSTGRES_PASSWORD
+
+HealthCmd=pg_isready --quiet --host=127.0.0.1 --dbname=pds --username=tranquil_pds
+HealthInterval=5s
+Notify=healthy
+
+Volume=/var/mnt/docker/app_data/tranquil-pds/postgres:/var/lib/postgresql:Z
+
+Pod=tranquil-pds.pod
+
+[Service]
+ExecStartPre=/usr/bin/mountpoint -q /var/mnt/docker
+ExecStartPre=/usr/bin/test -d /var/mnt/docker/app_data
+ExecStartPre=/usr/bin/mkdir -p -m 0700 -- /var/mnt/docker/app_data/tranquil-pds/postgres
+TimeoutStartSec=900
+Restart=always

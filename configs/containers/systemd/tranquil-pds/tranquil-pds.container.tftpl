@@ -1,0 +1,48 @@
+[Unit]
+Requires=tranquil-pds-postgres.service
+After=tranquil-pds-postgres.service
+Description=Tranquil PDS Quadlet
+
+[Container]
+Image=atcr.io/tranquil.farm/tranquil-pds@sha256:9aa9e28d84b82824701c6aca23d856bdc0747f668124eff722d46c2085aec4a0
+PodmanArgs=--authfile=%t/tranquil-pds/registry-auth.json
+ContainerName=tranquil-pds
+
+User=1000:1000
+
+Environment=PDS_HOSTNAME=pds.${base_domain}
+Environment=CRAWLERS=https://bsky.network
+Environment=REPORT_SERVICE_URL=https://mod.bsky.app
+Environment=REPORT_SERVICE_DID=did:plc:ar7c4by46qjdydhdevvrndac
+Secret=tranquil-pds-config,type=mount,target=/etc/tranquil-pds/config.toml,uid=1000,gid=1000,mode=0400
+
+Label="glance.name=Tranquil PDS"
+Label="glance.url=https://pds.${base_domain}"
+Label="glance.description=ATProto Personal Data Server"
+Label="glance.hide=false"
+
+Label="traefik.enable=true"
+Label="traefik.http.routers.pds.rule=Host(`pds.${base_domain}`) || Host(`*.pds.${base_domain}`)"
+Label="traefik.http.routers.pds.entrypoints=websecure"
+Label="traefik.http.routers.pds.tls.domains[0].main=pds.${base_domain}"
+Label="traefik.http.routers.pds.tls.domains[0].sans=*.pds.${base_domain}"
+Label="traefik.http.routers.pds.tls.certresolver=leresolver"
+Label="traefik.http.services.pds.loadbalancer.server.port=3000"
+
+HealthCmd=["/usr/local/bin/tranquil-pds", "healthcheck"]
+HealthInterval=10s
+Notify=healthy
+
+Volume=/var/mnt/docker/app_data/tranquil-pds/blobs:/var/lib/tranquil-pds/blobs:Z
+
+Pod=tranquil-pds.pod
+
+[Service]
+ExecStartPre=/usr/bin/mountpoint -q /var/mnt/docker
+ExecStartPre=/usr/bin/test -d /var/mnt/docker/app_data
+ExecStartPre=/usr/bin/mkdir -p -m 0700 -- /var/mnt/docker/app_data/tranquil-pds/blobs
+RuntimeDirectory=tranquil-pds
+RuntimeDirectoryMode=0700
+ExecStartPre=:/bin/sh -ec 'umask 077; exec /usr/bin/podman secret inspect --showsecret --format={{.SecretData}} atcr-registry-auth > "$RUNTIME_DIRECTORY/registry-auth.json"'
+TimeoutStartSec=900
+Restart=always

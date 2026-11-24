@@ -14,17 +14,6 @@ locals {
       restart = ["blog.service"]
     }
 
-    bluesky-pds = {
-      paths   = ["containers/systemd/bluesky-pds.container"]
-      restart = ["bluesky-pds.service"]
-      secrets = [
-        "pds-admin-password",
-        "pds-email-smtp-url",
-        "pds-jwt-secret",
-        "pds-plc-rotation-key-k256-private-key-hex",
-      ]
-    }
-
     crowdsec = {
       paths   = ["containers/systemd/crowdsec", "crowdsec"]
       restart = ["crowdsec-pod.service"]
@@ -352,6 +341,16 @@ locals {
         "traefik-cf-dns-api-token",
         "traefik-crowdsec-lapi-key",
         "vmauth-traefik-bearer-token",
+      ]
+    }
+
+    tranquil-pds = {
+      paths   = ["containers/systemd/tranquil-pds"]
+      restart = ["tranquil-pds-pod.service"]
+      secrets = [
+        "atcr-registry-auth",
+        "tranquil-pds-config",
+        "tranquil-pds-postgres-password",
       ]
     }
 

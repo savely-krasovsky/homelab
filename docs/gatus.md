@@ -54,12 +54,12 @@ those checks do not verify backup jobs or restores.
 
 ### Applications with HTTP coverage
 
-`actual-budget`, `blog`, `bluesky-pds`, `crowdsec`, `davmail`, `element-admin`,
+`actual-budget`, `blog`, `crowdsec`, `davmail`, `element-admin`,
 `element-call`, `element-web`, `glance`, `goatcounter`, `gopeed`, `grafana`,
 `grafana-alloy`, `immich`, `karakeep`, `matrix`, `matrix-rtc`, `miniflux`, `nogon`,
 `oauth2-proxy`, `open-webui`, `opencloud`, `opengist`, `outline`, `plex`, `pocket-id`,
 `qbittorrent`, `remark42`, `remnawave`, `stash`, `static-web-server`, `tangled`,
-`traefik` and `victoria`.
+`traefik`, `tranquil-pds` and `victoria`.
 
 Gopeed and Stash use the existing OAuth2 client-credentials checks, with separate
 unauthenticated probes expecting HTTP 403. GoatCounter uses its documented

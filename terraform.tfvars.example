@@ -132,10 +132,6 @@ secret_config = {
     "outline-secret-key" = { id = "replace-with-outline-secret-key-bitwarden-secret-id" }
     "outline-smtp-password" = { id = "replace-with-outline-smtp-password-bitwarden-secret-id" }
     "outline-utils-secret" = { id = "replace-with-outline-utils-secret-bitwarden-secret-id" }
-    "pds-admin-password" = { id = "replace-with-pds-admin-password-bitwarden-secret-id" }
-    "pds-email-smtp-url" = { id = "replace-with-pds-email-smtp-url-bitwarden-secret-id" }
-    "pds-jwt-secret" = { id = "replace-with-pds-jwt-secret-bitwarden-secret-id" }
-    "pds-plc-rotation-key-k256-private-key-hex" = { id = "replace-with-pds-plc-rotation-key-k256-private-key-hex-bitwarden-secret-id" }
     "pocket-id-encryption-key" = { id = "replace-with-pocket-id-encryption-key-bitwarden-secret-id" }
     "pocket-id-maxmind-license-key" = { id = "replace-with-pocket-id-maxmind-license-key-bitwarden-secret-id" }
     "remark42-auth-github-csec" = { id = "replace-with-remark42-auth-github-csec-bitwarden-secret-id" }
@@ -161,6 +157,8 @@ secret_config = {
     "synapse-registration-shared-secret" = { id = "replace-with-synapse-registration-shared-secret-bitwarden-secret-id" }
     "traefik-cf-dns-api-token" = { id = "replace-with-traefik-cf-dns-api-token-bitwarden-secret-id" }
     "traefik-crowdsec-lapi-key" = { id = "replace-with-traefik-crowdsec-lapi-key-bitwarden-secret-id" }
+    "tranquil-pds-config" = { id = "replace-with-tranquil-pds-config-bitwarden-secret-id" }
+    "tranquil-pds-postgres-password" = { id = "replace-with-tranquil-pds-postgres-password-bitwarden-secret-id" }
     "vmauth-alloy-bearer-token" = { id = "replace-with-vmauth-alloy-bearer-token-bitwarden-secret-id" }
     "vmauth-crowdsec-bearer-token" = { id = "replace-with-vmauth-crowdsec-bearer-token-bitwarden-secret-id" }
     "vmauth-fedora-coreos-bearer-token" = { id = "replace-with-vmauth-fedora-coreos-bearer-token-bitwarden-secret-id" }

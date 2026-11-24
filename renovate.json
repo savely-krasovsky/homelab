@@ -107,6 +107,18 @@
   ],
   "customManagers": [
     {
+      "description": "Track CrowdSec Bouncer releases in the Traefik static configuration.",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^configs/traefik/traefik\\.yml\\.tftpl$/"
+      ],
+      "matchStrings": [
+        "(?:^|\\r?\\n)[ \\t]+moduleName:[ \\t]+\"github\\.com/(?<depName>maxlerebourg/crowdsec-bouncer-traefik-plugin)\"[ \\t]*\\r?\\n[ \\t]+version:[ \\t]+\"(?<currentValue>[^\"]+)\""
+      ],
+      "datasourceTemplate": "github-releases",
+      "versioningTemplate": "npm"
+    },
+    {
       "description": "systemd_exporter tarball fetched by ignition; the version appears twice in the URL.",
       "customType": "regex",
       "managerFilePatterns": [

@@ -28,10 +28,6 @@ entryPoints:
         allowEncodedHash: true
     http3: &http3
       advertisedPort: 443
-    # Allow long uploads
-    transport: &transport
-      respondingTimeouts:
-        readTimeout: "0s"
   podmanWeb:
     address: ":80"
     http:
@@ -46,8 +42,6 @@ entryPoints:
       <<: *http_secure
     http3:
       <<: *http3
-    transport:
-      <<: *transport
   imaps:
     address: ":993"
   smtps:

@@ -32,8 +32,6 @@ Label="traefik.enable=true"
 Label="traefik.http.routers.dashboard.rule=Host(`traefik.${base_domain}`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
 Label="traefik.http.routers.dashboard.service=api@internal"
 Label="traefik.http.routers.dashboard.middlewares=oauth2-proxy@file"
-Label="traefik.http.routers.dashboard-auth.rule=Host(`traefik.${base_domain}`) && PathPrefix(`/oauth2/`)"
-Label="traefik.http.routers.dashboard-auth.service=oauth2-proxy"
 
 Volume=%E/traefik/traefik.yml:/etc/traefik/traefik.yml:Z
 Volume=%E/traefik/file:/etc/traefik/file:Z

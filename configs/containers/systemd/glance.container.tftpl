@@ -24,8 +24,6 @@ Label="traefik.enable=true"
 Label="traefik.http.routers.glance.rule=Host(`glance.${base_domain}`)"
 Label="traefik.http.routers.glance.middlewares=oauth2-proxy@file"
 Label="traefik.http.routers.glance.priority=1"
-Label="traefik.http.routers.glance-auth.rule=Host(`glance.${base_domain}`) && PathPrefix(`/oauth2/`)"
-Label="traefik.http.routers.glance-auth.service=oauth2-proxy"
 Label="traefik.http.routers.glance-private.rule=Host(`glance.${base_domain}`) && (ClientIP(`10.88.0.0/15`) || ClientIP(`192.168.0.0/16`))"
 Label="traefik.http.routers.glance-private.priority=2"
 

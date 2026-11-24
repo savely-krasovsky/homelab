@@ -12,8 +12,6 @@ Label="traefik.enable=true"
 Label="traefik.http.routers.stash.rule=Host(`stash.${base_domain}`)"
 Label="traefik.http.routers.stash.middlewares=oauth2-proxy@file"
 Label="traefik.http.services.stash.loadbalancer.server.port=9999"
-Label="traefik.http.routers.stash-auth.rule=Host(`stash.${base_domain}`) && PathPrefix(`/oauth2/`)"
-Label="traefik.http.routers.stash-auth.service=oauth2-proxy"
 
 Environment=STASH_STASH=/data/
 Environment=STASH_METADATA=/metadata/

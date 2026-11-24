@@ -44,6 +44,17 @@ Label="glance.hide=false"
 
 Label="traefik.enable=true"
 Label="traefik.http.routers.oauth2-proxy.rule=Host(`oauth2-proxy.${base_domain}`)"
+Label="traefik.http.routers.oauth2-paths.rule=PathPrefix(`/oauth2/`) && (\
+    Host(`alloy.grafana.${base_domain}`) || \
+    Host(`glance.${base_domain}`) || \
+    Host(`gopeed.${base_domain}`) || \
+    Host(`logs.${base_domain}`) || \
+    Host(`metrics.${base_domain}`) || \
+    Host(`qb.${base_domain}`) || \
+    Host(`stash.${base_domain}`) || \
+    Host(`traces.${base_domain}`) || \
+    Host(`traefik.${base_domain}`))"
+Label="traefik.http.routers.oauth2-paths.service=oauth2-proxy"
 Label="traefik.http.services.oauth2-proxy.loadbalancer.server.port=4180"
 
 Label="alloy.metrics.enable=true"

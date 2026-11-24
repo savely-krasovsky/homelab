@@ -12,8 +12,6 @@ Label="traefik.enable=true"
 Label="traefik.http.routers.gopeed.rule=Host(`gopeed.${base_domain}`)"
 Label="traefik.http.routers.gopeed.middlewares=oauth2-proxy@file"
 Label="traefik.http.services.gopeed.loadbalancer.server.port=9999"
-Label="traefik.http.routers.gopeed-auth.rule=Host(`gopeed.${base_domain}`) && PathPrefix(`/oauth2/`)"
-Label="traefik.http.routers.gopeed-auth.service=oauth2-proxy"
 
 Volume=/var/mnt/docker/app_data/gopeed:/app/storage:Z
 Volume=/var/mnt/random:/app/Downloads

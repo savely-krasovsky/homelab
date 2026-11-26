@@ -4,12 +4,12 @@ terraform {
   required_providers {
     proxmox = {
       source  = "bpg/proxmox"
-      version = "0.123.1"
+      version = "0.124.0"
     }
     bitwarden = {
       source = "maxlaverse/bitwarden"
       # Ephemeral secrets use the Bitwarden fork configured in .terraformrc.
-      version = "0.23.0"
+      version = "0.24.0"
     }
     ct = {
       source  = "poseidon/ct"

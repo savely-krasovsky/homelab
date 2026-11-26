@@ -278,6 +278,11 @@ locals {
       restart = ["rmqtt.service"]
     }
 
+    silverbullet = {
+      paths   = ["containers/systemd/silverbullet.container"]
+      restart = ["silverbullet.service"]
+    }
+
     socks5 = {
       paths   = ["containers/systemd/socks5.container", "socks5/3proxy.cfg"]
       restart = ["socks5.service"]

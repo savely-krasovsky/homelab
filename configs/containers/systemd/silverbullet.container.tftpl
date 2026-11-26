@@ -1,0 +1,34 @@
+[Unit]
+Requires=reverse-proxy-network.service
+After=reverse-proxy-network.service
+Description=SilverBullet
+
+[Container]
+Image=ghcr.io/silverbulletmd/silverbullet:3.0.1
+ContainerName=silverbullet
+
+UserNS=keep-id
+
+Label="glance.name=SilverBullet"
+Label="glance.icon=di:silverbullet.png"
+Label="glance.url=https://silverbullet.${base_domain}"
+Label="glance.description=Markdown notes"
+Label="glance.hide=false"
+
+Label="traefik.enable=true"
+Label="traefik.http.routers.silverbullet.rule=Host(`silverbullet.${base_domain}`)"
+Label="traefik.http.services.silverbullet.loadbalancer.server.port=3000"
+
+Volume=/var/mnt/docker/app_data/silverbullet:/data:Z
+
+Network=systemd-reverse-proxy
+
+[Service]
+ExecStartPre=/usr/bin/mountpoint -q /var/mnt/docker
+ExecStartPre=/usr/bin/test -d /var/mnt/docker/app_data
+ExecStartPre=/usr/bin/mkdir -p -m 0700 -- /var/mnt/docker/app_data/silverbullet
+TimeoutStartSec=900
+Restart=always
+
+[Install]
+WantedBy=default.target

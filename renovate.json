@@ -87,6 +87,17 @@
       "dependencyDashboardApproval": true
     },
     {
+      "description": "Track each OpenCloud extension's releases using its tag prefix.",
+      "matchManagers": [
+        "quadlet"
+      ],
+      "matchPackageNames": [
+        "docker.io/opencloudeu/web-extensions"
+      ],
+      "versionCompatibility": "^(?<compatibility>[a-z0-9-]+)-(?<version>\\d+\\.\\d+\\.\\d+)$",
+      "versioning": "semver"
+    },
+    {
       "description": "qBittorrent also ships libtorrent 2.x builds as 5.2.3-lt2-1. Semver ranks that suffix above 5.2.3-1, so Renovate would read a different build line as an upgrade.",
       "matchPackageNames": [
         "docker.io/qbittorrentofficial/qbittorrent-nox"

@@ -3,6 +3,32 @@
 Fedora CoreOS on Proxmox, rootless Podman and Quadlet applications managed with OpenTofu.
 Adapt storage, networking and accounts before using this configuration elsewhere.
 
+## Architecture
+
+```mermaid
+flowchart TB
+    tofu["OpenTofu"]
+    gatus["Gatus on a separate VPS"]
+
+    subgraph host["Proxmox host"]
+        pve["Proxmox VE"]
+        fcos["Fedora CoreOS VM<br/>Quadlet applications"]
+        pbs["Proxmox Backup Server VM"]
+
+        pve -->|VM and ZFS storage| fcos
+        pve -->|Disk and file backups| pbs
+    end
+
+    tofu -. Provisions VM .-> pve
+    tofu -. Deploys apps over SSH .-> fcos
+    gatus -->|Availability checks| fcos
+    pbs -->|S3| cloud["Backblaze B2 and Storj"]
+```
+
+Traefik, Alloy, Victoria and Grafana run alongside the other Quadlet applications.
+Traefik proxies the PVE and PBS web UIs and sends telemetry to Alloy.
+Victoria also receives metrics and logs from PVE and PBS.
+
 ## Layout
 
 - Fedora CoreOS VM and first-boot configuration in [fcos.tf](fcos.tf) and [butane/](butane/).

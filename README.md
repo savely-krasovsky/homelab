@@ -1,4 +1,4 @@
-# Experimental Homelab
+# (Not So) Experimental Homelab
 
 Fedora CoreOS on Proxmox, rootless Podman and Quadlet applications managed with OpenTofu.
 Adapt storage, networking and accounts before using this configuration elsewhere.

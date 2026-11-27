@@ -187,8 +187,6 @@ locals {
       paths = [
         "containers/systemd/opencloud",
         "opencloud",
-        "systemd/user/opencloud-extensions-update.service",
-        "systemd/user/opencloud-extensions-update.timer",
         "systemd/user/opencloud.target",
       ]
       restart = ["opencloud.target"]

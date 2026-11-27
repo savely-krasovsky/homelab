@@ -3,9 +3,7 @@ PartOf=opencloud.target
 Description=OpenCloud Unzip Extension Quadlet
 
 [Container]
-Image=docker.io/opencloudeu/web-extensions:unzip-latest
-# The daily timer reruns this oneshot; keep cached assets usable when offline.
-Pull=newer
+Image=docker.io/opencloudeu/web-extensions:unzip-2.2.3
 ContainerName=opencloud-unzip
 
 User=1000:1000

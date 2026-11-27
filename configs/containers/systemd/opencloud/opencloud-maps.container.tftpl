@@ -3,9 +3,7 @@ PartOf=opencloud.target
 Description=OpenCloud Maps Extension Quadlet
 
 [Container]
-Image=docker.io/opencloudeu/web-extensions:maps-latest
-# The daily timer reruns this oneshot; keep cached assets usable when offline.
-Pull=newer
+Image=docker.io/opencloudeu/web-extensions:maps-3.1.1
 ContainerName=opencloud-maps
 
 User=1000:1000

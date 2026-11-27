@@ -3,9 +3,7 @@ PartOf=opencloud.target
 Description=OpenCloud JSON Viewer Extension Quadlet
 
 [Container]
-Image=docker.io/opencloudeu/web-extensions:json-viewer-latest
-# The daily timer reruns this oneshot; keep cached assets usable when offline.
-Pull=newer
+Image=docker.io/opencloudeu/web-extensions:json-viewer-2.1.0
 ContainerName=opencloud-jsonviewer
 
 User=1000:1000

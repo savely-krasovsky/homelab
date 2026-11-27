@@ -3,9 +3,7 @@ PartOf=opencloud.target
 Description=OpenCloud Draw.io Extension Quadlet
 
 [Container]
-Image=docker.io/opencloudeu/web-extensions:draw-io-latest
-# The daily timer reruns this oneshot; keep cached assets usable when offline.
-Pull=newer
+Image=docker.io/opencloudeu/web-extensions:draw-io-2.2.1
 ContainerName=opencloud-drawio
 
 User=1000:1000

@@ -1,8 +1,0 @@
-[Unit]
-PartOf=opencloud.target
-Description=Refresh OpenCloud extensions daily
-
-[Timer]
-OnCalendar=daily
-RandomizedDelaySec=15m
-Persistent=true

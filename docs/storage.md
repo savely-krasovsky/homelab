@@ -2,7 +2,7 @@
 
 Prepare the encrypted `spool` pool, zvol and datasets on PVE before applying
 OpenTofu. Fedora CoreOS expects `spool/docker` to already contain `vg0/lv0`
-formatted as XFS. The zvol is 200 GiB and the logical volume is 100 GiB.
+formatted as XFS. The zvol is 200 GiB and the logical volume is 150 GiB.
 [VM attachments](../fcos.tf) and [directory mappings](../storage.tf) use this
 existing storage. Keep the zvol's device path absolute and `datastore_id` empty
 so it survives VM replacement.

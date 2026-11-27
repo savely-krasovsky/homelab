@@ -1,32 +1,29 @@
 # Gatus
 
-## Rootless Docker network on ch-vps01
+Gatus runs on a separate VPS. The [Gatus template](../ch-vps01/gatus/config.yml.tftpl)
+defines the external checks.
 
-Install the standard Debian `passt` package. Copy
-[`10-pasta.conf`](../ch-vps01/docker/10-pasta.conf) to
-`/home/docker-user/.config/systemd/user/docker.service.d/10-pasta.conf`.
-The drop-in selects `pasta`; Docker uses its default `implicit` port driver.
-IPv6 is enabled to preserve the existing IPv4 and IPv6 listeners on ports
-8080 and 8443. MTU, DNS and other network settings use Docker defaults.
+## Render locally
 
-Run `systemctl --user daemon-reload` and restart `docker.service` as
-`docker-user`. Start the existing containers after the daemon restart:
-their `on-failure` restart policy does not start them after a daemon restart.
-Check both address families and outbound HTTPS from the container network.
+Render from the repository root.
 
-This replaces the `gvisor-tap-vsock` backend whose pending TCP connection
-limit can stall Healthchecks.io heartbeats when home endpoints are unreachable.
+```sh
+tofu apply -target=terraform_data.gatus_config
+```
 
-To return to the previous backend, set
-`DOCKERD_ROOTLESS_ROOTLESSKIT_NET=gvisor-tap-vsock` in the drop-in, remove the
-IPv6 flag, and restart Docker and the existing containers. Removing the drop-in
-alone would still select the installed `pasta` automatically.
+To regenerate a deleted file or force a fresh render, use this command.
+
+```sh
+tofu apply -target=terraform_data.gatus_config -replace=terraform_data.gatus_config
+```
+
+The rendered file contains secrets and is written with mode `0600`.
+Upload it separately after rendering.
 
 ## Upload to the monitoring host
 
-From the repository root, upload the rendered config and restart Gatus as
-`docker-user`; enter the SSH user's sudo password when prompted.
-Replace the example SSH destination below with the monitoring host.
+From the repository root, replace the example SSH destination with the monitoring
+host and run the upload. Enter the SSH user's sudo password when prompted.
 
 ```sh
 gatus_host=admin@monitor.example.com
@@ -39,52 +36,18 @@ scp -p "$(tofu output -raw gatus_config_path)" "$gatus_host:/tmp/gatus-config.ym
        docker compose -f /home/docker-user/compose.yml restart gatus'
 ```
 
-## Coverage
+Check that the affected probes pass in Gatus after the restart.
 
-Last checked on 2026-09-25 against `deployment.tf`, the running Fedora CoreOS containers
-and public Traefik routes. HTTP/TLS/TCP probes originated on the external Gatus
-host. An HTTP health response does not establish that a complete
-user workflow or every dependency works.
+## Rootless Docker network on ch-vps01
 
-The Gatus template contains 51 endpoints, including
-Healthchecks.io, authenticated checks and external authentication-denial checks.
-34 of the 41 applications in `deployment.tf` have at least one direct HTTP check.
-Proxmox VE and Proxmox Backup Server are covered separately by their login pages;
-those checks do not verify backup jobs or restores.
+Install Debian's `passt` package and copy
+[`10-pasta.conf`](../ch-vps01/docker/10-pasta.conf) to
+`/home/docker-user/.config/systemd/user/docker.service.d/10-pasta.conf`.
 
-### Applications with HTTP coverage
+Run `systemctl --user daemon-reload` and restart `docker.service` as
+`docker-user`. Start the existing containers manually after restarting Docker
+because they use the `on-failure` policy. Check both address families and
+outbound HTTPS from the container network.
 
-`actual-budget`, `blog`, `crowdsec`, `davmail`, `element-admin`,
-`element-call`, `element-web`, `glance`, `goatcounter`, `gopeed`, `grafana`,
-`grafana-alloy`, `immich`, `karakeep`, `matrix`, `matrix-rtc`, `miniflux`, `nogon`,
-`oauth2-proxy`, `open-webui`, `opencloud`, `opengist`, `outline`, `plex`, `pocket-id`,
-`qbittorrent`, `remark42`, `remnawave`, `stash`, `static-web-server`, `tangled`,
-`traefik`, `tranquil-pds` and `victoria`.
-
-Gopeed and Stash use the existing OAuth2 client-credentials checks, with separate
-unauthenticated probes expecting HTTP 403. GoatCounter uses its documented
-[`/status`](https://github.com/arp242/goatcounter#management) JSON response;
-Remark42 uses [`/ping`](https://github.com/umputun/remark42/blob/master/compose-e2e-test.yml).
-
-Remnawave Subscription checks a real subscription page with a browser User-Agent,
-expecting HTTP 200 and the HTML application root. Its path is stored in BWS;
-the URL, request errors and expanded failed conditions are hidden in Gatus.
-This check passed locally on 2026-09-25; verification from the VPS is pending.
-
-### Applications without a Gatus check
-
-| Application | Current boundary |
-| --- | --- |
-| `forward-info-bot` | No published HTTP route; process liveness and Telegram operation need separate monitoring. |
-| `masked-email-bot` | Public OAuth callback service exists, but `/`, `/health` and `/healthz` return 404. A documented health endpoint is needed. |
-| `prometheus-podman-exporter` | Internal exporter; no public route from the external Gatus instance. |
-| `prusa-exporter` | Internal exporter with a printer telemetry input; no public health route. |
-| `rmqtt` | MQTT is restricted to the configured gateway by the Fedora CoreOS firewall; external Gatus cannot directly probe it. |
-| `step-ca` | HTTPS uses the homelab CA. The current VPS trust store rejects its certificate. Configure trust in the Gatus container before adding a verified HTTPS health check. |
-| `telegraf` | Internal collection/forwarding agent without a published health route. |
-
-These containers were running during the audit; that observation is not an ongoing
-Gatus check. Internal PostgreSQL/Valkey instances, the socket proxy, model workers,
-one-shot OpenCloud extension containers and other dependencies also have no
-individual external Gatus status. Podman health checks and Alloy scrape targets
-provide different evidence from an external availability probe.
+Pasta avoids the pending-connection limit that previously stalled Healthchecks.io
+heartbeats when home endpoints were unreachable.

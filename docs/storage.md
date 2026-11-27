@@ -1,35 +1,24 @@
 # Storage
 
-PVE owns the encrypted `spool` pool; Fedora CoreOS receives its zvol and VirtIO-FS shares.
-Host storage configuration is managed outside OpenTofu.
-
-| Data | PVE attachment | Fedora CoreOS mount | VM backup |
-| --- | --- | --- | --- |
-| `spool/docker`, 200 GiB zvol | `scsi1`, `/dev/zvol/spool/docker` | `vg0/lv0`, 100 GiB XFS, `/var/mnt/docker` | `backup=1` |
-| `spool/media` | `homelab-media`, `virtiofs0` | `/var/mnt/media` | No |
-| `spool/personal` | `homelab-personal`, `virtiofs1` | `/var/mnt/personal` | No |
-| `spool/observability` | `homelab-observability`, `virtiofs2` | `/var/mnt/observability` | No |
-| `spool/random` | `homelab-random`, `virtiofs3` | `/var/mnt/random` | No |
-
-PVE GUI: pool under **Node → Disks → ZFS**, directory mappings under
-**Datacenter → Resource Mappings → Directory**, attachments under **VM → Hardware**.
-The zvol uses an absolute device path and empty `datastore_id`; PVE does not delete it with the VM.
+Prepare the encrypted `spool` pool, zvol and datasets on PVE before applying
+OpenTofu. Fedora CoreOS expects `spool/docker` to already contain `vg0/lv0`
+formatted as XFS. The zvol is 200 GiB and the logical volume is 100 GiB.
+[VM attachments](../fcos.tf) and [directory mappings](../storage.tf) use this
+existing storage. Keep the zvol's device path absolute and `datastore_id` empty
+so it survives VM replacement.
 
 ## Boot and unlock
 
-Boot order: pool import → key loading → shared mounts → guest autostart.
-
-- `zfs-import-cache.service` imports pools from `/etc/zfs/zpool.cache`.
-- `zfs-load-key@spool.service` runs `zfs load-key spool`, reading `/etc/zfs/keys/spool.key`.
-  All children, including `docker`, use `encryptionroot=spool` and unlock together.
-- ZED maintains `/etc/zfs/zfs-list.cache/spool`; `zfs-mount-generator` uses it to
-  generate the key-loading service and four `mnt-spool-*.mount` units.
-- `spool` has `mountpoint=/mnt/spool`, `canmount=off`; the four shared datasets use `canmount=on`.
+PVE imports the pool from `/etc/zfs/zpool.cache`, loads the key, and mounts the
+shared datasets before guest autostart. All children use `encryptionroot=spool`
+and unlock together using `/etc/zfs/keys/spool.key`.
+ZED maintains `/etc/zfs/zfs-list.cache/spool` for `zfs-mount-generator`.
+The pool root uses `mountpoint=/mnt/spool` and `canmount=off`.
 
 The key directory/file are `root:root`, modes 0700/0600. Keep a separate key copy outside Git.
 The key is on unencrypted `rpool`, so encryption does not protect against theft of the whole server.
 
-All four shares have the same boot dependencies, already configured:
+Set the boot dependencies on all four shares when configuring the host.
 
 ```sh
 for dataset in media personal observability random; do
@@ -39,20 +28,19 @@ for dataset in media personal observability random; do
 done
 ```
 
-This is a homelab policy using [OpenZFS systemd properties](https://openzfs.github.io/openzfs-docs/man/master/8/zfs-mount-generator.8.html#properties).
-A mount failure blocks the common `pve-guests.service` autostart. Manual VM starts bypass this dependency.
 After changing properties, let ZED update the cache, then run `systemctl daemon-reload`.
+A mount failure blocks `pve-guests.service` autostart. Manual VM starts bypass this dependency.
 
 ## Fedora CoreOS
 
 [Butane](../butane/fcos.yml.tftpl) activates the existing `vg0` by PV UUID and
-requires all five mounts before starting `user@1000.service`; it creates no PV/VG/LV.
-VirtIO-FS shares use `container_file_t`, so container bind mounts need no `z`/`Z`.
-Local XFS data still needs `Z` for private paths or `z` for shared paths.
+waits for all mounts before starting the application user manager. VirtIO-FS
+shares already have the `container_file_t` context. On local XFS paths, use
+`Z` for private container bind mounts and `z` for shared ones.
 
 ## Checks and recovery
 
-On PVE:
+Run these checks on PVE.
 
 ```sh
 zpool status spool
@@ -62,7 +50,7 @@ systemctl status zfs-load-key@spool.service
 systemctl show pve-guests.service -p Requires -p After
 ```
 
-After fixing an unlock or mount error:
+After fixing an unlock or mount error, start the shared mounts.
 
 ```sh
 systemctl start mnt-spool-media.mount mnt-spool-personal.mount mnt-spool-observability.mount mnt-spool-random.mount
@@ -73,26 +61,16 @@ and check that `/dev/zvol/spool/docker` exists.
 
 ## Backups
 
-[`backups.tf`](../backups.tf) manages two jobs under **Datacenter → Backup**:
+The [PVE jobs](../backups.tf) back up the application disk to PBS. The
+[file-backup hook](../pve/file-backup.sh.tftpl) backs up `personal` and
+`observability` separately as `host/homelab-files` using the same PBS storage
+credentials and keys. PBS prune jobs manage file archive retention. See PVE Tasks
+for job and hook output.
 
-| Job | PVE local time | PBS storage |
-| --- | --- | --- |
-| `fcos-storj` | 06:00 | `pbs-storj` |
-| `fcos-backblaze` | 07:00 | `pbs-backblaze` |
-
-Each job backs up the Fedora CoreOS application disk, then its `job-end` hook snapshots
-`personal` and `observability`, uploads them to the same PBS destination and removes
-the snapshots. OpenTofu renders one executable [snippet](../pve/file-backup.sh.tftpl)
-per cloud under `/var/lib/vz/snippets/`. PVE Tasks includes the hook output and failures.
-Jobs share PVE's backup lock; overlapping runs wait subject to PVE's lock timeout.
-
-The hooks reuse `/etc/pve/priv/storage/pbs-{storj,backblaze}.{pw,enc}` credentials
-and keys. File archives remain separate as `host/homelab-files` in PBS;
-PBS prune jobs manage their retention. `media` and `random` are not included.
-
-Excluded data: Immich thumbnails/transcodes (keeping `.immich` markers), OpenCloud
-thumbnails/search index, and VictoriaMetrics cache/tmp. Regenerate derived data after restore.
-File snapshots are not coordinated with applications or the separate VM backup;
-restores need an application-level consistency check. Automated restore tests are not configured.
+VM backups omit the OS disk. File backups omit
+`media`, `random` and the derived data listed in the hook. Regenerate derived
+data after restoring. File snapshots are taken independently of application
+writes and the VM backup. Check application consistency after a restore.
+Restore verification is manual.
 
 After a power loss, check for leftover `@pbs-files-*` snapshots.

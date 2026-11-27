@@ -176,11 +176,9 @@ locals {
       paths   = ["containers/systemd/open-webui"]
       restart = ["open-webui-pod.service"]
       secrets = [
-        "open-webui-anthropic-api-key",
-        "open-webui-google-api-key",
         "open-webui-google-drive-api-key",
         "open-webui-oauth-client-secret",
-        "open-webui-openai-api-key",
+        "open-webui-pocket-id-client-secret",
         "open-webui-secret-key",
       ]
     }

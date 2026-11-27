@@ -116,11 +116,9 @@ secret_config = {
     "nogon-oidc-client-secret" = { id = "replace-with-nogon-oidc-client-secret-bitwarden-secret-id" }
     "oauth2-proxy-client-secret" = { id = "replace-with-oauth2-proxy-client-secret-bitwarden-secret-id" }
     "oauth2-proxy-cookie-secret" = { id = "replace-with-oauth2-proxy-cookie-secret-bitwarden-secret-id" }
-    "open-webui-anthropic-api-key" = { id = "replace-with-open-webui-anthropic-api-key-bitwarden-secret-id" }
-    "open-webui-google-api-key" = { id = "replace-with-open-webui-google-api-key-bitwarden-secret-id" }
     "open-webui-google-drive-api-key" = { id = "replace-with-open-webui-google-drive-api-key-bitwarden-secret-id" }
     "open-webui-oauth-client-secret" = { id = "replace-with-open-webui-oauth-client-secret-bitwarden-secret-id" }
-    "open-webui-openai-api-key" = { id = "replace-with-open-webui-openai-api-key-bitwarden-secret-id" }
+    "open-webui-pocket-id-client-secret" = { id = "replace-with-open-webui-pocket-id-client-secret-bitwarden-secret-id" }
     "open-webui-secret-key" = { id = "replace-with-open-webui-secret-key-bitwarden-secret-id" }
     "opencloud-collabora-password" = { id = "replace-with-opencloud-collabora-password-bitwarden-secret-id" }
     "opencloud-collabora-proof-key" = { id = "replace-with-opencloud-collabora-proof-key-bitwarden-secret-id" }

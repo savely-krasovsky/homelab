@@ -1,0 +1,19 @@
+[Unit]
+Description=Open WebUI OpenAI federation proxy
+
+[Container]
+Image=ghcr.io/open-webui/open-webui:v0.13.5
+ContainerName=open-webui-openai
+Exec=python /usr/local/bin/openai-federation.py
+
+Environment=POCKET_ID_TOKEN_URL=https://id.${base_domain}/api/oidc/token
+Environment=POCKET_ID_CLIENT_ID=036a76a9-ff33-42c7-b15f-037dc437f2a5
+Environment=OPENAI_IDENTITY_PROVIDER_ID=idp_23f3472b0acd6d08a9b9386b
+Environment=OPENAI_SERVICE_ACCOUNT_ID=user-45jkJYIEGd6PSav0uHZa1bLG
+Secret=open-webui-pocket-id-client-secret,mode=0400
+
+Volume=./openai-federation.py:/usr/local/bin/openai-federation.py:ro,Z
+Pod=open-webui.pod
+
+[Service]
+Restart=always
